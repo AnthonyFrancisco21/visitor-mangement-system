@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+datasource db {
+  provider = "postgresql"
+  // url is removed from here in Prisma 7
+}
+
+generator client {
+  provider = "prisma-client" // Changed from prisma-client-js in v7
+  output   = "../generated/client"
+}
+
+enum UserRole {
+  ADMIN
+  RECEPTIONIST
+}
+
+enum VisitStatus {
+  PENDING    // Finished Kiosk, waiting for Receptionist
+  ACTIVE     // Receptionist tapped RFID, visitor is inside
+  COMPLETED  // Visitor tapped RFID to exit
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(RECEPTIONIST)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Visitor {
+  id             String   @id @default(cuid())
+  // Extracted from ID OCR
+  fullName       String
+  birthDate      String?
+  contactNumber  String?
+  idType         String?  // e.g., Unified ID, Driver's License
+  idNumber       String?  @unique
+  
+  // Photos
+  idPhotoUrl     String?  // URL to the stored OCR scan
+  visitorPhotoUrl String? // URL to the live capture photo
+  
+  visits         Visit[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Destination {
+  id             String   @id @default(cuid())
+  floor          String
+  name           String   // Department name or Condo Unit number
+  headName       String   // Head of Dept or Unit Owner
+  description    String?
+  
+  visits         VisitDestination[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Visit {
+  id           String      @id @default(cuid())
+  visitorId    String
+  visitor      Visitor     @relation(fields: [visitorId], references: [id])
+  
+  status       VisitStatus @default(PENDING)
+  
+  // RFID Logic
+  rfidUid      String?     // This is populated when the Receptionist confirms
+  
+  // Timing
+  timeIn       DateTime?   // Set when status becomes ACTIVE
+  timeOut      DateTime?   // Set when status becomes COMPLETED
+  
+  // Relationship to multiple destinations
+  destinations VisitDestination[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([rfidUid])
+}
+
+// Explicit many-to-many junction table for Visit <-> Destination
+model VisitDestination {
+  visitId       String
+  visit         Visit       @relation(fields: [visitId], references: [id])
+  destinationId String
+  destination   Destination @relation(fields: [destinationId], references: [id])
+
+  @@id([visitId, destinationId])
+}
