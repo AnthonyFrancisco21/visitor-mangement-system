@@ -11,6 +11,7 @@
 export type * from './models/User'
 export type * from './models/Visitor'
 export type * from './models/Destination'
+export type * from './models/RfidCard'
 export type * from './models/Visit'
 export type * from './models/VisitDestination'
 export type * from './commonInputTypes'

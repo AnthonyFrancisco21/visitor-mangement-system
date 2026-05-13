@@ -20,7 +20,29 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 export const VisitStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
-  COMPLETED: 'COMPLETED'
+  COMPLETED: 'COMPLETED',
+  REVOKED: 'REVOKED'
 } as const
 
 export type VisitStatus = (typeof VisitStatus)[keyof typeof VisitStatus]
+
+
+export const RevokeReason = {
+  LOST_CARD: 'LOST_CARD',
+  FORGOT_TO_CHECK_OUT: 'FORGOT_TO_CHECK_OUT',
+  EMERGENCY_EXIT: 'EMERGENCY_EXIT',
+  END_OF_DAY: 'END_OF_DAY',
+  OTHER: 'OTHER'
+} as const
+
+export type RevokeReason = (typeof RevokeReason)[keyof typeof RevokeReason]
+
+
+export const RfidCardStatus = {
+  AVAILABLE: 'AVAILABLE',
+  IN_USE: 'IN_USE',
+  LOST: 'LOST',
+  RETIRED: 'RETIRED'
+} as const
+
+export type RfidCardStatus = (typeof RfidCardStatus)[keyof typeof RfidCardStatus]

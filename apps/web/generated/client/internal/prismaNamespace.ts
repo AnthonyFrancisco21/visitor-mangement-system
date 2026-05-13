@@ -387,6 +387,7 @@ export const ModelName = {
   User: 'User',
   Visitor: 'Visitor',
   Destination: 'Destination',
+  RfidCard: 'RfidCard',
   Visit: 'Visit',
   VisitDestination: 'VisitDestination'
 } as const
@@ -404,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "visitor" | "destination" | "visit" | "visitDestination"
+    modelProps: "user" | "visitor" | "destination" | "rfidCard" | "visit" | "visitDestination"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -630,6 +631,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RfidCard: {
+      payload: Prisma.$RfidCardPayload<ExtArgs>
+      fields: Prisma.RfidCardFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RfidCardFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RfidCardFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>
+        }
+        findFirst: {
+          args: Prisma.RfidCardFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RfidCardFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>
+        }
+        findMany: {
+          args: Prisma.RfidCardFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>[]
+        }
+        create: {
+          args: Prisma.RfidCardCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>
+        }
+        createMany: {
+          args: Prisma.RfidCardCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RfidCardCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>[]
+        }
+        delete: {
+          args: Prisma.RfidCardDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>
+        }
+        update: {
+          args: Prisma.RfidCardUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>
+        }
+        deleteMany: {
+          args: Prisma.RfidCardDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RfidCardUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RfidCardUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>[]
+        }
+        upsert: {
+          args: Prisma.RfidCardUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfidCardPayload>
+        }
+        aggregate: {
+          args: Prisma.RfidCardAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRfidCard>
+        }
+        groupBy: {
+          args: Prisma.RfidCardGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RfidCardGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RfidCardCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RfidCardCountAggregateOutputType> | number
+        }
+      }
+    }
     Visit: {
       payload: Prisma.$VisitPayload<ExtArgs>
       fields: Prisma.VisitFieldRefs
@@ -823,6 +898,7 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   role: 'role',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -834,6 +910,7 @@ export const VisitorScalarFieldEnum = {
   id: 'id',
   fullName: 'fullName',
   birthDate: 'birthDate',
+  address: 'address',
   contactNumber: 'contactNumber',
   idType: 'idType',
   idNumber: 'idNumber',
@@ -848,10 +925,11 @@ export type VisitorScalarFieldEnum = (typeof VisitorScalarFieldEnum)[keyof typeo
 
 export const DestinationScalarFieldEnum = {
   id: 'id',
-  floor: 'floor',
   name: 'name',
+  floor: 'floor',
   headName: 'headName',
   description: 'description',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -859,13 +937,31 @@ export const DestinationScalarFieldEnum = {
 export type DestinationScalarFieldEnum = (typeof DestinationScalarFieldEnum)[keyof typeof DestinationScalarFieldEnum]
 
 
+export const RfidCardScalarFieldEnum = {
+  id: 'id',
+  uid: 'uid',
+  label: 'label',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RfidCardScalarFieldEnum = (typeof RfidCardScalarFieldEnum)[keyof typeof RfidCardScalarFieldEnum]
+
+
 export const VisitScalarFieldEnum = {
   id: 'id',
   visitorId: 'visitorId',
   status: 'status',
-  rfidUid: 'rfidUid',
+  isManualEntry: 'isManualEntry',
+  rfidCardId: 'rfidCardId',
   timeIn: 'timeIn',
   timeOut: 'timeOut',
+  revokeReason: 'revokeReason',
+  revokeNote: 'revokeNote',
+  confirmedById: 'confirmedById',
+  revokedById: 'revokedById',
+  reason: 'reason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -875,7 +971,8 @@ export type VisitScalarFieldEnum = (typeof VisitScalarFieldEnum)[keyof typeof Vi
 
 export const VisitDestinationScalarFieldEnum = {
   visitId: 'visitId',
-  destinationId: 'destinationId'
+  destinationId: 'destinationId',
+  assignedAt: 'assignedAt'
 } as const
 
 export type VisitDestinationScalarFieldEnum = (typeof VisitDestinationScalarFieldEnum)[keyof typeof VisitDestinationScalarFieldEnum]
@@ -940,6 +1037,13 @@ export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -954,6 +1058,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'RfidCardStatus'
+ */
+export type EnumRfidCardStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RfidCardStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RfidCardStatus[]'
+ */
+export type ListEnumRfidCardStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RfidCardStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'VisitStatus'
  */
 export type EnumVisitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisitStatus'>
@@ -964,6 +1082,20 @@ export type EnumVisitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'VisitStatus[]'
  */
 export type ListEnumVisitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VisitStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RevokeReason'
+ */
+export type EnumRevokeReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RevokeReason'>
+    
+
+
+/**
+ * Reference to a field of type 'RevokeReason[]'
+ */
+export type ListEnumRevokeReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RevokeReason[]'>
     
 
 
@@ -1093,6 +1225,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   visitor?: Prisma.VisitorOmit
   destination?: Prisma.DestinationOmit
+  rfidCard?: Prisma.RfidCardOmit
   visit?: Prisma.VisitOmit
   visitDestination?: Prisma.VisitDestinationOmit
 }

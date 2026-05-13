@@ -33,12 +33,19 @@ export type Visitor = Prisma.VisitorModel
  */
 export type Destination = Prisma.DestinationModel
 /**
+ * Model RfidCard
+ * Tracks the 30+ physical RFID cards available in the building.
+ * Each card can be AVAILABLE, IN_USE, LOST, or RETIRED.
+ */
+export type RfidCard = Prisma.RfidCardModel
+/**
  * Model Visit
  * 
  */
 export type Visit = Prisma.VisitModel
 /**
  * Model VisitDestination
- * 
+ * Explicit many-to-many join table.
+ * A single visit can include multiple destinations (visitor going to multiple floors).
  */
 export type VisitDestination = Prisma.VisitDestinationModel

@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Visitor: 'Visitor',
   Destination: 'Destination',
+  RfidCard: 'RfidCard',
   Visit: 'Visit',
   VisitDestination: 'VisitDestination'
 } as const
@@ -80,6 +81,7 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   role: 'role',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -91,6 +93,7 @@ export const VisitorScalarFieldEnum = {
   id: 'id',
   fullName: 'fullName',
   birthDate: 'birthDate',
+  address: 'address',
   contactNumber: 'contactNumber',
   idType: 'idType',
   idNumber: 'idNumber',
@@ -105,10 +108,11 @@ export type VisitorScalarFieldEnum = (typeof VisitorScalarFieldEnum)[keyof typeo
 
 export const DestinationScalarFieldEnum = {
   id: 'id',
-  floor: 'floor',
   name: 'name',
+  floor: 'floor',
   headName: 'headName',
   description: 'description',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -116,13 +120,31 @@ export const DestinationScalarFieldEnum = {
 export type DestinationScalarFieldEnum = (typeof DestinationScalarFieldEnum)[keyof typeof DestinationScalarFieldEnum]
 
 
+export const RfidCardScalarFieldEnum = {
+  id: 'id',
+  uid: 'uid',
+  label: 'label',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RfidCardScalarFieldEnum = (typeof RfidCardScalarFieldEnum)[keyof typeof RfidCardScalarFieldEnum]
+
+
 export const VisitScalarFieldEnum = {
   id: 'id',
   visitorId: 'visitorId',
   status: 'status',
-  rfidUid: 'rfidUid',
+  isManualEntry: 'isManualEntry',
+  rfidCardId: 'rfidCardId',
   timeIn: 'timeIn',
   timeOut: 'timeOut',
+  revokeReason: 'revokeReason',
+  revokeNote: 'revokeNote',
+  confirmedById: 'confirmedById',
+  revokedById: 'revokedById',
+  reason: 'reason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -132,7 +154,8 @@ export type VisitScalarFieldEnum = (typeof VisitScalarFieldEnum)[keyof typeof Vi
 
 export const VisitDestinationScalarFieldEnum = {
   visitId: 'visitId',
-  destinationId: 'destinationId'
+  destinationId: 'destinationId',
+  assignedAt: 'assignedAt'
 } as const
 
 export type VisitDestinationScalarFieldEnum = (typeof VisitDestinationScalarFieldEnum)[keyof typeof VisitDestinationScalarFieldEnum]

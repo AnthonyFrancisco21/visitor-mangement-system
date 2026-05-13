@@ -1,7 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// ============================================================
+// SGW-VMS — Prisma Schema
+// 3-tier Visitor Management System: Kiosk → Receptionist → Admin
+// ============================================================
 
 datasource db {
   provider = "postgresql"
@@ -9,90 +9,231 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client" // Changed from prisma-client-js in v7
+  provider = "prisma-client" // Prisma 7+
   output   = "../generated/client"
 }
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
 
 enum UserRole {
   ADMIN
   RECEPTIONIST
 }
 
+/// Lifecycle of a single Visit record
 enum VisitStatus {
-  PENDING    // Finished Kiosk, waiting for Receptionist
-  ACTIVE     // Receptionist tapped RFID, visitor is inside
-  COMPLETED  // Visitor tapped RFID to exit
+  /// Visitor completed the kiosk form — waiting for receptionist RFID tap
+  PENDING
+  /// Receptionist tapped RFID card — visitor is inside the building
+  ACTIVE
+  /// Visitor tapped RFID at checkout — visit is over, card is free
+  COMPLETED
+  /// Staff manually closed the visit (lost card, emergency, etc.)
+  REVOKED
 }
+
+/// Reason used when a receptionist or admin manually revokes a visit
+enum RevokeReason {
+  LOST_CARD
+  FORGOT_TO_CHECK_OUT
+  EMERGENCY_EXIT
+  END_OF_DAY
+  OTHER
+}
+
+/// Lifecycle of a physical RFID card
+enum RfidCardStatus {
+  AVAILABLE
+  IN_USE
+  LOST
+  RETIRED
+}
+
+// ─────────────────────────────────────────────
+// User (Staff — Admin & Receptionist)
+// ─────────────────────────────────────────────
 
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
-  password  String
+  password  String   // bcrypt hash
   role      UserRole @default(RECEPTIONIST)
+
+  /// Soft-delete / deactivation for account management (Admin feature)
+  isActive  Boolean  @default(true)
+
+  /// Visits that this staff member confirmed (RFID tap)
+  confirmedVisits Visit[] @relation("ConfirmedBy")
+
+  /// Visits that this staff member revoked
+  revokedVisits   Visit[] @relation("RevokedBy")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// ─────────────────────────────────────────────
+// Visitor (Person entering the building)
+// ─────────────────────────────────────────────
+
 model Visitor {
-  id             String   @id @default(cuid())
-  // Extracted from ID OCR
-  fullName       String
-  birthDate      String?
-  contactNumber  String?
-  idType         String?  // e.g., Unified ID, Driver's License
-  idNumber       String?  @unique
-  
-  // Photos
-  idPhotoUrl     String?  // URL to the stored OCR scan
-  visitorPhotoUrl String? // URL to the live capture photo
-  
-  visits         Visit[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id String @id @default(cuid())
+
+  // ── Extracted from ID OCR / manual entry ──
+  fullName      String
+  /// Age is computed from birthDate; store raw date from ID
+  birthDate     String?
+  /// Full address extracted from ID
+  address       String?
+  contactNumber String?
+  /// e.g. "Driver's License", "Unified ID", "Passport"
+  idType        String?
+  /// ID document number — not globally unique because the same person
+  /// can visit multiple times; uniqueness enforced per visitor record
+  idNumber      String?
+
+  // ── Photos (stored as URLs/paths) ──
+  /// Photo of the ID document captured by OCR scan
+  idPhotoUrl      String?
+  /// Live photo of the visitor taken at the kiosk
+  visitorPhotoUrl String?
+
+  /// All visit sessions for this visitor (permanent historical record)
+  visits Visit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fullName])  // fast name search for repeat visitor detection
 }
+
+// ─────────────────────────────────────────────
+// Destination (Pre-defined building locations)
+// ─────────────────────────────────────────────
 
 model Destination {
-  id             String   @id @default(cuid())
-  floor          String
-  name           String   // Department name or Condo Unit number
-  headName       String   // Head of Dept or Unit Owner
-  description    String?
-  
-  visits         VisitDestination[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id String @id @default(cuid())
+
+  /// Department name, office, or unit number
+  name     String
+  /// Floor number or level label (e.g. "3", "G/F", "Penthouse")
+  floor    String
+  /// Head of department or unit owner — the person being visited
+  headName String
+  /// Optional details about the destination
+  description String?
+
+  /// Flag destinations that are no longer active (soft-delete)
+  isActive Boolean @default(true)
+
+  /// All visit entries that included this destination
+  visitDestinations VisitDestination[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+// ─────────────────────────────────────────────
+// RfidCard (Physical, reusable cards)
+// ─────────────────────────────────────────────
+
+/// Tracks the 30+ physical RFID cards available in the building.
+/// Each card can be AVAILABLE, IN_USE, LOST, or RETIRED.
+model RfidCard {
+  id  String @id @default(cuid())
+
+  /// The unique UID from the physical RFID card hardware
+  uid         String        @unique
+  /// Human-readable label printed on the card (e.g. "Card 01")
+  label       String?
+  status      RfidCardStatus @default(AVAILABLE)
+
+  /// All visits this card has been assigned to (historical record)
+  visits Visit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([uid])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// Visit (Core: one entry session per visitor per day)
+// ─────────────────────────────────────────────
 
 model Visit {
-  id           String      @id @default(cuid())
-  visitorId    String
-  visitor      Visitor     @relation(fields: [visitorId], references: [id])
-  
-  status       VisitStatus @default(PENDING)
-  
-  // RFID Logic
-  rfidUid      String?     // This is populated when the Receptionist confirms
-  
-  // Timing
-  timeIn       DateTime?   // Set when status becomes ACTIVE
-  timeOut      DateTime?   // Set when status becomes COMPLETED
-  
-  // Relationship to multiple destinations
+  id        String @id @default(cuid())
+
+  // ── Visitor relationship ──
+  visitorId String
+  visitor   Visitor @relation(fields: [visitorId], references: [id])
+
+  // ── Status & Lifecycle ──
+  status VisitStatus @default(PENDING)
+
+  // ── Registration source ──
+  /// True when receptionist created this manually (kiosk was unavailable)
+  isManualEntry Boolean @default(false)
+
+  // ── RFID Card assignment ──
+  /// Populated when the receptionist taps the RFID card (Time In moment)
+  rfidCardId String?
+  rfidCard   RfidCard? @relation(fields: [rfidCardId], references: [id])
+
+  // ── Timing ──
+  /// Timestamp when the receptionist tapped the RFID card (visitor enters building)
+  timeIn  DateTime?
+  /// Timestamp when visitor tapped RFID at exit OR staff manually revoked
+  timeOut DateTime?
+
+  // ── Manual revoke metadata ──
+  revokeReason RevokeReason?
+  revokeNote   String?       // Optional free-text for "Other" reason
+
+  // ── Staff audit trail ──
+  /// Staff member who confirmed the visit (RFID tap / Time In)
+  confirmedById String?
+  confirmedBy   User?   @relation("ConfirmedBy", fields: [confirmedById], references: [id])
+
+  /// Staff member who revoked / forced checkout
+  revokedById String?
+  revokedBy   User?   @relation("RevokedBy", fields: [revokedById], references: [id])
+
+  // ── Purpose of visit ──
+  reason String?
+
+  // ── Destinations (many-to-many via junction table) ──
   destinations VisitDestination[]
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([rfidUid])
+  // Indexes for dashboard queries
+  @@index([status])
+  @@index([visitorId])
+  @@index([rfidCardId])
+  @@index([timeIn])
+  @@index([timeOut])
 }
 
-// Explicit many-to-many junction table for Visit <-> Destination
+// ─────────────────────────────────────────────
+// VisitDestination (Junction: Visit ↔ Destination)
+// ─────────────────────────────────────────────
+
+/// Explicit many-to-many join table.
+/// A single visit can include multiple destinations (visitor going to multiple floors).
 model VisitDestination {
   visitId       String
-  visit         Visit       @relation(fields: [visitId], references: [id])
+  visit         Visit       @relation(fields: [visitId], references: [id], onDelete: Cascade)
   destinationId String
   destination   Destination @relation(fields: [destinationId], references: [id])
 
+  assignedAt DateTime @default(now())
+
   @@id([visitId, destinationId])
+  @@index([destinationId]) // fast lookup: "who visited this destination?"
 }

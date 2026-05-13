@@ -54,6 +54,11 @@ const Icons = {
       <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
     </svg>
   ),
+  RFID: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 10h10" /><path d="M7 14h4" />
+    </svg>
+  ),
   Logout: () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
@@ -67,6 +72,7 @@ const NAV_ITEMS = {
     { label: 'Registration', href: '/admin/registration', icon: <Icons.Registration /> },
     { label: 'Live Kiosk', href: '/admin/kiosk', icon: <Icons.Kiosk /> },
     { label: 'Destination', href: '/admin/destinations', icon: <Icons.Destination /> },
+    { label: 'RFID Inventory', href: '/admin/rfid', icon: <Icons.RFID /> },
     { label: "Visitor's time out", href: '/admin/checkout', icon: <Icons.TimeOut /> },
     { label: 'Reports', href: '/admin/reports', icon: <Icons.Reports /> },
     { label: 'Accounts Management', href: '/admin/accounts', icon: <Icons.Accounts /> },
@@ -77,6 +83,7 @@ const NAV_ITEMS = {
     { label: 'Registration', href: '/receptionist/registration', icon: <Icons.Registration /> },
     { label: 'Live Kiosk', href: '/receptionist/kiosk', icon: <Icons.Kiosk /> },
     { label: 'Destination', href: '/receptionist/destinations', icon: <Icons.Destination /> },
+    { label: 'RFID Inventory', href: '/receptionist/rfid', icon: <Icons.RFID /> },
     { label: "Visitor's Time out", href: '/receptionist/checkout', icon: <Icons.TimeOut /> },
   ],
 };

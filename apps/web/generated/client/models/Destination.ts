@@ -26,30 +26,33 @@ export type AggregateDestination = {
 
 export type DestinationMinAggregateOutputType = {
   id: string | null
-  floor: string | null
   name: string | null
+  floor: string | null
   headName: string | null
   description: string | null
+  isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type DestinationMaxAggregateOutputType = {
   id: string | null
-  floor: string | null
   name: string | null
+  floor: string | null
   headName: string | null
   description: string | null
+  isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type DestinationCountAggregateOutputType = {
   id: number
-  floor: number
   name: number
+  floor: number
   headName: number
   description: number
+  isActive: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,30 +61,33 @@ export type DestinationCountAggregateOutputType = {
 
 export type DestinationMinAggregateInputType = {
   id?: true
-  floor?: true
   name?: true
+  floor?: true
   headName?: true
   description?: true
+  isActive?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type DestinationMaxAggregateInputType = {
   id?: true
-  floor?: true
   name?: true
+  floor?: true
   headName?: true
   description?: true
+  isActive?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type DestinationCountAggregateInputType = {
   id?: true
-  floor?: true
   name?: true
+  floor?: true
   headName?: true
   description?: true
+  isActive?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -161,10 +167,11 @@ export type DestinationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type DestinationGroupByOutputType = {
   id: string
-  floor: string
   name: string
+  floor: string
   headName: string
   description: string | null
+  isActive: boolean
   createdAt: Date
   updatedAt: Date
   _count: DestinationCountAggregateOutputType | null
@@ -192,24 +199,26 @@ export type DestinationWhereInput = {
   OR?: Prisma.DestinationWhereInput[]
   NOT?: Prisma.DestinationWhereInput | Prisma.DestinationWhereInput[]
   id?: Prisma.StringFilter<"Destination"> | string
-  floor?: Prisma.StringFilter<"Destination"> | string
   name?: Prisma.StringFilter<"Destination"> | string
+  floor?: Prisma.StringFilter<"Destination"> | string
   headName?: Prisma.StringFilter<"Destination"> | string
   description?: Prisma.StringNullableFilter<"Destination"> | string | null
+  isActive?: Prisma.BoolFilter<"Destination"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Destination"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Destination"> | Date | string
-  visits?: Prisma.VisitDestinationListRelationFilter
+  visitDestinations?: Prisma.VisitDestinationListRelationFilter
 }
 
 export type DestinationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  floor?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   headName?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  visits?: Prisma.VisitDestinationOrderByRelationAggregateInput
+  visitDestinations?: Prisma.VisitDestinationOrderByRelationAggregateInput
 }
 
 export type DestinationWhereUniqueInput = Prisma.AtLeast<{
@@ -217,21 +226,23 @@ export type DestinationWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.DestinationWhereInput | Prisma.DestinationWhereInput[]
   OR?: Prisma.DestinationWhereInput[]
   NOT?: Prisma.DestinationWhereInput | Prisma.DestinationWhereInput[]
-  floor?: Prisma.StringFilter<"Destination"> | string
   name?: Prisma.StringFilter<"Destination"> | string
+  floor?: Prisma.StringFilter<"Destination"> | string
   headName?: Prisma.StringFilter<"Destination"> | string
   description?: Prisma.StringNullableFilter<"Destination"> | string | null
+  isActive?: Prisma.BoolFilter<"Destination"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Destination"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Destination"> | Date | string
-  visits?: Prisma.VisitDestinationListRelationFilter
+  visitDestinations?: Prisma.VisitDestinationListRelationFilter
 }, "id">
 
 export type DestinationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  floor?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   headName?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DestinationCountOrderByAggregateInput
@@ -244,114 +255,125 @@ export type DestinationScalarWhereWithAggregatesInput = {
   OR?: Prisma.DestinationScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DestinationScalarWhereWithAggregatesInput | Prisma.DestinationScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Destination"> | string
-  floor?: Prisma.StringWithAggregatesFilter<"Destination"> | string
   name?: Prisma.StringWithAggregatesFilter<"Destination"> | string
+  floor?: Prisma.StringWithAggregatesFilter<"Destination"> | string
   headName?: Prisma.StringWithAggregatesFilter<"Destination"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Destination"> | string | null
+  isActive?: Prisma.BoolWithAggregatesFilter<"Destination"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Destination"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Destination"> | Date | string
 }
 
 export type DestinationCreateInput = {
   id?: string
-  floor: string
   name: string
+  floor: string
   headName: string
   description?: string | null
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  visits?: Prisma.VisitDestinationCreateNestedManyWithoutDestinationInput
+  visitDestinations?: Prisma.VisitDestinationCreateNestedManyWithoutDestinationInput
 }
 
 export type DestinationUncheckedCreateInput = {
   id?: string
-  floor: string
   name: string
+  floor: string
   headName: string
   description?: string | null
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  visits?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutDestinationInput
+  visitDestinations?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutDestinationInput
 }
 
 export type DestinationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  floor?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  floor?: Prisma.StringFieldUpdateOperationsInput | string
   headName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  visits?: Prisma.VisitDestinationUpdateManyWithoutDestinationNestedInput
+  visitDestinations?: Prisma.VisitDestinationUpdateManyWithoutDestinationNestedInput
 }
 
 export type DestinationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  floor?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  floor?: Prisma.StringFieldUpdateOperationsInput | string
   headName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  visits?: Prisma.VisitDestinationUncheckedUpdateManyWithoutDestinationNestedInput
+  visitDestinations?: Prisma.VisitDestinationUncheckedUpdateManyWithoutDestinationNestedInput
 }
 
 export type DestinationCreateManyInput = {
   id?: string
-  floor: string
   name: string
+  floor: string
   headName: string
   description?: string | null
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type DestinationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  floor?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  floor?: Prisma.StringFieldUpdateOperationsInput | string
   headName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DestinationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  floor?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  floor?: Prisma.StringFieldUpdateOperationsInput | string
   headName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DestinationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  floor?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   headName?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type DestinationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  floor?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   headName?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type DestinationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  floor?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   headName?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -361,72 +383,76 @@ export type DestinationScalarRelationFilter = {
   isNot?: Prisma.DestinationWhereInput
 }
 
-export type DestinationCreateNestedOneWithoutVisitsInput = {
-  create?: Prisma.XOR<Prisma.DestinationCreateWithoutVisitsInput, Prisma.DestinationUncheckedCreateWithoutVisitsInput>
-  connectOrCreate?: Prisma.DestinationCreateOrConnectWithoutVisitsInput
+export type DestinationCreateNestedOneWithoutVisitDestinationsInput = {
+  create?: Prisma.XOR<Prisma.DestinationCreateWithoutVisitDestinationsInput, Prisma.DestinationUncheckedCreateWithoutVisitDestinationsInput>
+  connectOrCreate?: Prisma.DestinationCreateOrConnectWithoutVisitDestinationsInput
   connect?: Prisma.DestinationWhereUniqueInput
 }
 
-export type DestinationUpdateOneRequiredWithoutVisitsNestedInput = {
-  create?: Prisma.XOR<Prisma.DestinationCreateWithoutVisitsInput, Prisma.DestinationUncheckedCreateWithoutVisitsInput>
-  connectOrCreate?: Prisma.DestinationCreateOrConnectWithoutVisitsInput
-  upsert?: Prisma.DestinationUpsertWithoutVisitsInput
+export type DestinationUpdateOneRequiredWithoutVisitDestinationsNestedInput = {
+  create?: Prisma.XOR<Prisma.DestinationCreateWithoutVisitDestinationsInput, Prisma.DestinationUncheckedCreateWithoutVisitDestinationsInput>
+  connectOrCreate?: Prisma.DestinationCreateOrConnectWithoutVisitDestinationsInput
+  upsert?: Prisma.DestinationUpsertWithoutVisitDestinationsInput
   connect?: Prisma.DestinationWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.DestinationUpdateToOneWithWhereWithoutVisitsInput, Prisma.DestinationUpdateWithoutVisitsInput>, Prisma.DestinationUncheckedUpdateWithoutVisitsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DestinationUpdateToOneWithWhereWithoutVisitDestinationsInput, Prisma.DestinationUpdateWithoutVisitDestinationsInput>, Prisma.DestinationUncheckedUpdateWithoutVisitDestinationsInput>
 }
 
-export type DestinationCreateWithoutVisitsInput = {
+export type DestinationCreateWithoutVisitDestinationsInput = {
   id?: string
-  floor: string
   name: string
+  floor: string
   headName: string
   description?: string | null
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type DestinationUncheckedCreateWithoutVisitsInput = {
+export type DestinationUncheckedCreateWithoutVisitDestinationsInput = {
   id?: string
-  floor: string
   name: string
+  floor: string
   headName: string
   description?: string | null
+  isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type DestinationCreateOrConnectWithoutVisitsInput = {
+export type DestinationCreateOrConnectWithoutVisitDestinationsInput = {
   where: Prisma.DestinationWhereUniqueInput
-  create: Prisma.XOR<Prisma.DestinationCreateWithoutVisitsInput, Prisma.DestinationUncheckedCreateWithoutVisitsInput>
+  create: Prisma.XOR<Prisma.DestinationCreateWithoutVisitDestinationsInput, Prisma.DestinationUncheckedCreateWithoutVisitDestinationsInput>
 }
 
-export type DestinationUpsertWithoutVisitsInput = {
-  update: Prisma.XOR<Prisma.DestinationUpdateWithoutVisitsInput, Prisma.DestinationUncheckedUpdateWithoutVisitsInput>
-  create: Prisma.XOR<Prisma.DestinationCreateWithoutVisitsInput, Prisma.DestinationUncheckedCreateWithoutVisitsInput>
+export type DestinationUpsertWithoutVisitDestinationsInput = {
+  update: Prisma.XOR<Prisma.DestinationUpdateWithoutVisitDestinationsInput, Prisma.DestinationUncheckedUpdateWithoutVisitDestinationsInput>
+  create: Prisma.XOR<Prisma.DestinationCreateWithoutVisitDestinationsInput, Prisma.DestinationUncheckedCreateWithoutVisitDestinationsInput>
   where?: Prisma.DestinationWhereInput
 }
 
-export type DestinationUpdateToOneWithWhereWithoutVisitsInput = {
+export type DestinationUpdateToOneWithWhereWithoutVisitDestinationsInput = {
   where?: Prisma.DestinationWhereInput
-  data: Prisma.XOR<Prisma.DestinationUpdateWithoutVisitsInput, Prisma.DestinationUncheckedUpdateWithoutVisitsInput>
+  data: Prisma.XOR<Prisma.DestinationUpdateWithoutVisitDestinationsInput, Prisma.DestinationUncheckedUpdateWithoutVisitDestinationsInput>
 }
 
-export type DestinationUpdateWithoutVisitsInput = {
+export type DestinationUpdateWithoutVisitDestinationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  floor?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  floor?: Prisma.StringFieldUpdateOperationsInput | string
   headName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type DestinationUncheckedUpdateWithoutVisitsInput = {
+export type DestinationUncheckedUpdateWithoutVisitDestinationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  floor?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  floor?: Prisma.StringFieldUpdateOperationsInput | string
   headName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -437,11 +463,11 @@ export type DestinationUncheckedUpdateWithoutVisitsInput = {
  */
 
 export type DestinationCountOutputType = {
-  visits: number
+  visitDestinations: number
 }
 
 export type DestinationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  visits?: boolean | DestinationCountOutputTypeCountVisitsArgs
+  visitDestinations?: boolean | DestinationCountOutputTypeCountVisitDestinationsArgs
 }
 
 /**
@@ -457,56 +483,60 @@ export type DestinationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
 /**
  * DestinationCountOutputType without action
  */
-export type DestinationCountOutputTypeCountVisitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type DestinationCountOutputTypeCountVisitDestinationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.VisitDestinationWhereInput
 }
 
 
 export type DestinationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  floor?: boolean
   name?: boolean
+  floor?: boolean
   headName?: boolean
   description?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  visits?: boolean | Prisma.Destination$visitsArgs<ExtArgs>
+  visitDestinations?: boolean | Prisma.Destination$visitDestinationsArgs<ExtArgs>
   _count?: boolean | Prisma.DestinationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["destination"]>
 
 export type DestinationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  floor?: boolean
   name?: boolean
+  floor?: boolean
   headName?: boolean
   description?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["destination"]>
 
 export type DestinationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  floor?: boolean
   name?: boolean
+  floor?: boolean
   headName?: boolean
   description?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["destination"]>
 
 export type DestinationSelectScalar = {
   id?: boolean
-  floor?: boolean
   name?: boolean
+  floor?: boolean
   headName?: boolean
   description?: boolean
+  isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DestinationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "floor" | "name" | "headName" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["destination"]>
+export type DestinationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "floor" | "headName" | "description" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["destination"]>
 export type DestinationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  visits?: boolean | Prisma.Destination$visitsArgs<ExtArgs>
+  visitDestinations?: boolean | Prisma.Destination$visitDestinationsArgs<ExtArgs>
   _count?: boolean | Prisma.DestinationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DestinationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -515,14 +545,33 @@ export type DestinationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $DestinationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Destination"
   objects: {
-    visits: Prisma.$VisitDestinationPayload<ExtArgs>[]
+    /**
+     * All visit entries that included this destination
+     */
+    visitDestinations: Prisma.$VisitDestinationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    floor: string
+    /**
+     * Department name, office, or unit number
+     */
     name: string
+    /**
+     * Floor number or level label (e.g. "3", "G/F", "Penthouse")
+     */
+    floor: string
+    /**
+     * Head of department or unit owner — the person being visited
+     */
     headName: string
+    /**
+     * Optional details about the destination
+     */
     description: string | null
+    /**
+     * Flag destinations that are no longer active (soft-delete)
+     */
+    isActive: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["destination"]>
@@ -919,7 +968,7 @@ readonly fields: DestinationFieldRefs;
  */
 export interface Prisma__DestinationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  visits<T extends Prisma.Destination$visitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Destination$visitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VisitDestinationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  visitDestinations<T extends Prisma.Destination$visitDestinationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Destination$visitDestinationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VisitDestinationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -950,10 +999,11 @@ export interface Prisma__DestinationClient<T, Null = never, ExtArgs extends runt
  */
 export interface DestinationFieldRefs {
   readonly id: Prisma.FieldRef<"Destination", 'String'>
-  readonly floor: Prisma.FieldRef<"Destination", 'String'>
   readonly name: Prisma.FieldRef<"Destination", 'String'>
+  readonly floor: Prisma.FieldRef<"Destination", 'String'>
   readonly headName: Prisma.FieldRef<"Destination", 'String'>
   readonly description: Prisma.FieldRef<"Destination", 'String'>
+  readonly isActive: Prisma.FieldRef<"Destination", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Destination", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Destination", 'DateTime'>
 }
@@ -1349,9 +1399,9 @@ export type DestinationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * Destination.visits
+ * Destination.visitDestinations
  */
-export type Destination$visitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Destination$visitDestinationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the VisitDestination
    */

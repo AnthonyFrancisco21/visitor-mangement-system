@@ -28,9 +28,15 @@ export type VisitMinAggregateOutputType = {
   id: string | null
   visitorId: string | null
   status: $Enums.VisitStatus | null
-  rfidUid: string | null
+  isManualEntry: boolean | null
+  rfidCardId: string | null
   timeIn: Date | null
   timeOut: Date | null
+  revokeReason: $Enums.RevokeReason | null
+  revokeNote: string | null
+  confirmedById: string | null
+  revokedById: string | null
+  reason: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -39,9 +45,15 @@ export type VisitMaxAggregateOutputType = {
   id: string | null
   visitorId: string | null
   status: $Enums.VisitStatus | null
-  rfidUid: string | null
+  isManualEntry: boolean | null
+  rfidCardId: string | null
   timeIn: Date | null
   timeOut: Date | null
+  revokeReason: $Enums.RevokeReason | null
+  revokeNote: string | null
+  confirmedById: string | null
+  revokedById: string | null
+  reason: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,9 +62,15 @@ export type VisitCountAggregateOutputType = {
   id: number
   visitorId: number
   status: number
-  rfidUid: number
+  isManualEntry: number
+  rfidCardId: number
   timeIn: number
   timeOut: number
+  revokeReason: number
+  revokeNote: number
+  confirmedById: number
+  revokedById: number
+  reason: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -63,9 +81,15 @@ export type VisitMinAggregateInputType = {
   id?: true
   visitorId?: true
   status?: true
-  rfidUid?: true
+  isManualEntry?: true
+  rfidCardId?: true
   timeIn?: true
   timeOut?: true
+  revokeReason?: true
+  revokeNote?: true
+  confirmedById?: true
+  revokedById?: true
+  reason?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -74,9 +98,15 @@ export type VisitMaxAggregateInputType = {
   id?: true
   visitorId?: true
   status?: true
-  rfidUid?: true
+  isManualEntry?: true
+  rfidCardId?: true
   timeIn?: true
   timeOut?: true
+  revokeReason?: true
+  revokeNote?: true
+  confirmedById?: true
+  revokedById?: true
+  reason?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -85,9 +115,15 @@ export type VisitCountAggregateInputType = {
   id?: true
   visitorId?: true
   status?: true
-  rfidUid?: true
+  isManualEntry?: true
+  rfidCardId?: true
   timeIn?: true
   timeOut?: true
+  revokeReason?: true
+  revokeNote?: true
+  confirmedById?: true
+  revokedById?: true
+  reason?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -169,9 +205,15 @@ export type VisitGroupByOutputType = {
   id: string
   visitorId: string
   status: $Enums.VisitStatus
-  rfidUid: string | null
+  isManualEntry: boolean
+  rfidCardId: string | null
   timeIn: Date | null
   timeOut: Date | null
+  revokeReason: $Enums.RevokeReason | null
+  revokeNote: string | null
+  confirmedById: string | null
+  revokedById: string | null
+  reason: string | null
   createdAt: Date
   updatedAt: Date
   _count: VisitCountAggregateOutputType | null
@@ -201,12 +243,21 @@ export type VisitWhereInput = {
   id?: Prisma.StringFilter<"Visit"> | string
   visitorId?: Prisma.StringFilter<"Visit"> | string
   status?: Prisma.EnumVisitStatusFilter<"Visit"> | $Enums.VisitStatus
-  rfidUid?: Prisma.StringNullableFilter<"Visit"> | string | null
+  isManualEntry?: Prisma.BoolFilter<"Visit"> | boolean
+  rfidCardId?: Prisma.StringNullableFilter<"Visit"> | string | null
   timeIn?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
   timeOut?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
+  revokeReason?: Prisma.EnumRevokeReasonNullableFilter<"Visit"> | $Enums.RevokeReason | null
+  revokeNote?: Prisma.StringNullableFilter<"Visit"> | string | null
+  confirmedById?: Prisma.StringNullableFilter<"Visit"> | string | null
+  revokedById?: Prisma.StringNullableFilter<"Visit"> | string | null
+  reason?: Prisma.StringNullableFilter<"Visit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
   visitor?: Prisma.XOR<Prisma.VisitorScalarRelationFilter, Prisma.VisitorWhereInput>
+  rfidCard?: Prisma.XOR<Prisma.RfidCardNullableScalarRelationFilter, Prisma.RfidCardWhereInput> | null
+  confirmedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  revokedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   destinations?: Prisma.VisitDestinationListRelationFilter
 }
 
@@ -214,12 +265,21 @@ export type VisitOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  rfidUid?: Prisma.SortOrderInput | Prisma.SortOrder
+  isManualEntry?: Prisma.SortOrder
+  rfidCardId?: Prisma.SortOrderInput | Prisma.SortOrder
   timeIn?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOut?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokeReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokeNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  reason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   visitor?: Prisma.VisitorOrderByWithRelationInput
+  rfidCard?: Prisma.RfidCardOrderByWithRelationInput
+  confirmedBy?: Prisma.UserOrderByWithRelationInput
+  revokedBy?: Prisma.UserOrderByWithRelationInput
   destinations?: Prisma.VisitDestinationOrderByRelationAggregateInput
 }
 
@@ -230,12 +290,21 @@ export type VisitWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.VisitWhereInput | Prisma.VisitWhereInput[]
   visitorId?: Prisma.StringFilter<"Visit"> | string
   status?: Prisma.EnumVisitStatusFilter<"Visit"> | $Enums.VisitStatus
-  rfidUid?: Prisma.StringNullableFilter<"Visit"> | string | null
+  isManualEntry?: Prisma.BoolFilter<"Visit"> | boolean
+  rfidCardId?: Prisma.StringNullableFilter<"Visit"> | string | null
   timeIn?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
   timeOut?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
+  revokeReason?: Prisma.EnumRevokeReasonNullableFilter<"Visit"> | $Enums.RevokeReason | null
+  revokeNote?: Prisma.StringNullableFilter<"Visit"> | string | null
+  confirmedById?: Prisma.StringNullableFilter<"Visit"> | string | null
+  revokedById?: Prisma.StringNullableFilter<"Visit"> | string | null
+  reason?: Prisma.StringNullableFilter<"Visit"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
   visitor?: Prisma.XOR<Prisma.VisitorScalarRelationFilter, Prisma.VisitorWhereInput>
+  rfidCard?: Prisma.XOR<Prisma.RfidCardNullableScalarRelationFilter, Prisma.RfidCardWhereInput> | null
+  confirmedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  revokedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   destinations?: Prisma.VisitDestinationListRelationFilter
 }, "id">
 
@@ -243,9 +312,15 @@ export type VisitOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  rfidUid?: Prisma.SortOrderInput | Prisma.SortOrder
+  isManualEntry?: Prisma.SortOrder
+  rfidCardId?: Prisma.SortOrderInput | Prisma.SortOrder
   timeIn?: Prisma.SortOrderInput | Prisma.SortOrder
   timeOut?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokeReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokeNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  revokedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  reason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VisitCountOrderByAggregateInput
@@ -260,9 +335,15 @@ export type VisitScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Visit"> | string
   visitorId?: Prisma.StringWithAggregatesFilter<"Visit"> | string
   status?: Prisma.EnumVisitStatusWithAggregatesFilter<"Visit"> | $Enums.VisitStatus
-  rfidUid?: Prisma.StringNullableWithAggregatesFilter<"Visit"> | string | null
+  isManualEntry?: Prisma.BoolWithAggregatesFilter<"Visit"> | boolean
+  rfidCardId?: Prisma.StringNullableWithAggregatesFilter<"Visit"> | string | null
   timeIn?: Prisma.DateTimeNullableWithAggregatesFilter<"Visit"> | Date | string | null
   timeOut?: Prisma.DateTimeNullableWithAggregatesFilter<"Visit"> | Date | string | null
+  revokeReason?: Prisma.EnumRevokeReasonNullableWithAggregatesFilter<"Visit"> | $Enums.RevokeReason | null
+  revokeNote?: Prisma.StringNullableWithAggregatesFilter<"Visit"> | string | null
+  confirmedById?: Prisma.StringNullableWithAggregatesFilter<"Visit"> | string | null
+  revokedById?: Prisma.StringNullableWithAggregatesFilter<"Visit"> | string | null
+  reason?: Prisma.StringNullableWithAggregatesFilter<"Visit"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Visit"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Visit"> | Date | string
 }
@@ -270,12 +351,18 @@ export type VisitScalarWhereWithAggregatesInput = {
 export type VisitCreateInput = {
   id?: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  rfidCard?: Prisma.RfidCardCreateNestedOneWithoutVisitsInput
+  confirmedBy?: Prisma.UserCreateNestedOneWithoutConfirmedVisitsInput
+  revokedBy?: Prisma.UserCreateNestedOneWithoutRevokedVisitsInput
   destinations?: Prisma.VisitDestinationCreateNestedManyWithoutVisitInput
 }
 
@@ -283,9 +370,15 @@ export type VisitUncheckedCreateInput = {
   id?: string
   visitorId: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
+  rfidCardId?: string | null
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   destinations?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutVisitInput
@@ -294,12 +387,18 @@ export type VisitUncheckedCreateInput = {
 export type VisitUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  rfidCard?: Prisma.RfidCardUpdateOneWithoutVisitsNestedInput
+  confirmedBy?: Prisma.UserUpdateOneWithoutConfirmedVisitsNestedInput
+  revokedBy?: Prisma.UserUpdateOneWithoutRevokedVisitsNestedInput
   destinations?: Prisma.VisitDestinationUpdateManyWithoutVisitNestedInput
 }
 
@@ -307,9 +406,15 @@ export type VisitUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   destinations?: Prisma.VisitDestinationUncheckedUpdateManyWithoutVisitNestedInput
@@ -319,9 +424,15 @@ export type VisitCreateManyInput = {
   id?: string
   visitorId: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
+  rfidCardId?: string | null
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -329,9 +440,12 @@ export type VisitCreateManyInput = {
 export type VisitUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -340,9 +454,15 @@ export type VisitUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -361,9 +481,15 @@ export type VisitCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  rfidUid?: Prisma.SortOrder
+  isManualEntry?: Prisma.SortOrder
+  rfidCardId?: Prisma.SortOrder
   timeIn?: Prisma.SortOrder
   timeOut?: Prisma.SortOrder
+  revokeReason?: Prisma.SortOrder
+  revokeNote?: Prisma.SortOrder
+  confirmedById?: Prisma.SortOrder
+  revokedById?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -372,9 +498,15 @@ export type VisitMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  rfidUid?: Prisma.SortOrder
+  isManualEntry?: Prisma.SortOrder
+  rfidCardId?: Prisma.SortOrder
   timeIn?: Prisma.SortOrder
   timeOut?: Prisma.SortOrder
+  revokeReason?: Prisma.SortOrder
+  revokeNote?: Prisma.SortOrder
+  confirmedById?: Prisma.SortOrder
+  revokedById?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -383,9 +515,15 @@ export type VisitMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  rfidUid?: Prisma.SortOrder
+  isManualEntry?: Prisma.SortOrder
+  rfidCardId?: Prisma.SortOrder
   timeIn?: Prisma.SortOrder
   timeOut?: Prisma.SortOrder
+  revokeReason?: Prisma.SortOrder
+  revokeNote?: Prisma.SortOrder
+  confirmedById?: Prisma.SortOrder
+  revokedById?: Prisma.SortOrder
+  reason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -393,6 +531,90 @@ export type VisitMinOrderByAggregateInput = {
 export type VisitScalarRelationFilter = {
   is?: Prisma.VisitWhereInput
   isNot?: Prisma.VisitWhereInput
+}
+
+export type VisitCreateNestedManyWithoutConfirmedByInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutConfirmedByInput, Prisma.VisitUncheckedCreateWithoutConfirmedByInput> | Prisma.VisitCreateWithoutConfirmedByInput[] | Prisma.VisitUncheckedCreateWithoutConfirmedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutConfirmedByInput | Prisma.VisitCreateOrConnectWithoutConfirmedByInput[]
+  createMany?: Prisma.VisitCreateManyConfirmedByInputEnvelope
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+}
+
+export type VisitCreateNestedManyWithoutRevokedByInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRevokedByInput, Prisma.VisitUncheckedCreateWithoutRevokedByInput> | Prisma.VisitCreateWithoutRevokedByInput[] | Prisma.VisitUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRevokedByInput | Prisma.VisitCreateOrConnectWithoutRevokedByInput[]
+  createMany?: Prisma.VisitCreateManyRevokedByInputEnvelope
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+}
+
+export type VisitUncheckedCreateNestedManyWithoutConfirmedByInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutConfirmedByInput, Prisma.VisitUncheckedCreateWithoutConfirmedByInput> | Prisma.VisitCreateWithoutConfirmedByInput[] | Prisma.VisitUncheckedCreateWithoutConfirmedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutConfirmedByInput | Prisma.VisitCreateOrConnectWithoutConfirmedByInput[]
+  createMany?: Prisma.VisitCreateManyConfirmedByInputEnvelope
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+}
+
+export type VisitUncheckedCreateNestedManyWithoutRevokedByInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRevokedByInput, Prisma.VisitUncheckedCreateWithoutRevokedByInput> | Prisma.VisitCreateWithoutRevokedByInput[] | Prisma.VisitUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRevokedByInput | Prisma.VisitCreateOrConnectWithoutRevokedByInput[]
+  createMany?: Prisma.VisitCreateManyRevokedByInputEnvelope
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+}
+
+export type VisitUpdateManyWithoutConfirmedByNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutConfirmedByInput, Prisma.VisitUncheckedCreateWithoutConfirmedByInput> | Prisma.VisitCreateWithoutConfirmedByInput[] | Prisma.VisitUncheckedCreateWithoutConfirmedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutConfirmedByInput | Prisma.VisitCreateOrConnectWithoutConfirmedByInput[]
+  upsert?: Prisma.VisitUpsertWithWhereUniqueWithoutConfirmedByInput | Prisma.VisitUpsertWithWhereUniqueWithoutConfirmedByInput[]
+  createMany?: Prisma.VisitCreateManyConfirmedByInputEnvelope
+  set?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  disconnect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  delete?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  update?: Prisma.VisitUpdateWithWhereUniqueWithoutConfirmedByInput | Prisma.VisitUpdateWithWhereUniqueWithoutConfirmedByInput[]
+  updateMany?: Prisma.VisitUpdateManyWithWhereWithoutConfirmedByInput | Prisma.VisitUpdateManyWithWhereWithoutConfirmedByInput[]
+  deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+}
+
+export type VisitUpdateManyWithoutRevokedByNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRevokedByInput, Prisma.VisitUncheckedCreateWithoutRevokedByInput> | Prisma.VisitCreateWithoutRevokedByInput[] | Prisma.VisitUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRevokedByInput | Prisma.VisitCreateOrConnectWithoutRevokedByInput[]
+  upsert?: Prisma.VisitUpsertWithWhereUniqueWithoutRevokedByInput | Prisma.VisitUpsertWithWhereUniqueWithoutRevokedByInput[]
+  createMany?: Prisma.VisitCreateManyRevokedByInputEnvelope
+  set?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  disconnect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  delete?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  update?: Prisma.VisitUpdateWithWhereUniqueWithoutRevokedByInput | Prisma.VisitUpdateWithWhereUniqueWithoutRevokedByInput[]
+  updateMany?: Prisma.VisitUpdateManyWithWhereWithoutRevokedByInput | Prisma.VisitUpdateManyWithWhereWithoutRevokedByInput[]
+  deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+}
+
+export type VisitUncheckedUpdateManyWithoutConfirmedByNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutConfirmedByInput, Prisma.VisitUncheckedCreateWithoutConfirmedByInput> | Prisma.VisitCreateWithoutConfirmedByInput[] | Prisma.VisitUncheckedCreateWithoutConfirmedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutConfirmedByInput | Prisma.VisitCreateOrConnectWithoutConfirmedByInput[]
+  upsert?: Prisma.VisitUpsertWithWhereUniqueWithoutConfirmedByInput | Prisma.VisitUpsertWithWhereUniqueWithoutConfirmedByInput[]
+  createMany?: Prisma.VisitCreateManyConfirmedByInputEnvelope
+  set?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  disconnect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  delete?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  update?: Prisma.VisitUpdateWithWhereUniqueWithoutConfirmedByInput | Prisma.VisitUpdateWithWhereUniqueWithoutConfirmedByInput[]
+  updateMany?: Prisma.VisitUpdateManyWithWhereWithoutConfirmedByInput | Prisma.VisitUpdateManyWithWhereWithoutConfirmedByInput[]
+  deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+}
+
+export type VisitUncheckedUpdateManyWithoutRevokedByNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRevokedByInput, Prisma.VisitUncheckedCreateWithoutRevokedByInput> | Prisma.VisitCreateWithoutRevokedByInput[] | Prisma.VisitUncheckedCreateWithoutRevokedByInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRevokedByInput | Prisma.VisitCreateOrConnectWithoutRevokedByInput[]
+  upsert?: Prisma.VisitUpsertWithWhereUniqueWithoutRevokedByInput | Prisma.VisitUpsertWithWhereUniqueWithoutRevokedByInput[]
+  createMany?: Prisma.VisitCreateManyRevokedByInputEnvelope
+  set?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  disconnect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  delete?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  update?: Prisma.VisitUpdateWithWhereUniqueWithoutRevokedByInput | Prisma.VisitUpdateWithWhereUniqueWithoutRevokedByInput[]
+  updateMany?: Prisma.VisitUpdateManyWithWhereWithoutRevokedByInput | Prisma.VisitUpdateManyWithWhereWithoutRevokedByInput[]
+  deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
 }
 
 export type VisitCreateNestedManyWithoutVisitorInput = {
@@ -437,12 +659,58 @@ export type VisitUncheckedUpdateManyWithoutVisitorNestedInput = {
   deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
 }
 
+export type VisitCreateNestedManyWithoutRfidCardInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRfidCardInput, Prisma.VisitUncheckedCreateWithoutRfidCardInput> | Prisma.VisitCreateWithoutRfidCardInput[] | Prisma.VisitUncheckedCreateWithoutRfidCardInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRfidCardInput | Prisma.VisitCreateOrConnectWithoutRfidCardInput[]
+  createMany?: Prisma.VisitCreateManyRfidCardInputEnvelope
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+}
+
+export type VisitUncheckedCreateNestedManyWithoutRfidCardInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRfidCardInput, Prisma.VisitUncheckedCreateWithoutRfidCardInput> | Prisma.VisitCreateWithoutRfidCardInput[] | Prisma.VisitUncheckedCreateWithoutRfidCardInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRfidCardInput | Prisma.VisitCreateOrConnectWithoutRfidCardInput[]
+  createMany?: Prisma.VisitCreateManyRfidCardInputEnvelope
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+}
+
+export type VisitUpdateManyWithoutRfidCardNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRfidCardInput, Prisma.VisitUncheckedCreateWithoutRfidCardInput> | Prisma.VisitCreateWithoutRfidCardInput[] | Prisma.VisitUncheckedCreateWithoutRfidCardInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRfidCardInput | Prisma.VisitCreateOrConnectWithoutRfidCardInput[]
+  upsert?: Prisma.VisitUpsertWithWhereUniqueWithoutRfidCardInput | Prisma.VisitUpsertWithWhereUniqueWithoutRfidCardInput[]
+  createMany?: Prisma.VisitCreateManyRfidCardInputEnvelope
+  set?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  disconnect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  delete?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  update?: Prisma.VisitUpdateWithWhereUniqueWithoutRfidCardInput | Prisma.VisitUpdateWithWhereUniqueWithoutRfidCardInput[]
+  updateMany?: Prisma.VisitUpdateManyWithWhereWithoutRfidCardInput | Prisma.VisitUpdateManyWithWhereWithoutRfidCardInput[]
+  deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+}
+
+export type VisitUncheckedUpdateManyWithoutRfidCardNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitCreateWithoutRfidCardInput, Prisma.VisitUncheckedCreateWithoutRfidCardInput> | Prisma.VisitCreateWithoutRfidCardInput[] | Prisma.VisitUncheckedCreateWithoutRfidCardInput[]
+  connectOrCreate?: Prisma.VisitCreateOrConnectWithoutRfidCardInput | Prisma.VisitCreateOrConnectWithoutRfidCardInput[]
+  upsert?: Prisma.VisitUpsertWithWhereUniqueWithoutRfidCardInput | Prisma.VisitUpsertWithWhereUniqueWithoutRfidCardInput[]
+  createMany?: Prisma.VisitCreateManyRfidCardInputEnvelope
+  set?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  disconnect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  delete?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  connect?: Prisma.VisitWhereUniqueInput | Prisma.VisitWhereUniqueInput[]
+  update?: Prisma.VisitUpdateWithWhereUniqueWithoutRfidCardInput | Prisma.VisitUpdateWithWhereUniqueWithoutRfidCardInput[]
+  updateMany?: Prisma.VisitUpdateManyWithWhereWithoutRfidCardInput | Prisma.VisitUpdateManyWithWhereWithoutRfidCardInput[]
+  deleteMany?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+}
+
 export type EnumVisitStatusFieldUpdateOperationsInput = {
   set?: $Enums.VisitStatus
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableEnumRevokeReasonFieldUpdateOperationsInput = {
+  set?: $Enums.RevokeReason | null
 }
 
 export type VisitCreateNestedOneWithoutDestinationsInput = {
@@ -459,23 +727,175 @@ export type VisitUpdateOneRequiredWithoutDestinationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VisitUpdateToOneWithWhereWithoutDestinationsInput, Prisma.VisitUpdateWithoutDestinationsInput>, Prisma.VisitUncheckedUpdateWithoutDestinationsInput>
 }
 
+export type VisitCreateWithoutConfirmedByInput = {
+  id?: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  rfidCard?: Prisma.RfidCardCreateNestedOneWithoutVisitsInput
+  revokedBy?: Prisma.UserCreateNestedOneWithoutRevokedVisitsInput
+  destinations?: Prisma.VisitDestinationCreateNestedManyWithoutVisitInput
+}
+
+export type VisitUncheckedCreateWithoutConfirmedByInput = {
+  id?: string
+  visitorId: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  rfidCardId?: string | null
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  revokedById?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  destinations?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutVisitInput
+}
+
+export type VisitCreateOrConnectWithoutConfirmedByInput = {
+  where: Prisma.VisitWhereUniqueInput
+  create: Prisma.XOR<Prisma.VisitCreateWithoutConfirmedByInput, Prisma.VisitUncheckedCreateWithoutConfirmedByInput>
+}
+
+export type VisitCreateManyConfirmedByInputEnvelope = {
+  data: Prisma.VisitCreateManyConfirmedByInput | Prisma.VisitCreateManyConfirmedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type VisitCreateWithoutRevokedByInput = {
+  id?: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  rfidCard?: Prisma.RfidCardCreateNestedOneWithoutVisitsInput
+  confirmedBy?: Prisma.UserCreateNestedOneWithoutConfirmedVisitsInput
+  destinations?: Prisma.VisitDestinationCreateNestedManyWithoutVisitInput
+}
+
+export type VisitUncheckedCreateWithoutRevokedByInput = {
+  id?: string
+  visitorId: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  rfidCardId?: string | null
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  destinations?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutVisitInput
+}
+
+export type VisitCreateOrConnectWithoutRevokedByInput = {
+  where: Prisma.VisitWhereUniqueInput
+  create: Prisma.XOR<Prisma.VisitCreateWithoutRevokedByInput, Prisma.VisitUncheckedCreateWithoutRevokedByInput>
+}
+
+export type VisitCreateManyRevokedByInputEnvelope = {
+  data: Prisma.VisitCreateManyRevokedByInput | Prisma.VisitCreateManyRevokedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type VisitUpsertWithWhereUniqueWithoutConfirmedByInput = {
+  where: Prisma.VisitWhereUniqueInput
+  update: Prisma.XOR<Prisma.VisitUpdateWithoutConfirmedByInput, Prisma.VisitUncheckedUpdateWithoutConfirmedByInput>
+  create: Prisma.XOR<Prisma.VisitCreateWithoutConfirmedByInput, Prisma.VisitUncheckedCreateWithoutConfirmedByInput>
+}
+
+export type VisitUpdateWithWhereUniqueWithoutConfirmedByInput = {
+  where: Prisma.VisitWhereUniqueInput
+  data: Prisma.XOR<Prisma.VisitUpdateWithoutConfirmedByInput, Prisma.VisitUncheckedUpdateWithoutConfirmedByInput>
+}
+
+export type VisitUpdateManyWithWhereWithoutConfirmedByInput = {
+  where: Prisma.VisitScalarWhereInput
+  data: Prisma.XOR<Prisma.VisitUpdateManyMutationInput, Prisma.VisitUncheckedUpdateManyWithoutConfirmedByInput>
+}
+
+export type VisitScalarWhereInput = {
+  AND?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+  OR?: Prisma.VisitScalarWhereInput[]
+  NOT?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
+  id?: Prisma.StringFilter<"Visit"> | string
+  visitorId?: Prisma.StringFilter<"Visit"> | string
+  status?: Prisma.EnumVisitStatusFilter<"Visit"> | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFilter<"Visit"> | boolean
+  rfidCardId?: Prisma.StringNullableFilter<"Visit"> | string | null
+  timeIn?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
+  timeOut?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
+  revokeReason?: Prisma.EnumRevokeReasonNullableFilter<"Visit"> | $Enums.RevokeReason | null
+  revokeNote?: Prisma.StringNullableFilter<"Visit"> | string | null
+  confirmedById?: Prisma.StringNullableFilter<"Visit"> | string | null
+  revokedById?: Prisma.StringNullableFilter<"Visit"> | string | null
+  reason?: Prisma.StringNullableFilter<"Visit"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
+}
+
+export type VisitUpsertWithWhereUniqueWithoutRevokedByInput = {
+  where: Prisma.VisitWhereUniqueInput
+  update: Prisma.XOR<Prisma.VisitUpdateWithoutRevokedByInput, Prisma.VisitUncheckedUpdateWithoutRevokedByInput>
+  create: Prisma.XOR<Prisma.VisitCreateWithoutRevokedByInput, Prisma.VisitUncheckedCreateWithoutRevokedByInput>
+}
+
+export type VisitUpdateWithWhereUniqueWithoutRevokedByInput = {
+  where: Prisma.VisitWhereUniqueInput
+  data: Prisma.XOR<Prisma.VisitUpdateWithoutRevokedByInput, Prisma.VisitUncheckedUpdateWithoutRevokedByInput>
+}
+
+export type VisitUpdateManyWithWhereWithoutRevokedByInput = {
+  where: Prisma.VisitScalarWhereInput
+  data: Prisma.XOR<Prisma.VisitUpdateManyMutationInput, Prisma.VisitUncheckedUpdateManyWithoutRevokedByInput>
+}
+
 export type VisitCreateWithoutVisitorInput = {
   id?: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  rfidCard?: Prisma.RfidCardCreateNestedOneWithoutVisitsInput
+  confirmedBy?: Prisma.UserCreateNestedOneWithoutConfirmedVisitsInput
+  revokedBy?: Prisma.UserCreateNestedOneWithoutRevokedVisitsInput
   destinations?: Prisma.VisitDestinationCreateNestedManyWithoutVisitInput
 }
 
 export type VisitUncheckedCreateWithoutVisitorInput = {
   id?: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
+  rfidCardId?: string | null
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   destinations?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutVisitInput
@@ -507,38 +927,96 @@ export type VisitUpdateManyWithWhereWithoutVisitorInput = {
   data: Prisma.XOR<Prisma.VisitUpdateManyMutationInput, Prisma.VisitUncheckedUpdateManyWithoutVisitorInput>
 }
 
-export type VisitScalarWhereInput = {
-  AND?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
-  OR?: Prisma.VisitScalarWhereInput[]
-  NOT?: Prisma.VisitScalarWhereInput | Prisma.VisitScalarWhereInput[]
-  id?: Prisma.StringFilter<"Visit"> | string
-  visitorId?: Prisma.StringFilter<"Visit"> | string
-  status?: Prisma.EnumVisitStatusFilter<"Visit"> | $Enums.VisitStatus
-  rfidUid?: Prisma.StringNullableFilter<"Visit"> | string | null
-  timeIn?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
-  timeOut?: Prisma.DateTimeNullableFilter<"Visit"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Visit"> | Date | string
+export type VisitCreateWithoutRfidCardInput = {
+  id?: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  confirmedBy?: Prisma.UserCreateNestedOneWithoutConfirmedVisitsInput
+  revokedBy?: Prisma.UserCreateNestedOneWithoutRevokedVisitsInput
+  destinations?: Prisma.VisitDestinationCreateNestedManyWithoutVisitInput
+}
+
+export type VisitUncheckedCreateWithoutRfidCardInput = {
+  id?: string
+  visitorId: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  destinations?: Prisma.VisitDestinationUncheckedCreateNestedManyWithoutVisitInput
+}
+
+export type VisitCreateOrConnectWithoutRfidCardInput = {
+  where: Prisma.VisitWhereUniqueInput
+  create: Prisma.XOR<Prisma.VisitCreateWithoutRfidCardInput, Prisma.VisitUncheckedCreateWithoutRfidCardInput>
+}
+
+export type VisitCreateManyRfidCardInputEnvelope = {
+  data: Prisma.VisitCreateManyRfidCardInput | Prisma.VisitCreateManyRfidCardInput[]
+  skipDuplicates?: boolean
+}
+
+export type VisitUpsertWithWhereUniqueWithoutRfidCardInput = {
+  where: Prisma.VisitWhereUniqueInput
+  update: Prisma.XOR<Prisma.VisitUpdateWithoutRfidCardInput, Prisma.VisitUncheckedUpdateWithoutRfidCardInput>
+  create: Prisma.XOR<Prisma.VisitCreateWithoutRfidCardInput, Prisma.VisitUncheckedCreateWithoutRfidCardInput>
+}
+
+export type VisitUpdateWithWhereUniqueWithoutRfidCardInput = {
+  where: Prisma.VisitWhereUniqueInput
+  data: Prisma.XOR<Prisma.VisitUpdateWithoutRfidCardInput, Prisma.VisitUncheckedUpdateWithoutRfidCardInput>
+}
+
+export type VisitUpdateManyWithWhereWithoutRfidCardInput = {
+  where: Prisma.VisitScalarWhereInput
+  data: Prisma.XOR<Prisma.VisitUpdateManyMutationInput, Prisma.VisitUncheckedUpdateManyWithoutRfidCardInput>
 }
 
 export type VisitCreateWithoutDestinationsInput = {
   id?: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  rfidCard?: Prisma.RfidCardCreateNestedOneWithoutVisitsInput
+  confirmedBy?: Prisma.UserCreateNestedOneWithoutConfirmedVisitsInput
+  revokedBy?: Prisma.UserCreateNestedOneWithoutRevokedVisitsInput
 }
 
 export type VisitUncheckedCreateWithoutDestinationsInput = {
   id?: string
   visitorId: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
+  rfidCardId?: string | null
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -562,21 +1040,165 @@ export type VisitUpdateToOneWithWhereWithoutDestinationsInput = {
 export type VisitUpdateWithoutDestinationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  rfidCard?: Prisma.RfidCardUpdateOneWithoutVisitsNestedInput
+  confirmedBy?: Prisma.UserUpdateOneWithoutConfirmedVisitsNestedInput
+  revokedBy?: Prisma.UserUpdateOneWithoutRevokedVisitsNestedInput
 }
 
 export type VisitUncheckedUpdateWithoutDestinationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VisitCreateManyConfirmedByInput = {
+  id?: string
+  visitorId: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  rfidCardId?: string | null
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  revokedById?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VisitCreateManyRevokedByInput = {
+  id?: string
+  visitorId: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  rfidCardId?: string | null
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VisitUpdateWithoutConfirmedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  rfidCard?: Prisma.RfidCardUpdateOneWithoutVisitsNestedInput
+  revokedBy?: Prisma.UserUpdateOneWithoutRevokedVisitsNestedInput
+  destinations?: Prisma.VisitDestinationUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitUncheckedUpdateWithoutConfirmedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  destinations?: Prisma.VisitDestinationUncheckedUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitUncheckedUpdateManyWithoutConfirmedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VisitUpdateWithoutRevokedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  rfidCard?: Prisma.RfidCardUpdateOneWithoutVisitsNestedInput
+  confirmedBy?: Prisma.UserUpdateOneWithoutConfirmedVisitsNestedInput
+  destinations?: Prisma.VisitDestinationUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitUncheckedUpdateWithoutRevokedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  destinations?: Prisma.VisitDestinationUncheckedUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitUncheckedUpdateManyWithoutRevokedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -584,9 +1206,15 @@ export type VisitUncheckedUpdateWithoutDestinationsInput = {
 export type VisitCreateManyVisitorInput = {
   id?: string
   status?: $Enums.VisitStatus
-  rfidUid?: string | null
+  isManualEntry?: boolean
+  rfidCardId?: string | null
   timeIn?: Date | string | null
   timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -594,20 +1222,32 @@ export type VisitCreateManyVisitorInput = {
 export type VisitUpdateWithoutVisitorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rfidCard?: Prisma.RfidCardUpdateOneWithoutVisitsNestedInput
+  confirmedBy?: Prisma.UserUpdateOneWithoutConfirmedVisitsNestedInput
+  revokedBy?: Prisma.UserUpdateOneWithoutRevokedVisitsNestedInput
   destinations?: Prisma.VisitDestinationUpdateManyWithoutVisitNestedInput
 }
 
 export type VisitUncheckedUpdateWithoutVisitorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   destinations?: Prisma.VisitDestinationUncheckedUpdateManyWithoutVisitNestedInput
@@ -616,9 +1256,81 @@ export type VisitUncheckedUpdateWithoutVisitorInput = {
 export type VisitUncheckedUpdateManyWithoutVisitorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
-  rfidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rfidCardId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VisitCreateManyRfidCardInput = {
+  id?: string
+  visitorId: string
+  status?: $Enums.VisitStatus
+  isManualEntry?: boolean
+  timeIn?: Date | string | null
+  timeOut?: Date | string | null
+  revokeReason?: $Enums.RevokeReason | null
+  revokeNote?: string | null
+  confirmedById?: string | null
+  revokedById?: string | null
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VisitUpdateWithoutRfidCardInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  confirmedBy?: Prisma.UserUpdateOneWithoutConfirmedVisitsNestedInput
+  revokedBy?: Prisma.UserUpdateOneWithoutRevokedVisitsNestedInput
+  destinations?: Prisma.VisitDestinationUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitUncheckedUpdateWithoutRfidCardInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  destinations?: Prisma.VisitDestinationUncheckedUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitUncheckedUpdateManyWithoutRfidCardInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  isManualEntry?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  timeIn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  timeOut?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokeReason?: Prisma.NullableEnumRevokeReasonFieldUpdateOperationsInput | $Enums.RevokeReason | null
+  revokeNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revokedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -658,12 +1370,21 @@ export type VisitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   visitorId?: boolean
   status?: boolean
-  rfidUid?: boolean
+  isManualEntry?: boolean
+  rfidCardId?: boolean
   timeIn?: boolean
   timeOut?: boolean
+  revokeReason?: boolean
+  revokeNote?: boolean
+  confirmedById?: boolean
+  revokedById?: boolean
+  reason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
+  rfidCard?: boolean | Prisma.Visit$rfidCardArgs<ExtArgs>
+  confirmedBy?: boolean | Prisma.Visit$confirmedByArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.Visit$revokedByArgs<ExtArgs>
   destinations?: boolean | Prisma.Visit$destinationsArgs<ExtArgs>
   _count?: boolean | Prisma.VisitCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["visit"]>
@@ -672,63 +1393,123 @@ export type VisitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   visitorId?: boolean
   status?: boolean
-  rfidUid?: boolean
+  isManualEntry?: boolean
+  rfidCardId?: boolean
   timeIn?: boolean
   timeOut?: boolean
+  revokeReason?: boolean
+  revokeNote?: boolean
+  confirmedById?: boolean
+  revokedById?: boolean
+  reason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
+  rfidCard?: boolean | Prisma.Visit$rfidCardArgs<ExtArgs>
+  confirmedBy?: boolean | Prisma.Visit$confirmedByArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.Visit$revokedByArgs<ExtArgs>
 }, ExtArgs["result"]["visit"]>
 
 export type VisitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   visitorId?: boolean
   status?: boolean
-  rfidUid?: boolean
+  isManualEntry?: boolean
+  rfidCardId?: boolean
   timeIn?: boolean
   timeOut?: boolean
+  revokeReason?: boolean
+  revokeNote?: boolean
+  confirmedById?: boolean
+  revokedById?: boolean
+  reason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
+  rfidCard?: boolean | Prisma.Visit$rfidCardArgs<ExtArgs>
+  confirmedBy?: boolean | Prisma.Visit$confirmedByArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.Visit$revokedByArgs<ExtArgs>
 }, ExtArgs["result"]["visit"]>
 
 export type VisitSelectScalar = {
   id?: boolean
   visitorId?: boolean
   status?: boolean
-  rfidUid?: boolean
+  isManualEntry?: boolean
+  rfidCardId?: boolean
   timeIn?: boolean
   timeOut?: boolean
+  revokeReason?: boolean
+  revokeNote?: boolean
+  confirmedById?: boolean
+  revokedById?: boolean
+  reason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VisitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "visitorId" | "status" | "rfidUid" | "timeIn" | "timeOut" | "createdAt" | "updatedAt", ExtArgs["result"]["visit"]>
+export type VisitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "visitorId" | "status" | "isManualEntry" | "rfidCardId" | "timeIn" | "timeOut" | "revokeReason" | "revokeNote" | "confirmedById" | "revokedById" | "reason" | "createdAt" | "updatedAt", ExtArgs["result"]["visit"]>
 export type VisitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
+  rfidCard?: boolean | Prisma.Visit$rfidCardArgs<ExtArgs>
+  confirmedBy?: boolean | Prisma.Visit$confirmedByArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.Visit$revokedByArgs<ExtArgs>
   destinations?: boolean | Prisma.Visit$destinationsArgs<ExtArgs>
   _count?: boolean | Prisma.VisitCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type VisitIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
+  rfidCard?: boolean | Prisma.Visit$rfidCardArgs<ExtArgs>
+  confirmedBy?: boolean | Prisma.Visit$confirmedByArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.Visit$revokedByArgs<ExtArgs>
 }
 export type VisitIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
+  rfidCard?: boolean | Prisma.Visit$rfidCardArgs<ExtArgs>
+  confirmedBy?: boolean | Prisma.Visit$confirmedByArgs<ExtArgs>
+  revokedBy?: boolean | Prisma.Visit$revokedByArgs<ExtArgs>
 }
 
 export type $VisitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Visit"
   objects: {
     visitor: Prisma.$VisitorPayload<ExtArgs>
+    rfidCard: Prisma.$RfidCardPayload<ExtArgs> | null
+    confirmedBy: Prisma.$UserPayload<ExtArgs> | null
+    revokedBy: Prisma.$UserPayload<ExtArgs> | null
     destinations: Prisma.$VisitDestinationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     visitorId: string
     status: $Enums.VisitStatus
-    rfidUid: string | null
+    /**
+     * True when receptionist created this manually (kiosk was unavailable)
+     */
+    isManualEntry: boolean
+    /**
+     * Populated when the receptionist taps the RFID card (Time In moment)
+     */
+    rfidCardId: string | null
+    /**
+     * Timestamp when the receptionist tapped the RFID card (visitor enters building)
+     */
     timeIn: Date | null
+    /**
+     * Timestamp when visitor tapped RFID at exit OR staff manually revoked
+     */
     timeOut: Date | null
+    revokeReason: $Enums.RevokeReason | null
+    revokeNote: string | null
+    /**
+     * Staff member who confirmed the visit (RFID tap / Time In)
+     */
+    confirmedById: string | null
+    /**
+     * Staff member who revoked / forced checkout
+     */
+    revokedById: string | null
+    reason: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["visit"]>
@@ -1126,6 +1907,9 @@ readonly fields: VisitFieldRefs;
 export interface Prisma__VisitClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   visitor<T extends Prisma.VisitorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitorDefaultArgs<ExtArgs>>): Prisma.Prisma__VisitorClient<runtime.Types.Result.GetResult<Prisma.$VisitorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  rfidCard<T extends Prisma.Visit$rfidCardArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Visit$rfidCardArgs<ExtArgs>>): Prisma.Prisma__RfidCardClient<runtime.Types.Result.GetResult<Prisma.$RfidCardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  confirmedBy<T extends Prisma.Visit$confirmedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Visit$confirmedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  revokedBy<T extends Prisma.Visit$revokedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Visit$revokedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   destinations<T extends Prisma.Visit$destinationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Visit$destinationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VisitDestinationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1159,9 +1943,15 @@ export interface VisitFieldRefs {
   readonly id: Prisma.FieldRef<"Visit", 'String'>
   readonly visitorId: Prisma.FieldRef<"Visit", 'String'>
   readonly status: Prisma.FieldRef<"Visit", 'VisitStatus'>
-  readonly rfidUid: Prisma.FieldRef<"Visit", 'String'>
+  readonly isManualEntry: Prisma.FieldRef<"Visit", 'Boolean'>
+  readonly rfidCardId: Prisma.FieldRef<"Visit", 'String'>
   readonly timeIn: Prisma.FieldRef<"Visit", 'DateTime'>
   readonly timeOut: Prisma.FieldRef<"Visit", 'DateTime'>
+  readonly revokeReason: Prisma.FieldRef<"Visit", 'RevokeReason'>
+  readonly revokeNote: Prisma.FieldRef<"Visit", 'String'>
+  readonly confirmedById: Prisma.FieldRef<"Visit", 'String'>
+  readonly revokedById: Prisma.FieldRef<"Visit", 'String'>
+  readonly reason: Prisma.FieldRef<"Visit", 'String'>
   readonly createdAt: Prisma.FieldRef<"Visit", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Visit", 'DateTime'>
 }
@@ -1562,6 +2352,63 @@ export type VisitDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Visits to delete.
    */
   limit?: number
+}
+
+/**
+ * Visit.rfidCard
+ */
+export type Visit$rfidCardArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RfidCard
+   */
+  select?: Prisma.RfidCardSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RfidCard
+   */
+  omit?: Prisma.RfidCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RfidCardInclude<ExtArgs> | null
+  where?: Prisma.RfidCardWhereInput
+}
+
+/**
+ * Visit.confirmedBy
+ */
+export type Visit$confirmedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * Visit.revokedBy
+ */
+export type Visit$revokedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

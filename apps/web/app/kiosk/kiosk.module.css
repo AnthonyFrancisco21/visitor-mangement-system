@@ -1,564 +1,572 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap');
 
-/* Animations */
-@keyframes orbFloat {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+/* ── Keyframes ──────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(77, 184, 255, 0.4); }
-  70% { box-shadow: 0 0 0 15px rgba(77, 184, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(77, 184, 255, 0); }
+@keyframes pulsePill {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
 }
 
-.layout {
+/* ── Page Shell ─────────────────────────────────────── */
+/*
+ * KEY KEYBOARD STRATEGY:
+ * Use 100dvh so the page contracts when the virtual keyboard appears.
+ * The main scrollable area expands to fill the remaining space.
+ * The footer stays fixed at the bottom via sticky positioning.
+ */
+.page {
   display: flex;
-  min-height: 100vh;
-  background-color: #050a15; /* Midnight Blue */
+  flex-direction: column;
+  height: 100dvh;           /* shrinks when keyboard appears */
+  background: #060b18;
   color: #e2e8f0;
   font-family: 'Outfit', sans-serif;
   overflow: hidden;
 }
 
-/* Left Pane: Branding & Atmosphere */
-.leftPane {
-  flex: 1;
-  position: relative;
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 4rem;
-  background: linear-gradient(145deg, #050a15, #0a1128);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  overflow: hidden;
-}
-
-@media (min-width: 1024px) {
-  .leftPane {
-    display: flex;
-  }
-}
-
-/* Decorative Orbs */
-.orbPrimary {
-  position: absolute;
-  top: 20%;
-  left: 10%;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(46,92,255,0.15) 0%, rgba(0,0,0,0) 70%);
-  border-radius: 50%;
-  filter: blur(40px);
-  animation: orbFloat 20s infinite alternate ease-in-out;
-  pointer-events: none;
-}
-
-.orbSecondary {
-  position: absolute;
-  bottom: 10%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(14,211,255,0.1) 0%, rgba(0,0,0,0) 70%);
-  border-radius: 50%;
-  filter: blur(60px);
-  animation: orbFloat 25s infinite alternate-reverse ease-in-out;
-  pointer-events: none;
-}
-
-.noiseOverlay {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
-}
-
-.branding {
-  position: relative;
-  z-index: 10;
-}
-
-.logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #fff;
+/* ── Header ─────────────────────────────────────────── */
+.header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(6, 11, 24, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.logoIcon {
-  width: 12px;
-  height: 12px;
-  background: #4db8ff;
-  border-radius: 50%;
-  box-shadow: 0 0 20px #4db8ff;
-}
-
-.heroContent {
-  position: relative;
-  z-index: 10;
-  margin-top: -10vh;
-}
-
-.heroTitle {
-  font-family: 'Syne', sans-serif;
-  font-size: 4.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(180deg, #ffffff 0%, #a5b4fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.03em;
-}
-
-.heroSubtitle {
-  font-size: 1.25rem;
-  font-weight: 300;
-  color: #94a3b8;
-  max-width: 400px;
-  line-height: 1.6;
-}
-
-/* Right Pane: Form Area */
-.rightPane {
-  flex: 1;
+.headerBrand {
   display: flex;
-  flex-direction: column;
-  position: relative;
-  background-color: #070c1a;
-  overflow-y: auto;
-  padding: 2rem;
+  align-items: center;
+  gap: 0.625rem;
 }
 
-@media (min-width: 1024px) {
-  .rightPane {
-    flex: 1.2;
-    padding: 4rem 6rem;
-  }
+.brandDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4db8ff;
+  box-shadow: 0 0 8px #4db8ff;
 }
 
-.formContainer {
-  max-width: 600px;
-  width: 100%;
-  margin: auto;
-  position: relative;
-  z-index: 10;
-  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.brandName {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
 }
 
-/* Step Indicator */
+/* Step Tracker */
 .stepTracker {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 4rem;
+  gap: 0.5rem;
 }
 
 .stepItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  opacity: 0.4;
-  transition: all 0.4s ease;
+  gap: 0.375rem;
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
 }
 
-.stepItemActive {
+.stepActive {
   opacity: 1;
 }
 
-.stepNumber {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.875rem;
-  font-weight: 700;
-  width: 28px;
-  height: 28px;
+.stepDone {
+  opacity: 0.6;
+}
+
+.stepDot {
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  border: 1px solid currentColor;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
-.stepItemActive .stepNumber {
-  background: #fff;
-  color: #050a15;
-  border-color: #fff;
+.stepActive .stepDot {
+  border-color: #4db8ff;
+  background: #4db8ff;
+  color: #060b18;
+}
+
+.stepDone .stepDot {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .stepLabel {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
+  color: #94a3b8;
 }
 
-.stepSeparator {
-  width: 20px;
+.stepActive .stepLabel {
+  color: #e2e8f0;
+}
+
+.stepLine {
+  width: 24px;
   height: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
 }
 
-/* Form Elements */
+.stepLineDone {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Main Scrollable Area ────────────────────────────── */
+/*
+ * flex: 1 + overflow-y: auto lets this expand to fill space
+ * between the fixed header and sticky footer. When the keyboard
+ * rises, this area shrinks and becomes scrollable so the focused
+ * input is reachable.
+ */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0;
+  /* Padding at bottom ensures content isn't hidden behind footer */
+  padding-bottom: 1rem;
+  scroll-padding-top: 1rem;
+}
+
+.formCard {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 0;
+  animation: fadeUp 0.4s ease both;
+}
+
+/* ── Step Header ─────────────────────────────────────── */
 .stepHeader {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .stepTitle {
   font-family: 'Syne', sans-serif;
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 0.5rem;
   letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
 }
 
-.stepDescription {
+.stepDesc {
+  font-size: 0.9375rem;
   color: #64748b;
-  font-size: 1.125rem;
   font-weight: 300;
 }
 
-.fieldGroup {
-  margin-bottom: 2rem;
+/* ── Form Fields ─────────────────────────────────────── */
+.field {
+  margin-bottom: 1.25rem;
 }
 
 .label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.75rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.labelOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #475569;
 }
 
 .input {
   width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #f1f5f9;
   font-family: 'Outfit', sans-serif;
-  font-size: 1.25rem;
-  padding: 0.75rem 0;
-  transition: all 0.3s ease;
+  font-size: 1rem;
+  padding: 0.875rem 1rem;
+  transition: border-color 0.2s ease, background 0.2s ease;
   outline: none;
+  -webkit-appearance: none;
+  /* Prevent iOS zoom on focus (font must be >=16px) */
+  font-size: max(16px, 1rem);
 }
 
 .input:focus {
-  border-bottom-color: #4db8ff;
+  border-color: rgba(77, 184, 255, 0.5);
+  background: rgba(77, 184, 255, 0.05);
 }
 
 .input::placeholder {
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.18);
 }
 
 .inputDate {
-  colorScheme: dark;
+  color-scheme: dark;
 }
 
 .textarea {
-  min-height: 80px;
-  resize: vertical;
+  resize: none;
+  line-height: 1.6;
 }
 
 .row {
   display: flex;
-  gap: 2rem;
+  gap: 0.875rem;
 }
 
 .row > * {
   flex: 1;
 }
 
-/* Destinations Grid */
+/* ── Destination List ────────────────────────────────── */
 .destinationList {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
 }
 
-.destinationCard {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.destCard {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1rem 1.125rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.destinationCard:hover {
+.destCard:hover,
+.destCard:active {
   background: rgba(255, 255, 255, 0.06);
-  transform: translateX(5px);
 }
 
-.destinationCardSelected {
-  background: rgba(77, 184, 255, 0.1);
-  border-color: #4db8ff;
-  box-shadow: inset 4px 0 0 #4db8ff;
+.destCardSelected {
+  background: rgba(77, 184, 255, 0.08);
+  border-color: rgba(77, 184, 255, 0.4);
 }
 
-.destinationInfo h3 {
+.destInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.destName {
   font-family: 'Syne', sans-serif;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  margin-bottom: 0.25rem;
 }
 
-.destinationInfo p {
-  font-size: 0.875rem;
-  color: #94a3b8;
+.destMeta {
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 400;
 }
 
+.destCheck {
+  color: #4db8ff;
+  flex-shrink: 0;
+}
+
+/* Empty state */
 .emptyState {
-  padding: 3rem;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-}
-
-.emptyState p {
-  color: #94a3b8;
-  font-size: 1.125rem;
-}
-
-/* Camera Simulation Cards */
-.scanGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.scanBox {
-  aspect-ratio: 1;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
   text-align: center;
-  padding: 2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  padding: 2rem 1rem;
+  color: #475569;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
 }
 
-.scanBox:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.scanBoxSuccess {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.05);
-}
-
-.scanIconWrap {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-  color: #fff;
-  transition: all 0.3s ease;
-}
-
-.scanBox:hover .scanIconWrap {
-  background: rgba(77, 184, 255, 0.2);
-  color: #4db8ff;
-}
-
-.scanBoxSuccess .scanIconWrap {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-}
-
-.scanText {
+.emptyState p {
   font-size: 1rem;
-  font-weight: 500;
-  color: #cbd5e1;
+  color: #64748b;
 }
 
-/* Summary Box */
-.summaryPanel {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 20px;
-  padding: 2rem;
-  margin-top: 2rem;
+.emptyState span {
+  font-size: 0.875rem;
+  color: #475569;
 }
 
-.summaryGrid {
+/* ── Scan Buttons (Step 2) ───────────────────────────── */
+.scanRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 0.875rem;
+  margin-bottom: 1.5rem;
 }
 
-.summaryItem .label {
-  margin-bottom: 0.25rem;
+.scanBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 1.25rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  color: #94a3b8;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.summaryItem .value {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.125rem;
-  color: #fff;
-  font-weight: 600;
+.scanBtn:hover,
+.scanBtn:active {
+  border-color: rgba(77, 184, 255, 0.3);
+  color: #4db8ff;
+  background: rgba(77, 184, 255, 0.06);
 }
 
-/* Footer / Actions */
-.footer {
-  margin-top: 4rem;
+.scanBtnDone {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.06);
+}
+
+/* ── Summary (Step 3) ────────────────────────────────── */
+.summary {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 1.25rem;
+}
+
+.summaryRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 2rem;
+  gap: 1rem;
+  padding: 0.875rem 1.125rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summaryRow:last-child {
+  border-bottom: none;
+}
+
+.summaryKey {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.summaryVal {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9375rem;
+  color: #e2e8f0;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* ── Error Banner ────────────────────────────────────── */
+.errorBanner {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  color: #fca5a5;
+  padding: 0.875rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+/* ── Footer / Navigation ─────────────────────────────── */
+/*
+ * position: sticky + bottom: 0 keeps the buttons visible
+ * at the bottom even when the keyboard is up, because the
+ * sticky context is inside .main (the scrollable container).
+ */
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #060b18;
+  /* Safe area for home indicator on iOS */
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
 .btnBack {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-family: 'Outfit', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: color 0.2s ease;
-  padding: 0.5rem 0;
+  gap: 0.375rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #64748b;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btnBack:hover {
-  color: #fff;
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btnNext {
-  background: #fff;
-  color: #050a15;
-  border: none;
-  border-radius: 12px;
-  padding: 1rem 2.5rem;
-  font-family: 'Syne', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  background: #fff;
+  color: #060b18;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btnNext:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.12);
 }
 
 .btnNext:disabled {
-  opacity: 0.5;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 .btnSubmit {
   background: linear-gradient(135deg, #4db8ff, #2563eb);
   color: #fff;
-  animation: pulseGlow 3s infinite;
 }
 
 .btnSubmit:hover:not(:disabled) {
-  box-shadow: 0 10px 30px rgba(77, 184, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(77, 184, 255, 0.3);
 }
 
-.errorBanner {
-  background: rgba(239, 68, 68, 0.1);
-  border-left: 4px solid #ef4444;
-  color: #fca5a5;
-  padding: 1rem 1.5rem;
-  margin-top: 2rem;
-  font-size: 0.875rem;
-}
-
-/* Success Screen */
-.successWrapper {
+/* ── Success Screen ──────────────────────────────────── */
+.successScreen {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 100%;
-  min-height: 60vh;
+  padding: 2.5rem 2rem;
+  gap: 1.25rem;
 }
 
 .successIcon {
-  width: 120px;
-  height: 120px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   color: #10b981;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2rem;
 }
 
-.successWrapper h1 {
+.successTitle {
   font-family: 'Syne', sans-serif;
-  font-size: 3.5rem;
+  font-size: 2.25rem;
   font-weight: 800;
   color: #fff;
-  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
 }
 
-.successWrapper p {
-  font-size: 1.25rem;
-  color: #94a3b8;
-  margin-bottom: 3rem;
-  max-width: 400px;
+.successDesc {
+  font-size: 1rem;
+  color: #64748b;
+  max-width: 320px;
+  line-height: 1.6;
 }
 
 .statusPill {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 2rem;
+  gap: 0.625rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  color: #fff;
+  color: #94a3b8;
   font-family: 'Syne', sans-serif;
+  font-size: 0.9375rem;
   font-weight: 600;
+  animation: pulsePill 2s ease-in-out infinite;
 }
 
+/* ── Utilities ───────────────────────────────────────── */
 .spin {
-  animation: spin 1s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin {
-  100% { transform: rotate(360deg); }
+.fadeIn {
+  animation: fadeUp 0.35s ease both;
+}
+
+/* ── Tablet Portrait Overrides (768px wide, tall) ───── */
+@media (min-width: 600px) {
+  .formCard {
+    padding: 2rem 2rem 0;
+  }
+
+  .stepTitle {
+    font-size: 2rem;
+  }
+
+  .footer {
+    padding: 1.25rem 2rem;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
 }
