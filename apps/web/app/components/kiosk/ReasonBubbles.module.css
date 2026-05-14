@@ -1,0 +1,53 @@
+.container {
+  padding: 1.5rem 0;
+  width: 100%;
+}
+
+.bubbleGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.bubble {
+  padding: 1rem 1.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bubble:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.selected {
+  background: linear-gradient(135deg, #4db8ff, #2563eb);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.selected:hover {
+  background: linear-gradient(135deg, #4db8ff, #2563eb);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.5);
+}
+
+.label {
+  pointer-events: none;
+}
