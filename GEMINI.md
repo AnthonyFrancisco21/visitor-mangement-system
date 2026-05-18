@@ -126,16 +126,16 @@ Example pattern:
 
 ### System Overview
 
-**Visitor Management System** is a 3-tier system (Kiosk → Receptionist → Admin) that tracks visitor entry/exit from a building using a combination of tablet-based registration, ID scanning, and RFID cards.
+**Visitor Management System** is a 3-tier system (Kiosk → Receptionist → Admin) that tracks visitor entry/exit from a building using a combination of tablet-based registration, receptionist verification, and RFID cards.
 
 **Key Entities:**
 
-- **Visitor**: Person entering the building (name, age, address, contact, ID photo)
+- **Visitor**: Person entering the building (name, age, birthdate, address, contact, ID photo, visitor photo)
 - **RFID Card**: Physical reusable card (30+ available, numbered, tapped for time tracking)
 - **Destination/Department**: Pre-defined locations in the building with a contact person
-- **Registration**: Visitor submitting info on kiosk tablet
-- **Time In**: When receptionist taps RFID card (not when visitor submits form)
-- **Time Out**: When visitor taps RFID at checkout or admin manually revokes
+- **Registration**: Visitor submitting initial info on kiosk tablet
+- **Time In**: When receptionist scans RFID card, captures ID & face, and approves visitor (not when visitor submits form)
+- **Time Out**: When visitor's RFID card is scanned at checkout or admin manually revokes
 
 ---
 
@@ -145,39 +145,31 @@ Example pattern:
 
 **Flow:**
 
-1. **Visitor Navigation**
-   - Visitor selects desired destination/department from pre-defined list
-   - Visitor selects person/contact they are visiting
-   - Visitor states reason for visit
+1. **Visitor Standby Wallpaper**
+   - Kiosk displays standby wallpaper screen.
+   - Visitor taps anywhere on the screen to start the registration flow.
 
-2. **ID Scanning**
-   - Visitor points ID at tablet camera (front and back)
-   - System extracts: name, age, address
-   - **Note**: Extraction may not be 100% accurate
-   - Visitor can manually edit extracted fields
+2. **Name & Birthdate Input**
+   - Visitor enters their full name and selects their birthdate on a single screen.
+   - The kiosk automatically calculates and shows their age, and the visitor clicks "Next".
 
-3. **Contact Information**
-   - Visitor enters phone/contact number
-   - Visitor reviews all information
-   - Visitor clicks "Proceed" or "Finish"
+3. **Destination Selection**
+   - Visitor selects their desired destination/department and contact person from a pre-defined list.
 
-4. **Submission & Waiting State**
-   - Form submits → Registration status = **PENDING**
-   - Kiosk displays: `"You are set. Wait for receptionist to give you your visitor ID"`
-   - Kiosk shows **real-time timer** as visitor waits
-   - Visitor cannot proceed to destination until RFID is tapped
+4. **Reason for Visit**
+   - Visitor enters the reason for their visit and clicks "Next".
 
-5. **RFID Tap Confirmation** (by receptionist)
-   - Once receptionist taps RFID card reader: Time In is recorded
-   - Kiosk displays: `"You are good to go. Thank you for your visit"`
-   - Visitor takes RFID card and proceeds to destination
-   - Receptionist provides verbal confirmation
+5. **Final Notice & Standby Redirection**
+   - Kiosk submits form, creating a visit with `PENDING` status.
+   - Kiosk displays a final notice:
+     > *"Almost done! Last step of registration is to give your ID to the receptionist for scanning and for capturing an image of yourself."*
+   - Kiosk displays a real-time countdown timer (10 seconds) and automatically redirects the visitor back to the standby wallpaper screen.
 
 **Edge Case - Kiosk Not Used**:
 
 - If tablet is broken/unavailable, receptionist uses **Manual Registration** form
 - Receptionist asks visitor for all information verbally
-- ID photo is NOT taken (if no camera available)
+- ID photo and visitor photo are taken at the reception desk
 - Rest of workflow continues normally
 
 ---
@@ -190,33 +182,34 @@ Example pattern:
 
 #### A. REGISTRATION & TIME IN
 
-1. **Registration Table**
+1. **Registration Page (`/receptionist/registration`)**
    - Displays all **PENDING** registrations (visitors waiting on kiosk)
-   - Shows: name, destination, person visiting, time submitted
+   - Shows: Visitor Name, Destination, Reason, and Time Submitted
    - Receptionist reviews and clicks row to open **Confirmation Modal**
 
 2. **Confirmation Modal**
-   - Shows all extracted/entered visitor information
-   - Receptionist can edit any field if needed
-   - Receptionist clicks **"Confirm"** to approve
+   - **Step 1: Scan ID Document**: Receptionist asks the visitor for their government ID, positions it under the receptionist camera, and clicks "Capture Photo" (or clicks "Skip").
+   - **Step 2: Capture Visitor Photo**: Receptionist asks the visitor to look at the receptionist camera and captures their face photo (or clicks "Skip").
+   - **Step 3: Assign RFID Card**: 
+     - Receptionist taps an available physical RFID card on the card reader.
+     - The reader automatically populates the card's UID.
+     - Receptionist can optionally enter the ID number manually.
+     - Receptionist clicks **"Confirm & Time In"** to submit.
 
-3. **RFID Tap For Registration**
-   - Modal changes to: `"Tap visitor card for registration"`
-   - Receptionist taps RFID card on reader
-   - **IMPORTANT**: This records **Time In** and completes registration
-   - Kiosk receives confirmation (visitor sees "You are good to go")
-   - RFID is now **linked to this visitor** in database
-   - Receptionist hands RFID card to visitor
+3. **Complete Registration & Time In**
+   - Database creates/updates the visitor record with ID & face photos.
+   - Visit status is changed to `ACTIVE`, the RFID card is set to `IN_USE` and linked to the visitor, and `timeIn` is recorded as the current timestamp.
+   - Receptionist hands the physical RFID card to the visitor to proceed to their destination.
 
-4. **Live Dashboard**
+4. **Live Dashboard (`/receptionist`)**
    - Shows all **currently active visitors** (Time In but not yet Time Out)
-   - Updates in real-time as visitors are registered or checked out
-   - Receptionist can see who's in the building at any moment
+   - Displays: Visitor Name, Assigned RFID Card, Destination, Time In, and Time Elapsed
+   - Provides a quick **"Check Out"** action button to complete the visit and free up the RFID card
 
 **Manual Registration** (Fallback):
 
 - If kiosk is broken, click **"Manual Registration"** button
-- Form appears with all fields: name, age, address, contact, destination, person, reason
+- Form appears with all fields: name, destination, person, reason
 - Receptionist manually enters all information
 - Proceeds to RFID tap same as above
 
@@ -352,14 +345,14 @@ Example pattern:
 
 **Kiosk Updates**:
 
-- After form submit: `"You are set. Wait for receptionist to give you your visitor ID"` (with timer)
-- After RFID tap: `"You are good to go. Thank you for your visit"`
+- After form submit: Displays instructions: *"Almost done! Last step of registration is to give your ID to the receptionist for scanning and for capturing an image of yourself."*
+- Auto-redirects back to the standby wallpaper screen after a 10-second countdown.
 
 **Receptionist Updates**:
 
-- New pending registration appears in table immediately
-- Live dashboard updates when visitor is registered or checked out
-- Can view all active visitors in live dashboard and checkout page
+- New pending registration appears in the pending table (refreshed manually or on landing).
+- Live dashboard shows active visitors in the building and pending count badges.
+- Can check out any active visitor directly from the dashboard table.
 
 **Admin Overview**:
 

@@ -93,7 +93,7 @@ model Visitor {
   idType        String?
   /// ID document number — not globally unique because the same person
   /// can visit multiple times; uniqueness enforced per visitor record
-  idNumber      String?
+  idNumber      String? @unique
 
   // ── Photos (stored as URLs/paths) ──
   /// Photo of the ID document captured by OCR scan

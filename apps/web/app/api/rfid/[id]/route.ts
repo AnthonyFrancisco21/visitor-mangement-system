@@ -3,11 +3,11 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { status } = await request.json();
-    const id = params.id;
+    const { id } = await params;
 
     if (!['AVAILABLE', 'IN_USE', 'LOST', 'RETIRED'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });

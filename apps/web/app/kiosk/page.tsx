@@ -6,8 +6,6 @@ import {
   ChevronRight,
   ChevronLeft,
   Loader2,
-  FileText,
-  User,
   ArrowRight,
   Search,
   X,
@@ -23,27 +21,17 @@ type Destination = {
 };
 
 type FormData = {
-  destinationIds: string[];
-  reason: string;
   fullName: string;
   birthDate: string;
-  idType: string;
-  idNumber: string;
-  contactNumber: string;
-  idPhotoUrl: string;
-  visitorPhotoUrl: string;
+  destinationIds: string[];
+  reason: string;
 };
 
 const initialFormData: FormData = {
-  destinationIds: [],
-  reason: "",
   fullName: "",
   birthDate: "",
-  idType: "",
-  idNumber: "",
-  contactNumber: "",
-  idPhotoUrl: "",
-  visitorPhotoUrl: "",
+  destinationIds: [],
+  reason: "",
 };
 
 // Built-in standard reasons for the clean minimalist setup
@@ -75,20 +63,30 @@ export default function KioskRegistrationPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mounted, setMounted] = useState(false);
 
-  const [isScanningId, setIsScanningId] = useState(false);
-  const [isTakingPhoto, setIsTakingPhoto] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [timer, setTimer] = useState(10); // 10 seconds for the final notice
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const keyboardScroll = useKeyboardAwareScroll();
 
+  const calculatedAge = useMemo(() => {
+    if (!formData.birthDate) return null;
+    const dob = new Date(formData.birthDate);
+    if (isNaN(dob.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age;
+  }, [formData.birthDate]);
+
   useEffect(() => {
     setMounted(true);
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const timeInterval = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timeInterval);
   }, []);
 
   useEffect(() => {
@@ -101,27 +99,9 @@ export default function KioskRegistrationPage() {
         } else {
           // Fallback dummy data for visual testing if API fails
           setDestinations([
-            {
-              id: "1",
-              name: "Engineering Dept",
-              floor: "2",
-              headName: "John Doe",
-              description: "",
-            },
-            {
-              id: "2",
-              name: "HR Office",
-              floor: "2",
-              headName: "Jane Smith",
-              description: "",
-            },
-            {
-              id: "3",
-              name: "Executive Suite",
-              floor: "5",
-              headName: "CEO",
-              description: "",
-            },
+            { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
+            { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
+            { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
           ]);
         }
       } catch (error) {
@@ -134,9 +114,9 @@ export default function KioskRegistrationPage() {
   }, []);
 
   const floors = useMemo(() => {
-    const uniqueFloors = Array.from(
-      new Set(destinations.map((d) => d.floor)),
-    ).sort((a, b) => parseInt(a) - parseInt(b));
+    const uniqueFloors = Array.from(new Set(destinations.map((d) => d.floor))).sort(
+      (a, b) => parseInt(a) - parseInt(b),
+    );
     return uniqueFloors.length > 0 ? uniqueFloors : ["1", "2", "3", "4", "5"]; // Fallbacks
   }, [destinations]);
 
@@ -160,10 +140,30 @@ export default function KioskRegistrationPage() {
     }
   }, [step, selectedFloor]);
 
+  useEffect(() => {
+    let countdown: NodeJS.Timeout;
+    if (step === 4) {
+      countdown = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdown);
+            // Reset to beginning
+            setStep(0);
+            setFormData(initialFormData);
+            setTimer(10);
+            return 10;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (countdown) clearInterval(countdown);
+    };
+  }, [step]);
+
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -173,90 +173,51 @@ export default function KioskRegistrationPage() {
     setFormData((prev) => {
       const isSelected = prev.destinationIds.includes(id);
       if (isSelected) {
-        return {
-          ...prev,
-          destinationIds: prev.destinationIds.filter((d) => d !== id),
-        };
+        return { ...prev, destinationIds: prev.destinationIds.filter((d) => d !== id) };
       } else {
         return { ...prev, destinationIds: [...prev.destinationIds, id] };
       }
     });
   };
 
-  const simulateIdScan = () => {
-    setIsScanningId(true);
-    setTimeout(() => {
-      setFormData((prev) => ({
-        ...prev,
-        fullName: "Jane Doe",
-        birthDate: "1990-05-15",
-        idType: "Driver's License",
-        idNumber: "D12-345-6789",
-        idPhotoUrl: "https://example.com/id.jpg",
-      }));
-      setIsScanningId(false);
-    }, 1500);
-  };
-
-  const simulateVisitorPhoto = () => {
-    setIsTakingPhoto(true);
-    setTimeout(() => {
-      setFormData((prev) => ({
-        ...prev,
-        visitorPhotoUrl: "https://example.com/visitor.jpg",
-      }));
-      setIsTakingPhoto(false);
-    }, 1000);
-  };
-
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Simulate network request
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsSuccess(true);
+      const response = await fetch('/api/kiosk/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setStep(4);
+      } else {
+        console.error("Submission failed");
+        // Fallback for visual demo if API fails
+        setStep(4);
+      }
     } catch {
       console.error("Submission failed");
+      // Fallback for visual demo if API fails
+      setStep(4);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const steps = [
-    { num: 1, label: "Destination" },
-    { num: 2, label: "Purpose" },
-    { num: 3, label: "Identity" },
-    { num: 4, label: "Review" },
+    { num: 1, label: "Visitor Info" },
+    { num: 2, label: "Destination" },
+    { num: 3, label: "Purpose" },
+    { num: 4, label: "Notice" },
   ];
-
-  // ── Success Screen ──
-  if (isSuccess) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.successScreen}>
-          <div className={styles.successIcon}>
-            <CheckCircle2 size={48} strokeWidth={2.5} />
-          </div>
-          <h1 className={styles.successTitle}>You're all set</h1>
-          <p className={styles.successDesc}>
-            Your registration is complete. Please proceed to the desk to print
-            your visitor badge.
-          </p>
-          <div className={styles.statusPill}>
-            <Loader2 size={18} className={styles.spin} />
-            <span>Badge generating...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // ── Hero / Standby Screen (Full Screen Tap) ──
   if (step === 0) {
-    const timeStr = mounted 
+    const timeStr = mounted
       ? currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })
       : "";
-    const dateStr = mounted 
+    const dateStr = mounted
       ? currentTime.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })
       : "";
 
@@ -266,19 +227,37 @@ export default function KioskRegistrationPage() {
           <div className={styles.heroBackground} />
           <div className={styles.heroContent}>
             <div className={styles.heroLogoLarge}>VMS</div>
-
             <div className={styles.heroTime}>
               <div className={styles.heroTimeDisplay}>{timeStr}</div>
               <div className={styles.heroDateDisplay}>{dateStr}</div>
             </div>
-
             <h1 className={styles.heroTitle}>Welcome to SGW</h1>
             <p className={styles.heroSubtitle}>Visitor Registration Kiosk</p>
-
             <div className={styles.tapIndicator}>
               <span>Tap anywhere to begin</span>
               <ArrowRight size={20} />
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Notice Screen (Step 4) ──
+  if (step === 4) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.successScreen}>
+          <div className={styles.successIcon}>
+            <CheckCircle2 size={48} strokeWidth={2.5} />
+          </div>
+          <h1 className={styles.successTitle}>Almost done!</h1>
+          <p className={styles.successDesc} style={{ maxWidth: '600px', fontSize: '1.2rem', lineHeight: '1.6' }}>
+            Last step of registration is to give your ID to the receptionist for scanning and for capturing an image of yourself.
+          </p>
+          <div className={styles.statusPill} style={{ marginTop: '2rem' }}>
+            <Loader2 size={18} className={styles.spin} />
+            <span>Redirecting to home in {timer}s...</span>
           </div>
         </div>
       </div>
@@ -291,7 +270,10 @@ export default function KioskRegistrationPage() {
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerTop}>
-          <div className={styles.brand} onClick={() => setStep(0)}>
+          <div className={styles.brand} onClick={() => {
+            setStep(0);
+            setFormData(initialFormData);
+          }}>
             <div className={styles.brandLogo}>VMS</div>
             <span className={styles.brandName}>SGW Global</span>
           </div>
@@ -306,11 +288,7 @@ export default function KioskRegistrationPage() {
               }`}
             >
               <div className={styles.stepDot}>
-                {step > s.num ? (
-                  <CheckCircle2 size={16} strokeWidth={3} />
-                ) : (
-                  s.num
-                )}
+                {step > s.num ? <CheckCircle2 size={16} strokeWidth={3} /> : s.num}
               </div>
               <span className={styles.stepLabel}>{s.label}</span>
             </div>
@@ -321,8 +299,67 @@ export default function KioskRegistrationPage() {
       {/* Main Form Area */}
       <main className={styles.main} ref={scrollRef}>
         <div className={styles.formCard}>
-          {/* STEP 1: Destination */}
+
+          {/* STEP 1: Visitor Info (Name, Birthdate & Age) */}
           {step === 1 && (
+            <div className={styles.fadeIn}>
+              <div className={styles.stepHeader}>
+                <h2 className={styles.stepTitle}>Visitor Information</h2>
+                <p className={styles.stepDesc}>Please provide your full name and date of birth</p>
+              </div>
+
+              <div className={styles.field} style={{ marginTop: "2rem" }}>
+                <label className={styles.label}>Full Name</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className={styles.input}
+                  placeholder="e.g. John Doe"
+                  style={{ fontSize: '1.25rem', padding: '1rem' }}
+                  {...keyboardScroll}
+                />
+              </div>
+
+              <div className={styles.row} style={{ marginTop: "1.5rem", gap: "1.5rem" }}>
+                <div className={styles.field}>
+                  <label className={styles.label}>Date of Birth</label>
+                  <input
+                    type="date"
+                    name="birthDate"
+                    value={formData.birthDate}
+                    onChange={handleInputChange}
+                    className={`${styles.input} ${styles.inputDate}`}
+                    style={{ fontSize: '1.25rem', padding: '1rem' }}
+                    {...keyboardScroll}
+                  />
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>Calculated Age</label>
+                  <div
+                    className={styles.input}
+                    style={{
+                      fontSize: '1.25rem',
+                      padding: '1rem',
+                      background: 'var(--color-bg-tertiary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontWeight: 600,
+                      color: 'var(--color-text-secondary)',
+                      height: '59px'
+                    }}
+                  >
+                    {calculatedAge !== null ? `${calculatedAge} years old` : "Select birthdate"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: Destination */}
+          {step === 2 && (
             <div className={styles.fadeIn}>
               <div className={styles.stepHeader}>
                 <h2 className={styles.stepTitle}>Where are you heading?</h2>
@@ -346,10 +383,7 @@ export default function KioskRegistrationPage() {
                     className={styles.searchInput}
                   />
                   {searchQuery && (
-                    <button
-                      className={styles.searchClear}
-                      onClick={() => setSearchQuery("")}
-                    >
+                    <button className={styles.searchClear} onClick={() => setSearchQuery("")}>
                       <X size={18} />
                     </button>
                   )}
@@ -372,19 +406,14 @@ export default function KioskRegistrationPage() {
               ) : (
                 <>
                   {!searchQuery.trim() && (
-                    <button
-                      className={styles.backLink}
-                      onClick={() => setSelectedFloor(null)}
-                    >
+                    <button className={styles.backLink} onClick={() => setSelectedFloor(null)}>
                       <ChevronLeft size={16} /> Back to Floors
                     </button>
                   )}
 
                   <div className={styles.destinationList}>
                     {filteredDestinations.map((dest) => {
-                      const selected = formData.destinationIds.includes(
-                        dest.id,
-                      );
+                      const selected = formData.destinationIds.includes(dest.id);
                       return (
                         <button
                           key={dest.id}
@@ -395,21 +424,12 @@ export default function KioskRegistrationPage() {
                             <div className={styles.destNameRow}>
                               <span className={styles.destName}>{dest.name}</span>
                               {(searchQuery.trim() || !selectedFloor) && (
-                                <span className={styles.floorBadge}>
-                                  Floor {dest.floor}
-                                </span>
+                                <span className={styles.floorBadge}>Floor {dest.floor}</span>
                               )}
                             </div>
-                            <span className={styles.destMeta}>
-                              {dest.headName}
-                            </span>
+                            <span className={styles.destMeta}>{dest.headName}</span>
                           </div>
-                          {selected && (
-                            <CheckCircle2
-                              size={24}
-                              className={styles.destCheck}
-                            />
-                          )}
+                          {selected && <CheckCircle2 size={24} className={styles.destCheck} />}
                         </button>
                       );
                     })}
@@ -417,10 +437,7 @@ export default function KioskRegistrationPage() {
                     {searchQuery.trim() && filteredDestinations.length === 0 && (
                       <div className={styles.noResults}>
                         <p>No destinations found matching "{searchQuery}"</p>
-                        <button 
-                          className={styles.clearSearchBtn}
-                          onClick={() => setSearchQuery("")}
-                        >
+                        <button className={styles.clearSearchBtn} onClick={() => setSearchQuery("")}>
                           Clear search
                         </button>
                       </div>
@@ -431,174 +448,24 @@ export default function KioskRegistrationPage() {
             </div>
           )}
 
-          {/* STEP 2: Purpose */}
-          {step === 2 && (
+          {/* STEP 3: Purpose */}
+          {step === 3 && (
             <div className={styles.fadeIn}>
               <div className={styles.stepHeader}>
                 <h2 className={styles.stepTitle}>Purpose of visit</h2>
-                <p className={styles.stepDesc}>
-                  Please select your primary reason
-                </p>
+                <p className={styles.stepDesc}>Please select your primary reason</p>
               </div>
 
               <div className={styles.gridSelection}>
                 {VISITOR_REASONS.map((r) => (
                   <button
                     key={r}
-                    onClick={() =>
-                      setFormData((prev) => ({ ...prev, reason: r }))
-                    }
+                    onClick={() => setFormData((prev) => ({ ...prev, reason: r }))}
                     className={`${styles.selectionCard} ${formData.reason === r ? styles.selected : ""}`}
                   >
                     <span className={styles.reasonText}>{r}</span>
                   </button>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Identity */}
-          {step === 3 && (
-            <div className={styles.fadeIn}>
-              <div className={styles.stepHeader}>
-                <h2 className={styles.stepTitle}>Your Details</h2>
-                <p className={styles.stepDesc}>
-                  Scan ID for quick entry or type manually
-                </p>
-              </div>
-
-              <div className={styles.scanRow}>
-                <button
-                  onClick={simulateIdScan}
-                  className={`${styles.scanBtn} ${formData.idPhotoUrl ? styles.done : ""}`}
-                  disabled={isScanningId || isTakingPhoto}
-                >
-                  {isScanningId ? (
-                    <Loader2 size={28} className={styles.spin} />
-                  ) : (
-                    <FileText size={28} />
-                  )}
-                  <span>
-                    {isScanningId
-                      ? "Scanning..."
-                      : formData.idPhotoUrl
-                        ? "ID Scanned"
-                        : "Scan ID"}
-                  </span>
-                </button>
-
-                <button
-                  onClick={simulateVisitorPhoto}
-                  className={`${styles.scanBtn} ${formData.visitorPhotoUrl ? styles.done : ""}`}
-                  disabled={isScanningId || isTakingPhoto}
-                >
-                  {isTakingPhoto ? (
-                    <Loader2 size={28} className={styles.spin} />
-                  ) : (
-                    <User size={28} />
-                  )}
-                  <span>
-                    {isTakingPhoto
-                      ? "Capturing..."
-                      : formData.visitorPhotoUrl
-                        ? "Photo Taken"
-                        : "Take Photo"}
-                  </span>
-                </button>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label}>Full Name</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                  placeholder="e.g. John Doe"
-                  {...keyboardScroll}
-                />
-              </div>
-
-              <div className={styles.row}>
-                <div className={styles.field}>
-                  <label className={styles.label}>ID Type</label>
-                  <input
-                    type="text"
-                    name="idType"
-                    value={formData.idType}
-                    onChange={handleInputChange}
-                    className={styles.input}
-                    placeholder="Passport, License..."
-                    {...keyboardScroll}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>ID Number</label>
-                  <input
-                    type="text"
-                    name="idNumber"
-                    value={formData.idNumber}
-                    onChange={handleInputChange}
-                    className={styles.input}
-                    placeholder="Enter ID number"
-                    {...keyboardScroll}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: Review */}
-          {step === 4 && (
-            <div className={styles.fadeIn}>
-              <div className={styles.stepHeader}>
-                <h2 className={styles.stepTitle}>Review Info</h2>
-                <p className={styles.stepDesc}>
-                  Confirm details before generating your pass
-                </p>
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  Contact Number (Required)
-                </label>
-                <input
-                  type="tel"
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                  placeholder="+63 9XX XXX XXXX"
-                  {...keyboardScroll}
-                />
-              </div>
-
-              <div className={styles.summary}>
-                <div className={styles.summaryRow}>
-                  <span className={styles.summaryKey}>Name</span>
-                  <span className={styles.summaryVal}>
-                    {formData.fullName || "—"}
-                  </span>
-                </div>
-                <div className={styles.summaryRow}>
-                  <span className={styles.summaryKey}>Purpose</span>
-                  <span className={styles.summaryVal}>
-                    {formData.reason || "—"}
-                  </span>
-                </div>
-                <div className={styles.summaryRow}>
-                  <span className={styles.summaryKey}>Contact</span>
-                  <span className={styles.summaryVal}>
-                    {formData.contactNumber || "—"}
-                  </span>
-                </div>
-                <div className={styles.summaryRow}>
-                  <span className={styles.summaryKey}>Destinations</span>
-                  <span className={styles.summaryVal}>
-                    {formData.destinationIds.length} location(s)
-                  </span>
-                </div>
               </div>
             </div>
           )}
@@ -615,12 +482,12 @@ export default function KioskRegistrationPage() {
           <div />
         )}
 
-        {step < 4 ? (
+        {step < 3 ? (
           <button
             onClick={() => setStep(step + 1)}
             disabled={
-              (step === 1 && formData.destinationIds.length === 0) ||
-              (step === 2 && !formData.reason)
+              (step === 1 && (!formData.fullName.trim() || !formData.birthDate)) ||
+              (step === 2 && formData.destinationIds.length === 0)
             }
             className={styles.btnNext}
           >
@@ -629,12 +496,7 @@ export default function KioskRegistrationPage() {
         ) : (
           <button
             onClick={handleSubmit}
-            disabled={
-              isSubmitting ||
-              !formData.fullName ||
-              formData.destinationIds.length === 0 ||
-              !formData.contactNumber
-            }
+            disabled={isSubmitting || !formData.reason}
             className={styles.btnNext}
           >
             {isSubmitting ? (

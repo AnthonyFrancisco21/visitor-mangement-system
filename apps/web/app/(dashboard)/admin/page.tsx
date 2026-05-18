@@ -1,18 +1,9 @@
-import styles from './admin.module.css';
+import ActiveVisitorsDashboard from "@/app/components/dashboard/ActiveVisitorsDashboard";
 
 export const metadata = {
-  title: 'Admin Dashboard — VisitorPass',
+  title: "Admin Live Dashboard — VisitorPass",
 };
 
-export default function AdminPage() {
-  return (
-    <div className={styles.content}>
-      <div className={styles.badge}>Admin</div>
-      <h1 className={styles.title}>Admin Dashboard</h1>
-      <p className={styles.desc}>
-        Reports, analytics, system management, and full visitor oversight
-        will live here. Coming soon.
-      </p>
-    </div>
-  );
+export default function AdminDashboardPage() {
+  return <ActiveVisitorsDashboard roleBadge="Admin" rolePath="admin" />;
 }

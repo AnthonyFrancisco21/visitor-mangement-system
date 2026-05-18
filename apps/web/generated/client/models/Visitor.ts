@@ -250,6 +250,7 @@ export type VisitorOrderByWithRelationInput = {
 
 export type VisitorWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  idNumber?: string
   AND?: Prisma.VisitorWhereInput | Prisma.VisitorWhereInput[]
   OR?: Prisma.VisitorWhereInput[]
   NOT?: Prisma.VisitorWhereInput | Prisma.VisitorWhereInput[]
@@ -258,13 +259,12 @@ export type VisitorWhereUniqueInput = Prisma.AtLeast<{
   address?: Prisma.StringNullableFilter<"Visitor"> | string | null
   contactNumber?: Prisma.StringNullableFilter<"Visitor"> | string | null
   idType?: Prisma.StringNullableFilter<"Visitor"> | string | null
-  idNumber?: Prisma.StringNullableFilter<"Visitor"> | string | null
   idPhotoUrl?: Prisma.StringNullableFilter<"Visitor"> | string | null
   visitorPhotoUrl?: Prisma.StringNullableFilter<"Visitor"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Visitor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Visitor"> | Date | string
   visits?: Prisma.VisitListRelationFilter
-}, "id">
+}, "id" | "idNumber">
 
 export type VisitorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       idPhotoUrl,
       visitorPhotoUrl,
       destinationIds,
+      reason,
     } = parsedData;
 
     // 2. Check for active or pending visits if idNumber is provided
@@ -89,6 +90,7 @@ export async function POST(req: NextRequest) {
         data: {
           visitorId: visitor.id,
           status: "PENDING",
+          reason: reason,
           destinations: {
             create: destinationIds.map((destinationId) => ({
               destination: {
