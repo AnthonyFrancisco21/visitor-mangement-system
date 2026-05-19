@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, RefreshCw, UserCheck } from "lucide-react";
+import { Loader2, RefreshCw, UserCheck, Trash2 } from "lucide-react";
 import styles from "./PendingRegistrations.module.css";
 import ConfirmModal from "./ConfirmModal";
 
@@ -36,6 +36,33 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
   const handleSuccess = () => {
     setSelectedVisit(null);
     fetchVisits();
+  };
+
+  const handleDeleteVisit = async (visitId: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to reject and delete this pending registration?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch("/api/receptionist/visits/pending", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ visitId }),
+      });
+
+      if (res.ok) {
+        fetchVisits();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete pending registration");
+      }
+    } catch (err) {
+      console.error("Error deleting pending registration:", err);
+      alert("An error occurred while deleting the registration.");
+    }
   };
 
   return (
@@ -79,7 +106,7 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
             </thead>
             <tbody>
               {visits.map((visit) => (
-                <tr key={visit.id} onClick={() => setSelectedVisit(visit)} className={styles.clickableRow}>
+                <tr key={visit.id} className={styles.tableRow}>
                   <td>
                     <strong className={styles.visitorName}>{visit.visitor.fullName}</strong>
                   </td>
@@ -91,9 +118,22 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
                     {new Date(visit.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </td>
                   <td>
-                    <button className={styles.actionBtn}>
-                      Confirm
-                    </button>
+                    <div className={styles.actionsContainer}>
+                      <button
+                        onClick={() => setSelectedVisit(visit)}
+                        className={styles.confirmBtn}
+                      >
+                        <UserCheck size={16} />
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => handleDeleteVisit(visit.id)}
+                        className={styles.deleteBtn}
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

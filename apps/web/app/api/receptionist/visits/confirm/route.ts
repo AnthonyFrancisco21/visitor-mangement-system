@@ -15,7 +15,21 @@ export async function POST(req: NextRequest) {
     }
 
     if (rfidCard.status !== "AVAILABLE") {
-      return NextResponse.json({ error: "RFID card is not available" }, { status: 400 });
+      const activeVisit = await prisma.visit.findFirst({
+        where: {
+          rfidCardId: rfidCard.id,
+          status: "ACTIVE",
+        },
+        include: {
+          visitor: true,
+        },
+      });
+      const activeVisitorName = activeVisit?.visitor?.fullName || "another visitor";
+      return NextResponse.json({ 
+        error: `RFID card is already in use by ${activeVisitorName}`,
+        isAlreadyInUse: true,
+        assignedTo: activeVisitorName
+      }, { status: 400 });
     }
 
     // Update the Visit and Visitor

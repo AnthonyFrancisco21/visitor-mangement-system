@@ -158,7 +158,6 @@ export default function ActiveVisitorsDashboard({ roleBadge, rolePath }: ActiveV
                 <th>Destination</th>
                 <th>Time In</th>
                 <th>Duration Spent</th>
-                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -180,19 +179,6 @@ export default function ActiveVisitorsDashboard({ roleBadge, rolePath }: ActiveV
                   </td>
                   <td className={styles.duration}>
                     {getDuration(visit.timeIn)}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => handleCheckout(visit.id)}
-                      disabled={isCheckingOut === visit.id}
-                      className={styles.checkoutBtn}
-                    >
-                      {isCheckingOut === visit.id ? (
-                        <Loader2 size={14} className={styles.spin} />
-                      ) : (
-                        "Check Out"
-                      )}
-                    </button>
                   </td>
                 </tr>
               ))}

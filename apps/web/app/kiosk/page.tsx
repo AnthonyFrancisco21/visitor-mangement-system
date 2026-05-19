@@ -34,7 +34,6 @@ const initialFormData: FormData = {
   reason: "",
 };
 
-// Built-in standard reasons for the clean minimalist setup
 const VISITOR_REASONS = [
   "Meeting",
   "Interview",
@@ -44,16 +43,6 @@ const VISITOR_REASONS = [
   "Other",
 ];
 
-function useKeyboardAwareScroll() {
-  const handleFocus = (e: React.FocusEvent<HTMLElement>) => {
-    const target = e.currentTarget;
-    setTimeout(() => {
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 300);
-  };
-  return { onFocus: handleFocus };
-}
-
 export default function KioskRegistrationPage() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -62,13 +51,11 @@ export default function KioskRegistrationPage() {
   const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mounted, setMounted] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [timer, setTimer] = useState(10); // 10 seconds for the final notice
+  const [timer, setTimer] = useState(10);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const keyboardScroll = useKeyboardAwareScroll();
 
   const calculatedAge = useMemo(() => {
     if (!formData.birthDate) return null;
@@ -77,16 +64,14 @@ export default function KioskRegistrationPage() {
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
     const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-      age--;
-    }
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
     return age;
   }, [formData.birthDate]);
 
   useEffect(() => {
     setMounted(true);
-    const timeInterval = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timeInterval);
+    const t = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
@@ -94,18 +79,70 @@ export default function KioskRegistrationPage() {
       try {
         const res = await fetch("/api/destinations");
         if (res.ok) {
-          const data = await res.json();
-          setDestinations(data);
+          setDestinations(await res.json());
         } else {
-          // Fallback dummy data for visual testing if API fails
           setDestinations([
-            { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
-            { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
-            { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
+            {
+              id: "1",
+              name: "Engineering Dept",
+              floor: "2",
+              headName: "John Doe",
+              description: "",
+            },
+            {
+              id: "2",
+              name: "HR Office",
+              floor: "2",
+              headName: "Jane Smith",
+              description: "",
+            },
+            {
+              id: "3",
+              name: "Executive Suite",
+              floor: "5",
+              headName: "CEO",
+              description: "",
+            },
+            {
+              id: "4",
+              name: "Finance Office",
+              floor: "3",
+              headName: "Maria Santos",
+              description: "",
+            },
+            {
+              id: "5",
+              name: "IT Department",
+              floor: "4",
+              headName: "Alex Chen",
+              description: "",
+            },
           ]);
         }
-      } catch (error) {
-        console.error("Failed to fetch destinations", error);
+      } catch {
+        setDestinations([
+          {
+            id: "1",
+            name: "Engineering Dept",
+            floor: "2",
+            headName: "John Doe",
+            description: "",
+          },
+          {
+            id: "2",
+            name: "HR Office",
+            floor: "2",
+            headName: "Jane Smith",
+            description: "",
+          },
+          {
+            id: "3",
+            name: "Executive Suite",
+            floor: "5",
+            headName: "CEO",
+            description: "",
+          },
+        ]);
       } finally {
         setIsLoadingDestinations(false);
       }
@@ -114,10 +151,10 @@ export default function KioskRegistrationPage() {
   }, []);
 
   const floors = useMemo(() => {
-    const uniqueFloors = Array.from(new Set(destinations.map((d) => d.floor))).sort(
+    const unique = Array.from(new Set(destinations.map((d) => d.floor))).sort(
       (a, b) => parseInt(a) - parseInt(b),
     );
-    return uniqueFloors.length > 0 ? uniqueFloors : ["1", "2", "3", "4", "5"]; // Fallbacks
+    return unique.length > 0 ? unique : ["1", "2", "3", "4", "5"];
   }, [destinations]);
 
   const filteredDestinations = useMemo(() => {
@@ -127,7 +164,7 @@ export default function KioskRegistrationPage() {
         (d) =>
           d.name.toLowerCase().includes(q) ||
           d.headName.toLowerCase().includes(q) ||
-          d.floor.toLowerCase().includes(q),
+          d.floor.includes(q),
       );
     }
     if (!selectedFloor) return [];
@@ -147,321 +184,448 @@ export default function KioskRegistrationPage() {
         setTimer((prev) => {
           if (prev <= 1) {
             clearInterval(countdown);
-            // Reset to beginning
-            setStep(0);
-            setFormData(initialFormData);
-            setTimer(10);
+            resetKiosk();
             return 10;
           }
           return prev - 1;
         });
       }, 1000);
     }
-    return () => {
-      if (countdown) clearInterval(countdown);
-    };
+    return () => clearInterval(countdown);
   }, [step]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const toggleDestination = (id: string) => {
-    setFormData((prev) => {
-      const isSelected = prev.destinationIds.includes(id);
-      if (isSelected) {
-        return { ...prev, destinationIds: prev.destinationIds.filter((d) => d !== id) };
-      } else {
-        return { ...prev, destinationIds: [...prev.destinationIds, id] };
-      }
-    });
+    setFormData((prev) => ({
+      ...prev,
+      destinationIds: prev.destinationIds.includes(id)
+        ? prev.destinationIds.filter((d) => d !== id)
+        : [...prev.destinationIds, id],
+    }));
   };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/kiosk/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/kiosk/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
-      if (response.ok) {
-        setStep(4);
-      } else {
-        console.error("Submission failed");
-        // Fallback for visual demo if API fails
-        setStep(4);
-      }
     } catch {
-      console.error("Submission failed");
-      // Fallback for visual demo if API fails
-      setStep(4);
+      // fall through to show notice screen regardless
     } finally {
       setIsSubmitting(false);
+      setStep(4);
     }
   };
 
-  const steps = [
-    { num: 1, label: "Visitor Info" },
+  const resetKiosk = () => {
+    setStep(0);
+    setFormData(initialFormData);
+    setSelectedFloor(null);
+    setSearchQuery("");
+    setTimer(10);
+  };
+
+  const STEPS = [
+    { num: 1, label: "Visitor" },
     { num: 2, label: "Destination" },
     { num: 3, label: "Purpose" },
     { num: 4, label: "Notice" },
   ];
 
-  // ── Hero / Standby Screen (Full Screen Tap) ──
+  // ── STANDBY SCREEN ──────────────────────────────────────────
   if (step === 0) {
-    const timeStr = mounted
-      ? currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })
-      : "";
+    const rawTime = mounted
+      ? currentTime.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      : "12:00 AM";
+    const parts = rawTime.split(" ");
+    const timeDisplay = parts[0];
+    const meridiem = parts[1] ?? "";
     const dateStr = mounted
-      ? currentTime.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })
+      ? currentTime.toLocaleDateString([], {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        })
       : "";
 
     return (
       <div className={styles.page} onClick={() => setStep(1)}>
-        <div className={styles.hero}>
-          <div className={styles.heroBackground} />
-          <div className={styles.heroContent}>
-            <div className={styles.heroLogoLarge}>VMS</div>
-            <div className={styles.heroTime}>
-              <div className={styles.heroTimeDisplay}>{timeStr}</div>
-              <div className={styles.heroDateDisplay}>{dateStr}</div>
+        <div className={styles.standby}>
+          {/* Top brand bar */}
+          <div className={styles.standbyTopBar}>
+            <span className={styles.standbyBadge}>VMS</span>
+            <span className={styles.standbySystem}>
+              SGW Visitor Management System
+            </span>
+          </div>
+
+          {/* Giant clock */}
+          <div className={styles.standbyClock}>
+            <div className={styles.standbyTimeRow}>
+              <span className={styles.standbyTime}>{timeDisplay}</span>
+              <span className={styles.standbyMeridiem}>{meridiem}</span>
             </div>
-            <h1 className={styles.heroTitle}>Welcome to SGW</h1>
-            <p className={styles.heroSubtitle}>Visitor Registration Kiosk</p>
-            <div className={styles.tapIndicator}>
+            <p className={styles.standbyDate}>{dateStr}</p>
+          </div>
+
+          {/* Thick rule */}
+          <div className={styles.standbyRule} />
+
+          {/* Welcome + CTA */}
+          <div className={styles.standbyFooter}>
+            <div>
+              <p className={styles.standbyWelcome}>Welcome.</p>
+              <p className={styles.standbyWelcomeSub}>
+                SGW Global &mdash; Visitor Registration Kiosk
+              </p>
+            </div>
+            <button className={styles.tapBtn} tabIndex={-1}>
               <span>Tap anywhere to begin</span>
-              <ArrowRight size={20} />
-            </div>
+              <ArrowRight size={16} strokeWidth={1.5} />
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  // ── Notice Screen (Step 4) ──
+  // ── NOTICE SCREEN ───────────────────────────────────────────
   if (step === 4) {
     return (
       <div className={styles.page}>
-        <div className={styles.successScreen}>
-          <div className={styles.successIcon}>
-            <CheckCircle2 size={48} strokeWidth={2.5} />
-          </div>
-          <h1 className={styles.successTitle}>Almost done!</h1>
-          <p className={styles.successDesc} style={{ maxWidth: '600px', fontSize: '1.2rem', lineHeight: '1.6' }}>
-            Last step of registration is to give your ID to the receptionist for scanning and for capturing an image of yourself.
-          </p>
-          <div className={styles.statusPill} style={{ marginTop: '2rem' }}>
-            <Loader2 size={18} className={styles.spin} />
-            <span>Redirecting to home in {timer}s...</span>
+        <div className={styles.noticePage}>
+          <div className={styles.noticeInner}>
+            {/* Registration tag */}
+            <div className={styles.noticeTag}>
+              <CheckCircle2 size={14} strokeWidth={1.5} />
+              <span>Registration Complete</span>
+            </div>
+
+            {/* Big headline */}
+            <h1 className={styles.noticeTitle}>
+              Almost
+              <br />
+              done.
+            </h1>
+
+            <div className={styles.noticeRule} />
+
+            {/* Instruction */}
+            <p className={styles.noticeDesc}>
+              Please proceed to the reception desk with your{" "}
+              <strong>government-issued ID.</strong> The receptionist will
+              complete the final steps below.
+            </p>
+
+            {/* Steps list */}
+            <div className={styles.noticeSteps}>
+              <div className={styles.noticeStep}>
+                <span className={styles.noticeStepNum}>01</span>
+                <div>
+                  <p className={styles.noticeStepTitle}>ID Document Scan</p>
+                  <p className={styles.noticeStepSub}>
+                    Present your government-issued ID
+                  </p>
+                </div>
+              </div>
+              <div className={styles.noticeStep}>
+                <span className={styles.noticeStepNum}>02</span>
+                <div>
+                  <p className={styles.noticeStepTitle}>Photo Capture</p>
+                  <p className={styles.noticeStepSub}>
+                    A photo will be taken for your visitor badge
+                  </p>
+                </div>
+              </div>
+              <div className={styles.noticeStep}>
+                <span className={styles.noticeStepNum}>03</span>
+                <div>
+                  <p className={styles.noticeStepTitle}>RFID Card Issuance</p>
+                  <p className={styles.noticeStepSub}>
+                    Receive your access card for the building
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.noticeRule} />
+
+            <p className={styles.noticeTimeInNote}>
+              Your time-in has been automatically recorded.
+            </p>
+
+            {/* Countdown */}
+            <div className={styles.noticeCountdown}>
+              <Loader2 size={13} className={styles.spin} />
+              <span>Returning to start in {timer}s&hellip;</span>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // ── Main Form Flow ──
+  // ── MAIN FORM FLOW ──────────────────────────────────────────
   return (
     <div className={styles.page}>
       {/* Header */}
       <header className={styles.header}>
-        <div className={styles.headerTop}>
-          <div className={styles.brand} onClick={() => {
-            setStep(0);
-            setFormData(initialFormData);
-          }}>
-            <div className={styles.brandLogo}>VMS</div>
+        <div className={styles.headerRow}>
+          {/* Brand */}
+          <button className={styles.brand} onClick={resetKiosk}>
+            <span className={styles.brandMark}>VMS</span>
             <span className={styles.brandName}>SGW Global</span>
-          </div>
-        </div>
+          </button>
 
-        <div className={styles.stepTracker}>
-          {steps.map((s) => (
-            <div
-              key={s.num}
-              className={`${styles.stepItem} ${step === s.num ? styles.active : ""} ${
-                step > s.num ? styles.completed : ""
-              }`}
-            >
-              <div className={styles.stepDot}>
-                {step > s.num ? <CheckCircle2 size={16} strokeWidth={3} /> : s.num}
+          {/* Step indicators */}
+          <div className={styles.stepTracker}>
+            {STEPS.map((s) => (
+              <div
+                key={s.num}
+                className={[
+                  styles.stepItem,
+                  step === s.num ? styles.stepActive : "",
+                  step > s.num ? styles.stepDone : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <span className={styles.stepNum}>
+                  {step > s.num ? "✓" : `0${s.num}`}
+                </span>
+                <span className={styles.stepLabel}>{s.label}</span>
               </div>
-              <span className={styles.stepLabel}>{s.label}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </header>
 
-      {/* Main Form Area */}
+      {/* Scrollable content */}
       <main className={styles.main} ref={scrollRef}>
-        <div className={styles.formCard}>
-
-          {/* STEP 1: Visitor Info (Name, Birthdate & Age) */}
+        <div className={styles.formInner}>
+          {/* ── STEP 1: Visitor Info ── */}
           {step === 1 && (
             <div className={styles.fadeIn}>
               <div className={styles.stepHeader}>
-                <h2 className={styles.stepTitle}>Visitor Information</h2>
-                <p className={styles.stepDesc}>Please provide your full name and date of birth</p>
+                <p className={styles.stepTag}>
+                  01 &middot; Visitor Information
+                </p>
+                <h2 className={styles.stepTitle}>
+                  Your
+                  <br />
+                  Details.
+                </h2>
               </div>
 
-              <div className={styles.field} style={{ marginTop: "2rem" }}>
-                <label className={styles.label}>Full Name</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  className={styles.input}
-                  placeholder="e.g. John Doe"
-                  style={{ fontSize: '1.25rem', padding: '1rem' }}
-                  {...keyboardScroll}
-                />
-              </div>
-
-              <div className={styles.row} style={{ marginTop: "1.5rem", gap: "1.5rem" }}>
+              <div className={styles.fieldGroup}>
                 <div className={styles.field}>
-                  <label className={styles.label}>Date of Birth</label>
+                  <label className={styles.fieldLabel} htmlFor="fullName">
+                    Full Name
+                  </label>
                   <input
-                    type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
+                    id="fullName"
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
                     onChange={handleInputChange}
-                    className={`${styles.input} ${styles.inputDate}`}
-                    style={{ fontSize: '1.25rem', padding: '1rem' }}
-                    {...keyboardScroll}
+                    className={styles.fieldInput}
+                    placeholder="e.g. Juan dela Cruz"
+                    autoComplete="off"
                   />
                 </div>
 
-                <div className={styles.field}>
-                  <label className={styles.label}>Calculated Age</label>
-                  <div
-                    className={styles.input}
-                    style={{
-                      fontSize: '1.25rem',
-                      padding: '1rem',
-                      background: 'var(--color-bg-tertiary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      fontWeight: 600,
-                      color: 'var(--color-text-secondary)',
-                      height: '59px'
-                    }}
-                  >
-                    {calculatedAge !== null ? `${calculatedAge} years old` : "Select birthdate"}
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel} htmlFor="birthDate">
+                      Date of Birth
+                    </label>
+                    <input
+                      id="birthDate"
+                      type="date"
+                      name="birthDate"
+                      value={formData.birthDate}
+                      onChange={handleInputChange}
+                      className={styles.fieldInput}
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>Calculated Age</label>
+                    <div className={styles.ageDisplay}>
+                      {calculatedAge !== null ? (
+                        <>
+                          <span className={styles.ageNum}>{calculatedAge}</span>
+                          <span className={styles.ageUnit}>yrs old</span>
+                        </>
+                      ) : (
+                        <span className={styles.agePlaceholder}>—</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* STEP 2: Destination */}
+          {/* ── STEP 2: Destination ── */}
           {step === 2 && (
             <div className={styles.fadeIn}>
               <div className={styles.stepHeader}>
-                <h2 className={styles.stepTitle}>Where are you heading?</h2>
-                <p className={styles.stepDesc}>
-                  {searchQuery.trim()
-                    ? `Found ${filteredDestinations.length} matching locations`
-                    : selectedFloor
-                      ? `Select an office on Floor ${selectedFloor}`
-                      : "Select the floor or search for your destination"}
-                </p>
+                <p className={styles.stepTag}>02 &middot; Destination</p>
+                <h2 className={styles.stepTitle}>
+                  {searchQuery.trim() || selectedFloor
+                    ? "Select Office."
+                    : "Which Floor?"}
+                </h2>
               </div>
 
-              <div className={styles.searchContainer}>
-                <div className={styles.searchWrapper}>
-                  <Search className={styles.searchIcon} size={20} />
-                  <input
-                    type="text"
-                    placeholder="Search department, head, or floor..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={styles.searchInput}
-                  />
-                  {searchQuery && (
-                    <button className={styles.searchClear} onClick={() => setSearchQuery("")}>
-                      <X size={18} />
-                    </button>
-                  )}
-                </div>
+              {/* Search bar */}
+              <div className={styles.searchBar}>
+                <Search
+                  size={18}
+                  strokeWidth={1.5}
+                  className={styles.searchIco}
+                />
+                <input
+                  type="text"
+                  placeholder="Search department or contact..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={styles.searchInput}
+                  autoComplete="off"
+                />
+                {searchQuery && (
+                  <button
+                    className={styles.searchClear}
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
               </div>
 
+              {/* Floor selection grid */}
               {!selectedFloor && !searchQuery.trim() ? (
-                <div className={styles.gridSelection}>
+                <div className={styles.floorGrid}>
                   {floors.map((floor) => (
                     <button
                       key={floor}
-                      className={styles.selectionCard}
+                      className={styles.floorCard}
                       onClick={() => setSelectedFloor(floor)}
                     >
-                      <span className={styles.floorNumber}>{floor}</span>
-                      <span className={styles.floorLabel}>Floor</span>
+                      <span className={styles.floorNum}>{floor}</span>
+                      <span className={styles.floorLbl}>Floor</span>
                     </button>
                   ))}
                 </div>
               ) : (
-                <>
+                <div className={styles.destSection}>
                   {!searchQuery.trim() && (
-                    <button className={styles.backLink} onClick={() => setSelectedFloor(null)}>
-                      <ChevronLeft size={16} /> Back to Floors
+                    <button
+                      className={styles.backLink}
+                      onClick={() => setSelectedFloor(null)}
+                    >
+                      <ChevronLeft size={14} strokeWidth={2} />
+                      <span>All Floors</span>
                     </button>
                   )}
 
-                  <div className={styles.destinationList}>
-                    {filteredDestinations.map((dest) => {
-                      const selected = formData.destinationIds.includes(dest.id);
-                      return (
-                        <button
-                          key={dest.id}
-                          onClick={() => toggleDestination(dest.id)}
-                          className={`${styles.destCard} ${selected ? styles.selected : ""}`}
-                        >
-                          <div className={styles.destInfo}>
-                            <div className={styles.destNameRow}>
-                              <span className={styles.destName}>{dest.name}</span>
-                              {(searchQuery.trim() || !selectedFloor) && (
-                                <span className={styles.floorBadge}>Floor {dest.floor}</span>
-                              )}
+                  {filteredDestinations.length > 0 ? (
+                    <div className={styles.destList}>
+                      {filteredDestinations.map((dest) => {
+                        const sel = formData.destinationIds.includes(dest.id);
+                        return (
+                          <button
+                            key={dest.id}
+                            onClick={() => toggleDestination(dest.id)}
+                            className={[
+                              styles.destCard,
+                              sel ? styles.destSelected : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          >
+                            <div className={styles.destBody}>
+                              <span className={styles.destName}>
+                                {dest.name}
+                              </span>
+                              <div className={styles.destMeta}>
+                                <span>{dest.headName}</span>
+                                {(searchQuery.trim() || !selectedFloor) && (
+                                  <span className={styles.destFloor}>
+                                    Floor {dest.floor}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <span className={styles.destMeta}>{dest.headName}</span>
-                          </div>
-                          {selected && <CheckCircle2 size={24} className={styles.destCheck} />}
-                        </button>
-                      );
-                    })}
-
-                    {searchQuery.trim() && filteredDestinations.length === 0 && (
-                      <div className={styles.noResults}>
-                        <p>No destinations found matching "{searchQuery}"</p>
-                        <button className={styles.clearSearchBtn} onClick={() => setSearchQuery("")}>
-                          Clear search
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </>
+                            {sel && (
+                              <CheckCircle2
+                                size={20}
+                                strokeWidth={1.5}
+                                className={styles.destCheckIcon}
+                              />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className={styles.noResults}>
+                      <p>No results for &ldquo;{searchQuery}&rdquo;</p>
+                      <button
+                        className={styles.clearBtn}
+                        onClick={() => setSearchQuery("")}
+                      >
+                        Clear Search
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           )}
 
-          {/* STEP 3: Purpose */}
+          {/* ── STEP 3: Purpose ── */}
           {step === 3 && (
             <div className={styles.fadeIn}>
               <div className={styles.stepHeader}>
-                <h2 className={styles.stepTitle}>Purpose of visit</h2>
-                <p className={styles.stepDesc}>Please select your primary reason</p>
+                <p className={styles.stepTag}>03 &middot; Purpose of Visit</p>
+                <h2 className={styles.stepTitle}>
+                  Why are
+                  <br />
+                  you here?
+                </h2>
               </div>
 
-              <div className={styles.gridSelection}>
+              <div className={styles.reasonGrid}>
                 {VISITOR_REASONS.map((r) => (
                   <button
                     key={r}
-                    onClick={() => setFormData((prev) => ({ ...prev, reason: r }))}
-                    className={`${styles.selectionCard} ${formData.reason === r ? styles.selected : ""}`}
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, reason: r }))
+                    }
+                    className={[
+                      styles.reasonCard,
+                      formData.reason === r ? styles.reasonSelected : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                   >
                     <span className={styles.reasonText}>{r}</span>
                   </button>
@@ -472,11 +636,12 @@ export default function KioskRegistrationPage() {
         </div>
       </main>
 
-      {/* Footer / Navigation */}
+      {/* Footer navigation */}
       <footer className={styles.footer}>
         {step > 1 ? (
           <button onClick={() => setStep(step - 1)} className={styles.btnBack}>
-            <ChevronLeft size={20} /> Back
+            <ChevronLeft size={16} strokeWidth={2} />
+            <span>Back</span>
           </button>
         ) : (
           <div />
@@ -486,12 +651,14 @@ export default function KioskRegistrationPage() {
           <button
             onClick={() => setStep(step + 1)}
             disabled={
-              (step === 1 && (!formData.fullName.trim() || !formData.birthDate)) ||
+              (step === 1 &&
+                (!formData.fullName.trim() || !formData.birthDate)) ||
               (step === 2 && formData.destinationIds.length === 0)
             }
             className={styles.btnNext}
           >
-            Continue <ChevronRight size={20} />
+            <span>Continue</span>
+            <ChevronRight size={16} strokeWidth={2} />
           </button>
         ) : (
           <button
@@ -501,10 +668,11 @@ export default function KioskRegistrationPage() {
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={20} className={styles.spin} /> Processing
+                <Loader2 size={16} className={styles.spin} />
+                <span>Processing&hellip;</span>
               </>
             ) : (
-              <>Complete Registration</>
+              <span>Complete Registration</span>
             )}
           </button>
         )}

@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --port 3000 --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
@@ -18,14 +18,12 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "jose": "^6.2.3",
-    "jscanify": "^1.4.2",
     "lucide-react": "^1.14.0",
     "next": "16.2.0",
     "pg": "^8.20.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-webcam": "^7.2.0",
-    "tesseract.js": "^7.0.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -70,6 +70,7 @@ const NAV_ITEMS = {
   ADMIN: [
     { label: 'Live Dashboard', href: '/admin', icon: <Icons.Dashboard /> },
     { label: 'Registration', href: '/admin/registration', icon: <Icons.Registration /> },
+    { label: 'Visitor List', href: '/admin/visitor-list', icon: <Icons.Reports /> },
     { label: 'Live Kiosk', href: '/admin/kiosk', icon: <Icons.Kiosk /> },
     { label: 'Destination', href: '/admin/destinations', icon: <Icons.Destination /> },
     { label: 'RFID Inventory', href: '/admin/rfid', icon: <Icons.RFID /> },
@@ -81,6 +82,7 @@ const NAV_ITEMS = {
   RECEPTIONIST: [
     { label: 'Live Dashboard', href: '/receptionist', icon: <Icons.Dashboard /> },
     { label: 'Registration', href: '/receptionist/registration', icon: <Icons.Registration /> },
+    { label: 'Visitor List', href: '/receptionist/visitor-list', icon: <Icons.Reports /> },
     { label: 'Live Kiosk', href: '/receptionist/kiosk', icon: <Icons.Kiosk /> },
     { label: 'Destination', href: '/receptionist/destinations', icon: <Icons.Destination /> },
     { label: 'RFID Inventory', href: '/receptionist/rfid', icon: <Icons.RFID /> },
