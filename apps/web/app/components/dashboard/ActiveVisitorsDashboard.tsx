@@ -175,7 +175,7 @@ export default function ActiveVisitorsDashboard({ roleBadge, rolePath }: ActiveV
                     {visit.destinations.map((d: any) => d.destination.name).join(", ")}
                   </td>
                   <td>
-                    {new Date(visit.timeIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(visit.timeIn).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                   </td>
                   <td className={styles.duration}>
                     {getDuration(visit.timeIn)}

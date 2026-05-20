@@ -115,7 +115,7 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
                   </td>
                   <td>{visit.reason || "—"}</td>
                   <td>
-                    {new Date(visit.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(visit.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                   </td>
                   <td>
                     <div className={styles.actionsContainer}>

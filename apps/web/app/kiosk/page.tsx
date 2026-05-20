@@ -9,6 +9,9 @@ import {
   ArrowRight,
   Search,
   X,
+  MapPin,
+  Clock,
+  CreditCard,
 } from "lucide-react";
 import styles from "./kiosk.module.css";
 
@@ -82,66 +85,18 @@ export default function KioskRegistrationPage() {
           setDestinations(await res.json());
         } else {
           setDestinations([
-            {
-              id: "1",
-              name: "Engineering Dept",
-              floor: "2",
-              headName: "John Doe",
-              description: "",
-            },
-            {
-              id: "2",
-              name: "HR Office",
-              floor: "2",
-              headName: "Jane Smith",
-              description: "",
-            },
-            {
-              id: "3",
-              name: "Executive Suite",
-              floor: "5",
-              headName: "CEO",
-              description: "",
-            },
-            {
-              id: "4",
-              name: "Finance Office",
-              floor: "3",
-              headName: "Maria Santos",
-              description: "",
-            },
-            {
-              id: "5",
-              name: "IT Department",
-              floor: "4",
-              headName: "Alex Chen",
-              description: "",
-            },
+            { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
+            { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
+            { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
+            { id: "4", name: "Finance Office", floor: "3", headName: "Maria Santos", description: "" },
+            { id: "5", name: "IT Department", floor: "4", headName: "Alex Chen", description: "" },
           ]);
         }
       } catch {
         setDestinations([
-          {
-            id: "1",
-            name: "Engineering Dept",
-            floor: "2",
-            headName: "John Doe",
-            description: "",
-          },
-          {
-            id: "2",
-            name: "HR Office",
-            floor: "2",
-            headName: "Jane Smith",
-            description: "",
-          },
-          {
-            id: "3",
-            name: "Executive Suite",
-            floor: "5",
-            headName: "CEO",
-            description: "",
-          },
+          { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
+          { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
+          { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
         ]);
       } finally {
         setIsLoadingDestinations(false);
@@ -152,7 +107,7 @@ export default function KioskRegistrationPage() {
 
   const floors = useMemo(() => {
     const unique = Array.from(new Set(destinations.map((d) => d.floor))).sort(
-      (a, b) => parseInt(a) - parseInt(b),
+      (a, b) => parseInt(a) - parseInt(b)
     );
     return unique.length > 0 ? unique : ["1", "2", "3", "4", "5"];
   }, [destinations]);
@@ -164,7 +119,7 @@ export default function KioskRegistrationPage() {
         (d) =>
           d.name.toLowerCase().includes(q) ||
           d.headName.toLowerCase().includes(q) ||
-          d.floor.includes(q),
+          d.floor.includes(q)
       );
     }
     if (!selectedFloor) return [];
@@ -195,9 +150,7 @@ export default function KioskRegistrationPage() {
   }, [step]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -221,7 +174,7 @@ export default function KioskRegistrationPage() {
         body: JSON.stringify(formData),
       });
     } catch {
-      // fall through to show notice screen regardless
+      // fall through
     } finally {
       setIsSubmitting(false);
       setStep(4);
@@ -246,57 +199,58 @@ export default function KioskRegistrationPage() {
   // ── STANDBY SCREEN ──────────────────────────────────────────
   if (step === 0) {
     const rawTime = mounted
-      ? currentTime.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
+      ? currentTime.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: true })
       : "12:00 AM";
     const parts = rawTime.split(" ");
     const timeDisplay = parts[0];
     const meridiem = parts[1] ?? "";
     const dateStr = mounted
-      ? currentTime.toLocaleDateString([], {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-        })
+      ? currentTime.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" })
       : "";
 
     return (
       <div className={styles.page} onClick={() => setStep(1)}>
         <div className={styles.standby}>
+          {/* Decorative ambient glow */}
+          <div className={styles.standbyGlow} />
+
           {/* Top brand bar */}
           <div className={styles.standbyTopBar}>
-            <span className={styles.standbyBadge}>VMS</span>
-            <span className={styles.standbySystem}>
-              SGW Visitor Management System
-            </span>
+            <div className={styles.standbyBrandBlock}>
+              <span className={styles.standbyBrandMark}>VMS</span>
+              <span className={styles.standbyBrandSep} />
+              <span className={styles.standbyBrandName}>SGW Visitor Management</span>
+            </div>
           </div>
 
-          {/* Giant clock */}
-          <div className={styles.standbyClock}>
-            <div className={styles.standbyTimeRow}>
+          {/* Clock centrepiece */}
+          <div className={styles.standbyCenter}>
+            <p className={styles.standbyCenterLabel}>Current Time</p>
+
+            <div className={styles.standbyClockRow}>
               <span className={styles.standbyTime}>{timeDisplay}</span>
               <span className={styles.standbyMeridiem}>{meridiem}</span>
             </div>
+
+            {/* Gold rule */}
+            <div className={styles.standbyGoldRule} />
+
             <p className={styles.standbyDate}>{dateStr}</p>
           </div>
 
-          {/* Thick rule */}
-          <div className={styles.standbyRule} />
-
-          {/* Welcome + CTA */}
-          <div className={styles.standbyFooter}>
-            <div>
-              <p className={styles.standbyWelcome}>Welcome.</p>
-              <p className={styles.standbyWelcomeSub}>
-                SGW Global &mdash; Visitor Registration Kiosk
-              </p>
+          {/* Bottom welcome section */}
+          <div className={styles.standbyBottom}>
+            {/* Section-label style rule */}
+            <div className={styles.standbyTitleRow}>
+              <span className={styles.standbyTitleRule} />
+              <h1 className={styles.standbyTitle}>Welcome to SGW</h1>
+              <span className={styles.standbyTitleRule} />
             </div>
+            <p className={styles.standbySubtitle}>Visitor Registration Kiosk</p>
+
             <button className={styles.tapBtn} tabIndex={-1}>
               <span>Tap anywhere to begin</span>
-              <ArrowRight size={16} strokeWidth={1.5} />
+              <ArrowRight size={18} strokeWidth={1.5} />
             </button>
           </div>
         </div>
@@ -304,74 +258,81 @@ export default function KioskRegistrationPage() {
     );
   }
 
-  // ── NOTICE SCREEN ───────────────────────────────────────────
+  // ── NOTICE / COMPLETION SCREEN ──────────────────────────────
   if (step === 4) {
     return (
       <div className={styles.page}>
         <div className={styles.noticePage}>
+          {/* Ambient glow */}
+          <div className={styles.noticeGlow} />
+
           <div className={styles.noticeInner}>
-            {/* Registration tag */}
-            <div className={styles.noticeTag}>
-              <CheckCircle2 size={14} strokeWidth={1.5} />
+            {/* Success badge */}
+            <div className={styles.noticeBadge}>
+              <CheckCircle2 size={20} strokeWidth={1.5} />
               <span>Registration Complete</span>
             </div>
 
-            {/* Big headline */}
+            {/* Headline */}
             <h1 className={styles.noticeTitle}>
-              Almost
-              <br />
-              done.
+              Almost<br />
+              <em>done.</em>
             </h1>
 
-            <div className={styles.noticeRule} />
+            {/* Gold rule */}
+            <div className={styles.noticeGoldRule} />
 
-            {/* Instruction */}
+            {/* Description */}
             <p className={styles.noticeDesc}>
               Please proceed to the reception desk with your{" "}
-              <strong>government-issued ID.</strong> The receptionist will
-              complete the final steps below.
+              <strong>government-issued ID.</strong> The receptionist
+              will complete the final steps on your behalf.
             </p>
 
-            {/* Steps list */}
+            {/* Numbered reception steps */}
             <div className={styles.noticeSteps}>
               <div className={styles.noticeStep}>
-                <span className={styles.noticeStepNum}>01</span>
-                <div>
-                  <p className={styles.noticeStepTitle}>ID Document Scan</p>
-                  <p className={styles.noticeStepSub}>
-                    Present your government-issued ID
-                  </p>
+                <div className={styles.noticeStepIcon}>
+                  <MapPin size={18} strokeWidth={1.5} />
+                </div>
+                <div className={styles.noticeStepBody}>
+                  <p className={styles.noticeStepLabel}>01 &mdash; ID Document Scan</p>
+                  <p className={styles.noticeStepDesc}>Present your government-issued ID at reception</p>
                 </div>
               </div>
+
               <div className={styles.noticeStep}>
-                <span className={styles.noticeStepNum}>02</span>
-                <div>
-                  <p className={styles.noticeStepTitle}>Photo Capture</p>
-                  <p className={styles.noticeStepSub}>
-                    A photo will be taken for your visitor badge
-                  </p>
+                <div className={styles.noticeStepIcon}>
+                  <Clock size={18} strokeWidth={1.5} />
+                </div>
+                <div className={styles.noticeStepBody}>
+                  <p className={styles.noticeStepLabel}>02 &mdash; Photo Capture</p>
+                  <p className={styles.noticeStepDesc}>A photo will be taken for your visitor record</p>
                 </div>
               </div>
+
               <div className={styles.noticeStep}>
-                <span className={styles.noticeStepNum}>03</span>
-                <div>
-                  <p className={styles.noticeStepTitle}>RFID Card Issuance</p>
-                  <p className={styles.noticeStepSub}>
-                    Receive your access card for the building
-                  </p>
+                <div className={styles.noticeStepIcon}>
+                  <CreditCard size={18} strokeWidth={1.5} />
+                </div>
+                <div className={styles.noticeStepBody}>
+                  <p className={styles.noticeStepLabel}>03 &mdash; RFID Card Issuance</p>
+                  <p className={styles.noticeStepDesc}>Receive your access card for the building</p>
                 </div>
               </div>
             </div>
 
-            <div className={styles.noticeRule} />
+            {/* Thin rule */}
+            <div className={styles.noticeDivider} />
 
-            <p className={styles.noticeTimeInNote}>
-              Your time-in has been automatically recorded.
+            {/* Auto time-in note */}
+            <p className={styles.noticeTimeNote}>
+              ✦ Your time-in has been automatically recorded.
             </p>
 
             {/* Countdown */}
             <div className={styles.noticeCountdown}>
-              <Loader2 size={13} className={styles.spin} />
+              <Loader2 size={15} className={styles.spin} />
               <span>Returning to start in {timer}s&hellip;</span>
             </div>
           </div>
@@ -385,14 +346,15 @@ export default function KioskRegistrationPage() {
     <div className={styles.page}>
       {/* Header */}
       <header className={styles.header}>
-        <div className={styles.headerRow}>
+        <div className={styles.headerInner}>
           {/* Brand */}
           <button className={styles.brand} onClick={resetKiosk}>
             <span className={styles.brandMark}>VMS</span>
+            <span className={styles.brandSep} />
             <span className={styles.brandName}>SGW Global</span>
           </button>
 
-          {/* Step indicators */}
+          {/* Step progress */}
           <div className={styles.stepTracker}>
             {STEPS.map((s) => (
               <div
@@ -401,12 +363,12 @@ export default function KioskRegistrationPage() {
                   styles.stepItem,
                   step === s.num ? styles.stepActive : "",
                   step > s.num ? styles.stepDone : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
+                ].filter(Boolean).join(" ")}
               >
-                <span className={styles.stepNum}>
-                  {step > s.num ? "✓" : `0${s.num}`}
+                <span className={styles.stepDot}>
+                  {step > s.num
+                    ? <CheckCircle2 size={13} strokeWidth={2.5} />
+                    : s.num}
                 </span>
                 <span className={styles.stepLabel}>{s.label}</span>
               </div>
@@ -415,22 +377,23 @@ export default function KioskRegistrationPage() {
         </div>
       </header>
 
-      {/* Scrollable content */}
+      {/* Scrollable form area */}
       <main className={styles.main} ref={scrollRef}>
         <div className={styles.formInner}>
+
           {/* ── STEP 1: Visitor Info ── */}
           {step === 1 && (
             <div className={styles.fadeIn}>
-              <div className={styles.stepHeader}>
-                <p className={styles.stepTag}>
-                  01 &middot; Visitor Information
-                </p>
-                <h2 className={styles.stepTitle}>
-                  Your
-                  <br />
-                  Details.
-                </h2>
+              {/* Section label */}
+              <div className={styles.sectionLabel}>
+                <span className={styles.sectionRule} />
+                <span className={styles.sectionLabelText}>Visitor Information</span>
+                <span className={styles.sectionRule} />
               </div>
+
+              <h2 className={styles.stepTitle}>
+                Your<br />Details.
+              </h2>
 
               <div className={styles.fieldGroup}>
                 <div className={styles.field}>
@@ -470,7 +433,7 @@ export default function KioskRegistrationPage() {
                       {calculatedAge !== null ? (
                         <>
                           <span className={styles.ageNum}>{calculatedAge}</span>
-                          <span className={styles.ageUnit}>yrs old</span>
+                          <span className={styles.ageUnit}>years old</span>
                         </>
                       ) : (
                         <span className={styles.agePlaceholder}>—</span>
@@ -485,25 +448,24 @@ export default function KioskRegistrationPage() {
           {/* ── STEP 2: Destination ── */}
           {step === 2 && (
             <div className={styles.fadeIn}>
-              <div className={styles.stepHeader}>
-                <p className={styles.stepTag}>02 &middot; Destination</p>
-                <h2 className={styles.stepTitle}>
-                  {searchQuery.trim() || selectedFloor
-                    ? "Select Office."
-                    : "Which Floor?"}
-                </h2>
+              <div className={styles.sectionLabel}>
+                <span className={styles.sectionRule} />
+                <span className={styles.sectionLabelText}>Destination</span>
+                <span className={styles.sectionRule} />
               </div>
 
-              {/* Search bar */}
+              <h2 className={styles.stepTitle}>
+                {searchQuery.trim() || selectedFloor
+                  ? "Select an Office."
+                  : "Which Floor?"}
+              </h2>
+
+              {/* Search */}
               <div className={styles.searchBar}>
-                <Search
-                  size={18}
-                  strokeWidth={1.5}
-                  className={styles.searchIco}
-                />
+                <Search size={20} strokeWidth={1.5} className={styles.searchIco} />
                 <input
                   type="text"
-                  placeholder="Search department or contact..."
+                  placeholder="Search by department or contact name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={styles.searchInput}
@@ -515,12 +477,12 @@ export default function KioskRegistrationPage() {
                     onClick={() => setSearchQuery("")}
                     aria-label="Clear search"
                   >
-                    <X size={15} />
+                    <X size={16} />
                   </button>
                 )}
               </div>
 
-              {/* Floor selection grid */}
+              {/* Floor grid or destination list */}
               {!selectedFloor && !searchQuery.trim() ? (
                 <div className={styles.floorGrid}>
                   {floors.map((floor) => (
@@ -541,7 +503,7 @@ export default function KioskRegistrationPage() {
                       className={styles.backLink}
                       onClick={() => setSelectedFloor(null)}
                     >
-                      <ChevronLeft size={14} strokeWidth={2} />
+                      <ChevronLeft size={15} strokeWidth={2} />
                       <span>All Floors</span>
                     </button>
                   )}
@@ -557,18 +519,14 @@ export default function KioskRegistrationPage() {
                             className={[
                               styles.destCard,
                               sel ? styles.destSelected : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
+                            ].filter(Boolean).join(" ")}
                           >
                             <div className={styles.destBody}>
-                              <span className={styles.destName}>
-                                {dest.name}
-                              </span>
+                              <span className={styles.destName}>{dest.name}</span>
                               <div className={styles.destMeta}>
                                 <span>{dest.headName}</span>
                                 {(searchQuery.trim() || !selectedFloor) && (
-                                  <span className={styles.destFloor}>
+                                  <span className={styles.destFloorBadge}>
                                     Floor {dest.floor}
                                   </span>
                                 )}
@@ -576,7 +534,7 @@ export default function KioskRegistrationPage() {
                             </div>
                             {sel && (
                               <CheckCircle2
-                                size={20}
+                                size={22}
                                 strokeWidth={1.5}
                                 className={styles.destCheckIcon}
                               />
@@ -604,14 +562,15 @@ export default function KioskRegistrationPage() {
           {/* ── STEP 3: Purpose ── */}
           {step === 3 && (
             <div className={styles.fadeIn}>
-              <div className={styles.stepHeader}>
-                <p className={styles.stepTag}>03 &middot; Purpose of Visit</p>
-                <h2 className={styles.stepTitle}>
-                  Why are
-                  <br />
-                  you here?
-                </h2>
+              <div className={styles.sectionLabel}>
+                <span className={styles.sectionRule} />
+                <span className={styles.sectionLabelText}>Purpose of Visit</span>
+                <span className={styles.sectionRule} />
               </div>
+
+              <h2 className={styles.stepTitle}>
+                Why are<br />you here?
+              </h2>
 
               <div className={styles.reasonGrid}>
                 {VISITOR_REASONS.map((r) => (
@@ -623,9 +582,7 @@ export default function KioskRegistrationPage() {
                     className={[
                       styles.reasonCard,
                       formData.reason === r ? styles.reasonSelected : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
+                    ].filter(Boolean).join(" ")}
                   >
                     <span className={styles.reasonText}>{r}</span>
                   </button>
@@ -640,7 +597,7 @@ export default function KioskRegistrationPage() {
       <footer className={styles.footer}>
         {step > 1 ? (
           <button onClick={() => setStep(step - 1)} className={styles.btnBack}>
-            <ChevronLeft size={16} strokeWidth={2} />
+            <ChevronLeft size={18} strokeWidth={2} />
             <span>Back</span>
           </button>
         ) : (
@@ -651,14 +608,13 @@ export default function KioskRegistrationPage() {
           <button
             onClick={() => setStep(step + 1)}
             disabled={
-              (step === 1 &&
-                (!formData.fullName.trim() || !formData.birthDate)) ||
+              (step === 1 && (!formData.fullName.trim() || !formData.birthDate)) ||
               (step === 2 && formData.destinationIds.length === 0)
             }
             className={styles.btnNext}
           >
             <span>Continue</span>
-            <ChevronRight size={16} strokeWidth={2} />
+            <ChevronRight size={18} strokeWidth={2} />
           </button>
         ) : (
           <button
@@ -668,7 +624,7 @@ export default function KioskRegistrationPage() {
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={16} className={styles.spin} />
+                <Loader2 size={18} className={styles.spin} />
                 <span>Processing&hellip;</span>
               </>
             ) : (

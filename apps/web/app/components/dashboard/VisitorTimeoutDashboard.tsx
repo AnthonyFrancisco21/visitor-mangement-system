@@ -113,8 +113,8 @@ export default function VisitorTimeoutDashboard({ roleBadge }: VisitorTimeoutDas
         setSuccessData({
           visitorName: data.visitorName || "Visitor",
           cardLabel: data.result.rfidCard?.label || cleanRfid,
-          timeIn: timeIn.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          timeOut: timeOut.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          timeIn: timeIn.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
+          timeOut: timeOut.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
           duration: durationStr,
         });
 

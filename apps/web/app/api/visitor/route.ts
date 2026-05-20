@@ -50,6 +50,114 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    const formatParam = searchParams.get("format");
+
+    if (formatParam === "csv") {
+      const escapeCSVValue = (val: string | null | undefined) => {
+        if (val === null || val === undefined) return '""';
+        let formatted = val.toString().replace(/"/g, '""');
+        if (formatted.includes(',') || formatted.includes('\n') || formatted.includes('"')) {
+          formatted = `"${formatted}"`;
+        }
+        return formatted;
+      };
+
+      const formatCSVDate = (dateStr: Date | string | null) => {
+        if (!dateStr) return "—";
+        try {
+          const d = new Date(dateStr);
+          if (isNaN(d.getTime())) return String(dateStr);
+          return d.toLocaleString();
+        } catch {
+          return "—";
+        }
+      };
+
+      const getStatusLabel = (status: string) => {
+        switch (status) {
+          case "ACTIVE": return "Active In Building";
+          case "COMPLETED": return "Checked Out";
+          case "REVOKED": return "Revoked Checkout";
+          default: return status;
+        }
+      };
+
+      const getDuration = (timeInVal: Date | null, timeOutVal: Date | null) => {
+        if (!timeInVal || !timeOutVal) return "—";
+        try {
+          const start = new Date(timeInVal);
+          const end = new Date(timeOutVal);
+          const diffMs = end.getTime() - start.getTime();
+          const diffMins = Math.floor(diffMs / 60000);
+
+          if (diffMins < 0) return "0m";
+          if (diffMins < 60) {
+            return `${diffMins}m`;
+          }
+          const diffHours = Math.floor(diffMins / 60);
+          const remainingMins = diffMins % 60;
+          return `${diffHours}h ${remainingMins}m`;
+        } catch {
+          return "—";
+        }
+      };
+
+      const headers = [
+        "Visitor Name",
+        "Contact Number",
+        "Birth Date",
+        "ID Type",
+        "ID Number",
+        "Destination",
+        "RFID Card",
+        "Time In",
+        "Time Out",
+        "Status",
+        "Reason for Visit",
+        "Duration Spent",
+        "Revoke Reason",
+        "Revoke Note"
+      ];
+
+      const rows = visits.map(v => {
+        const dests = v.destinations.map((d: any) => d.destination.name).join(", ");
+        const rfid = v.rfidCard?.label || v.rfidCard?.uid || "—";
+        const duration = getDuration(v.timeIn, v.timeOut);
+        
+        return [
+          escapeCSVValue(v.visitor.fullName),
+          escapeCSVValue(v.visitor.contactNumber || "—"),
+          escapeCSVValue(v.visitor.birthDate),
+          escapeCSVValue(v.visitor.idType || "—"),
+          escapeCSVValue(v.visitor.idNumber || "—"),
+          escapeCSVValue(dests),
+          escapeCSVValue(rfid),
+          escapeCSVValue(formatCSVDate(v.timeIn)),
+          escapeCSVValue(formatCSVDate(v.timeOut)),
+          escapeCSVValue(getStatusLabel(v.status)),
+          escapeCSVValue(v.reason || "General Visit"),
+          escapeCSVValue(duration),
+          escapeCSVValue(v.revokeReason),
+          escapeCSVValue(v.revokeNote)
+        ];
+      });
+
+      const csvContent = "\ufeff" + [
+        headers.join(","),
+        ...rows.map(row => row.join(","))
+      ].join("\n");
+
+      const filename = `Visitor_Report_${startDateParam || "today"}_to_${endDateParam || "today"}.csv`;
+
+      return new NextResponse(csvContent, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+        },
+      });
+    }
+
     // Transform data to send formatted response
     const formatted = visits.map((v) => ({
       id: v.id,
@@ -66,6 +174,11 @@ export async function GET(req: NextRequest) {
       reason: v.reason || "General Visit",
       revokeReason: v.revokeReason,
       revokeNote: v.revokeNote,
+      address: v.visitor.address || "—",
+      visitorPhotoUrl: v.visitor.visitorPhotoUrl,
+      idPhotoUrl: v.visitor.idPhotoUrl,
+      rfidCardUid: v.rfidCard?.uid || "",
+      rfidCardLabel: v.rfidCard?.label || "",
     }));
 
     return NextResponse.json(formatted, { status: 200 });

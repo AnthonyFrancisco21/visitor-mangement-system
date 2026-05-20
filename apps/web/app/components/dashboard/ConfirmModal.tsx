@@ -487,7 +487,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.sumLabel}>Time In</span>
-                  <span className={styles.sumVal}>{new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className={styles.sumVal}>{new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span>
                 </div>
               </div>
 
