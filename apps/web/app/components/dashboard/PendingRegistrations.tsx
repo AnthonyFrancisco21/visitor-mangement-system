@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Loader2, RefreshCw, UserCheck, Trash2 } from "lucide-react";
 import styles from "./PendingRegistrations.module.css";
 import ConfirmModal from "./ConfirmModal";
+import WarningModal from "@/app/components/ui/WarningModal";
 
 interface PendingRegistrationsProps {
   roleBadge: string;
@@ -13,6 +14,8 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
   const [visits, setVisits] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedVisit, setSelectedVisit] = useState<any | null>(null);
+  const [visitToDelete, setVisitToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchVisits = async () => {
     setIsLoading(true);
@@ -38,11 +41,13 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
     fetchVisits();
   };
 
-  const handleDeleteVisit = async (visitId: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to reject and delete this pending registration?"
-    );
-    if (!confirmDelete) return;
+  const handleDeleteVisit = (visitId: string) => {
+    setVisitToDelete(visitId);
+  };
+
+  const confirmDelete = async () => {
+    if (!visitToDelete) return;
+    setIsDeleting(true);
 
     try {
       const res = await fetch("/api/receptionist/visits/pending", {
@@ -50,11 +55,12 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ visitId }),
+        body: JSON.stringify({ visitId: visitToDelete }),
       });
 
       if (res.ok) {
         fetchVisits();
+        setVisitToDelete(null);
       } else {
         const data = await res.json();
         alert(data.error || "Failed to delete pending registration");
@@ -62,6 +68,8 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
     } catch (err) {
       console.error("Error deleting pending registration:", err);
       alert("An error occurred while deleting the registration.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -149,6 +157,17 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
           onSuccess={handleSuccess}
         />
       )}
+
+      <WarningModal
+        isOpen={!!visitToDelete}
+        title="Reject Registration"
+        message="Are you sure you want to reject and delete this pending registration? This action cannot be undone."
+        confirmText="Delete Registration"
+        type="danger"
+        isLoading={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={() => !isDeleting && setVisitToDelete(null)}
+      />
     </div>
   );
 }

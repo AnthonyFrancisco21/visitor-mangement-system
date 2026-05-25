@@ -531,6 +531,52 @@
   box-sizing: border-box;
 }
 
+.dateSelectGroup {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.dateSelect {
+  flex: 1;
+  height: 3.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 1.125rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  color: var(--fg);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23b8860b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.dateSelect:hover {
+  border-color: var(--border-hover);
+}
+
+.dateSelect:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12), var(--shadow-sm);
+}
+
+.dateSelectPlaceholder {
+  color: rgba(107, 107, 107, 0.5);
+  font-style: italic;
+  font-family: var(--font-display);
+}
+
 .fieldInput::placeholder {
   color: rgba(107, 107, 107, 0.5);
   font-style: italic;

@@ -46,6 +46,21 @@ const VISITOR_REASONS = [
   "Other",
 ];
 
+const MONTHS = [
+  { value: "01", label: "January" },
+  { value: "02", label: "February" },
+  { value: "03", label: "March" },
+  { value: "04", label: "April" },
+  { value: "05", label: "May" },
+  { value: "06", label: "June" },
+  { value: "07", label: "July" },
+  { value: "08", label: "August" },
+  { value: "09", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
 export default function KioskRegistrationPage() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -57,6 +72,86 @@ export default function KioskRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [timer, setTimer] = useState(10);
+
+  const [dobYear, setDobYear] = useState("");
+  const [dobMonth, setDobMonth] = useState("");
+  const [dobDay, setDobDay] = useState("");
+
+  const YEARS = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let y = currentYear; y >= currentYear - 100; y--) {
+      years.push(String(y));
+    }
+    return years;
+  }, []);
+
+  const daysInMonth = useMemo(() => {
+    if (!dobMonth) return 31;
+    const year = dobYear ? parseInt(dobYear) : 2020; // Default to leap year
+    const month = parseInt(dobMonth);
+    return new Date(year, month, 0).getDate();
+  }, [dobMonth, dobYear]);
+
+  const DAYS = useMemo(() => {
+    const list = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      list.push(String(d).padStart(2, "0"));
+    }
+    return list;
+  }, [daysInMonth]);
+
+  // Sync local select states if birthDate is cleared (e.g. on reset)
+  useEffect(() => {
+    if (!formData.birthDate) {
+      setDobYear("");
+      setDobMonth("");
+      setDobDay("");
+    } else {
+      const parts = formData.birthDate.split("-");
+      if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+        setDobYear(parts[0]);
+        setDobMonth(parts[1]);
+        setDobDay(parts[2]);
+      }
+    }
+  }, [formData.birthDate]);
+
+  const handleDateChange = (type: "year" | "month" | "day", value: string) => {
+    let newYear = dobYear;
+    let newMonth = dobMonth;
+    let newDay = dobDay;
+
+    if (type === "year") {
+      newYear = value;
+      setDobYear(value);
+    } else if (type === "month") {
+      newMonth = value;
+      setDobMonth(value);
+    } else if (type === "day") {
+      newDay = value;
+      setDobDay(value);
+    }
+
+    if (newYear && newMonth && newDay) {
+      const maxDays = new Date(parseInt(newYear), parseInt(newMonth), 0).getDate();
+      let finalDay = parseInt(newDay);
+      if (finalDay > maxDays) {
+        finalDay = maxDays;
+        newDay = String(finalDay).padStart(2, "0");
+        setDobDay(newDay);
+      }
+      setFormData((prev) => ({
+        ...prev,
+        birthDate: `${newYear}-${newMonth}-${newDay}`,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        birthDate: "",
+      }));
+    }
+  };
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -195,6 +290,17 @@ export default function KioskRegistrationPage() {
     { num: 3, label: "Purpose" },
     { num: 4, label: "Notice" },
   ];
+
+  // Prevent hydration mismatch by returning a skeleton on initial render
+  if (!mounted) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.standby}>
+          <div className={styles.standbyGlow} />
+        </div>
+      </div>
+    );
+  }
 
   // ── STANDBY SCREEN ──────────────────────────────────────────
   if (step === 0) {
@@ -414,17 +520,52 @@ export default function KioskRegistrationPage() {
 
                 <div className={styles.fieldRow}>
                   <div className={styles.field}>
-                    <label className={styles.fieldLabel} htmlFor="birthDate">
+                    <label className={styles.fieldLabel}>
                       Date of Birth
                     </label>
-                    <input
-                      id="birthDate"
-                      type="date"
-                      name="birthDate"
-                      value={formData.birthDate}
-                      onChange={handleInputChange}
-                      className={styles.fieldInput}
-                    />
+                    <div className={styles.dateSelectGroup}>
+                      <select
+                        value={dobMonth}
+                        onChange={(e) => handleDateChange("month", e.target.value)}
+                        className={styles.dateSelect}
+                        aria-label="Month"
+                      >
+                        <option value="" disabled className={styles.dateSelectPlaceholder}>MM</option>
+                        {MONTHS.map((m) => (
+                          <option key={m.value} value={m.value}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        value={dobDay}
+                        onChange={(e) => handleDateChange("day", e.target.value)}
+                        className={styles.dateSelect}
+                        aria-label="Day"
+                      >
+                        <option value="" disabled className={styles.dateSelectPlaceholder}>DD</option>
+                        {DAYS.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        value={dobYear}
+                        onChange={(e) => handleDateChange("year", e.target.value)}
+                        className={styles.dateSelect}
+                        aria-label="Year"
+                      >
+                        <option value="" disabled className={styles.dateSelectPlaceholder}>YYYY</option>
+                        {YEARS.map((y) => (
+                          <option key={y} value={y}>
+                            {y}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   <div className={styles.field}>

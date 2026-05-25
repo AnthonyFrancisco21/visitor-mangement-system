@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './RFIDInventory.module.css';
 
 type RfidCard = {
@@ -14,6 +14,13 @@ type RfidCard = {
 export default function RFIDInventory() {
   const [cards, setCards] = useState<RfidCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // New Card Registration State
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [scannedUid, setScannedUid] = useState('');
+  const [cardLabel, setCardLabel] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchCards = async () => {
     try {
@@ -32,6 +39,48 @@ export default function RFIDInventory() {
   useEffect(() => {
     fetchCards();
   }, []);
+
+  // Auto-focus input for scanner when modal opens
+  useEffect(() => {
+    if (isRegisterModalOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isRegisterModalOpen]);
+
+  const handleRegisterCard = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scannedUid) return;
+
+    setIsRegistering(true);
+    try {
+      const res = await fetch('/api/rfid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: scannedUid, label: cardLabel }),
+      });
+
+      if (res.ok) {
+        setIsRegisterModalOpen(false);
+        setScannedUid('');
+        setCardLabel('');
+        fetchCards();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to register card');
+      }
+    } catch (error) {
+      console.error('Error registering card:', error);
+      alert('An error occurred during registration');
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const handleContainerClick = () => {
+    if (inputRef.current && !scannedUid) {
+      inputRef.current.focus();
+    }
+  };
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
@@ -65,9 +114,21 @@ export default function RFIDInventory() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>RFID Inventory</h1>
-        <p className={styles.subtitle}>Track and manage physical visitor cards.</p>
+      <div className={styles.headerActions}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>RFID Inventory</h1>
+          <p className={styles.subtitle}>Track and manage physical visitor cards.</p>
+        </div>
+        <button 
+          className={styles.registerBtn}
+          onClick={() => {
+            setIsRegisterModalOpen(true);
+            setScannedUid('');
+            setCardLabel('');
+          }}
+        >
+          Register New Card
+        </button>
       </div>
 
       {isLoading ? (
@@ -121,6 +182,76 @@ export default function RFIDInventory() {
           {cards.length === 0 && (
             <div className={styles.empty}>No RFID cards found in the system.</div>
           )}
+        </div>
+      )}
+
+      {/* Registration Modal */}
+      {isRegisterModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsRegisterModalOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>Register New Card</h2>
+            <p className={styles.modalSubtitle}>Tap a new RFID card on the reader to register it.</p>
+            
+            <form onSubmit={handleRegisterCard}>
+              <div className={styles.listeningBox} onClick={handleContainerClick}>
+                {!scannedUid ? (
+                  <>
+                    <div className={styles.listeningIcon}>📡</div>
+                    <span className={styles.listeningText}>Listening for card tap...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.listeningIcon} style={{ animation: 'none' }}>✅</div>
+                    <span className={styles.listeningText}>Card Read Successfully</span>
+                  </>
+                )}
+                
+                {/* Hidden input to catch scanner keystrokes */}
+                <input 
+                  type="text" 
+                  ref={inputRef}
+                  value={scannedUid}
+                  onChange={(e) => setScannedUid(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              {scannedUid && (
+                <>
+                  <div className={styles.formGroup}>
+                    <label>Card UID</label>
+                    <input type="text" value={scannedUid} readOnly />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Card Label (Optional)</label>
+                    <input 
+                      type="text" 
+                      value={cardLabel}
+                      onChange={(e) => setCardLabel(e.target.value)}
+                      placeholder="e.g. VISITOR NO. 11" 
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className={styles.modalActions}>
+                <button 
+                  type="button" 
+                  className={styles.cancelBtn}
+                  onClick={() => setIsRegisterModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className={styles.submitBtn}
+                  disabled={!scannedUid || isRegistering}
+                >
+                  {isRegistering ? 'Registering...' : 'Register Card'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
