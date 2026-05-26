@@ -1,19 +1,14 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import Webcam from "react-webcam";
 import { 
   X, 
-  Camera, 
-  Loader2, 
-  CreditCard, 
   User, 
-  Calendar, 
   MapPin, 
   Clock, 
-  RotateCcw, 
   Check, 
-  AlertTriangle 
+  AlertTriangle,
+  CreditCard
 } from "lucide-react";
 import styles from "./ConfirmModal.module.css";
 
@@ -25,19 +20,16 @@ type ConfirmModalProps = {
 
 export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModalProps) {
   const [step, setStep] = useState(1);
-  const [idPhotoUrl, setIdPhotoUrl] = useState<string | null>(null);
-  const [visitorPhotoUrl, setVisitorPhotoUrl] = useState<string | null>(null);
   const [rfidUid, setRfidUid] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [rfidAssignedTo, setRfidAssignedTo] = useState<string | null>(null);
 
-  const webcamRef = useRef<Webcam>(null);
   const rfidInputRef = useRef<HTMLInputElement>(null);
 
-  // Automatically focus RFID input on step 4
+  // Automatically focus RFID input on step 2
   useEffect(() => {
-    if (step === 4) {
+    if (step === 2) {
       const focusTimer = setTimeout(() => {
         rfidInputRef.current?.focus();
       }, 100);
@@ -45,9 +37,9 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
     }
   }, [step]);
 
-  // Constantly ensure RFID input stays focused while on step 4
+  // Constantly ensure RFID input stays focused while on step 2
   useEffect(() => {
-    if (step !== 4) return;
+    if (step !== 2) return;
 
     const handleFocusBack = () => {
       rfidInputRef.current?.focus();
@@ -76,42 +68,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
     };
   }, [step]);
 
-  const handleCapture = () => {
-    if (!webcamRef.current) return;
-    const imageSrc = webcamRef.current.getScreenshot();
-    if (!imageSrc) return;
 
-    if (step === 2) {
-      setIdPhotoUrl(imageSrc);
-    } else if (step === 3) {
-      setVisitorPhotoUrl(imageSrc);
-    }
-  };
-
-  const handleRetake = () => {
-    if (step === 2) {
-      setIdPhotoUrl(null);
-    } else if (step === 3) {
-      setVisitorPhotoUrl(null);
-    }
-  };
-
-  const calculateAge = (birthDateString?: string) => {
-    if (!birthDateString) return "—";
-    try {
-      const birthDate = new Date(birthDateString);
-      if (isNaN(birthDate.getTime())) return "—";
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age.toString();
-    } catch {
-      return "—";
-    }
-  };
 
   const handleConfirm = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -134,8 +91,6 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
         body: JSON.stringify({
           visitId: visit.id,
           rfidUid: cleanRfid,
-          idPhotoUrl,
-          visitorPhotoUrl,
         }),
       });
 
@@ -150,7 +105,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
       }
 
       // Transition to Success Step
-      setStep(5);
+      setStep(3);
       
       // Auto-trigger onSuccess callback after a delay for visual confirmation
       setTimeout(() => {
@@ -167,7 +122,6 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
     }
   };
 
-  // Human-readable format of visitor birthdate
   const formatBirthdate = (dateStr?: string) => {
     if (!dateStr) return "—";
     try {
@@ -180,7 +134,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
   };
 
   const currentStepPercentage = () => {
-    return ((step - 1) / 4) * 100;
+    return ((step - 1) / 2) * 100;
   };
 
   return (
@@ -192,7 +146,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
             <h2>Confirm Registration</h2>
             <p className={styles.subtitle}>{visit.visitor.fullName}</p>
           </div>
-          {step < 5 && (
+          {step < 3 && (
             <button onClick={onClose} className={styles.closeBtn} aria-label="Close modal">
               <X size={20} />
             </button>
@@ -200,7 +154,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
         </div>
 
         {/* Step Indicator Tracker */}
-        {step < 5 && (
+        {step < 3 && (
           <div className={styles.stepTracker}>
             <div className={styles.progressContainer}>
               <div 
@@ -214,15 +168,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                 <span className={styles.dotLabel}>Overview</span>
               </div>
               <div className={`${styles.stepDot} ${step >= 2 ? styles.activeDot : ""} ${step > 2 ? styles.completedDot : ""}`}>
-                <span className={styles.dotNumber}>{step > 2 ? "✓" : "2"}</span>
-                <span className={styles.dotLabel}>Government ID</span>
-              </div>
-              <div className={`${styles.stepDot} ${step >= 3 ? styles.activeDot : ""} ${step > 3 ? styles.completedDot : ""}`}>
-                <span className={styles.dotNumber}>{step > 3 ? "✓" : "3"}</span>
-                <span className={styles.dotLabel}>Visitor Photo</span>
-              </div>
-              <div className={`${styles.stepDot} ${step >= 4 ? styles.activeDot : ""} ${step > 4 ? styles.completedDot : ""}`}>
-                <span className={styles.dotNumber}>4</span>
+                <span className={styles.dotNumber}>2</span>
                 <span className={styles.dotLabel}>RFID Card</span>
               </div>
             </div>
@@ -267,18 +213,6 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
 
                 <div className={styles.infoCard}>
                   <div className={styles.infoIconWrapper}>
-                    <Calendar size={18} />
-                  </div>
-                  <div className={styles.infoDetails}>
-                    <span className={styles.label}>Birthdate (Age)</span>
-                    <span className={styles.value}>
-                      {formatBirthdate(visit.visitor.birthDate)} ({calculateAge(visit.visitor.birthDate)} years old)
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles.infoCard}>
-                  <div className={styles.infoIconWrapper}>
                     <MapPin size={18} />
                   </div>
                   <div className={styles.infoDetails}>
@@ -304,109 +238,32 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                   </div>
                 </div>
               </div>
+
+              {/* Photos from Kiosk */}
+              {(visit.visitor.idPhotoUrl || visit.visitor.visitorPhotoUrl) && (
+                <div className={styles.kioskPhotosSection}>
+                  <h4>Visitor Photos</h4>
+                  <div className={styles.kioskPhotosGrid}>
+                    {visit.visitor.idPhotoUrl && (
+                      <div className={styles.photoBox}>
+                        <img src={visit.visitor.idPhotoUrl} alt="ID Document" className={styles.photoImg} />
+                        <span className={styles.photoLabel}>Government ID</span>
+                      </div>
+                    )}
+                    {visit.visitor.visitorPhotoUrl && (
+                      <div className={styles.photoBox}>
+                        <img src={visit.visitor.visitorPhotoUrl} alt="Visitor Face" className={styles.photoImg} />
+                        <span className={styles.photoLabel}>Visitor Face</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* STEP 2: CAPTURE ID */}
+          {/* STEP 2: ASSIGN RFID CARD */}
           {step === 2 && (
-            <div className={styles.stepContent}>
-              <div className={styles.sectionHeader}>
-                <h3>Government ID</h3>
-                <p>Position the visitor's government ID inside the camera frame.</p>
-              </div>
-
-              {idPhotoUrl === null ? (
-                <div className={styles.cameraContainer}>
-                  <div className={styles.webcamWrapper}>
-                    <Webcam
-                      audio={false}
-                      ref={webcamRef}
-                      screenshotFormat="image/jpeg"
-                      className={styles.webcamVideo}
-                      videoConstraints={{ facingMode: "user" }}
-                    />
-                    <div className={styles.overlayFrame}>
-                      <div className={styles.cornerTL} />
-                      <div className={styles.cornerTR} />
-                      <div className={styles.cornerBL} />
-                      <div className={styles.cornerBR} />
-                      <span className={styles.frameInstruction}>PLACE GOVERNMENT ID HERE</span>
-                    </div>
-                  </div>
-                  <button onClick={handleCapture} className={styles.actionBtn}>
-                    <Camera size={18} /> Capture ID Photo
-                  </button>
-                  <button onClick={() => setStep(3)} className={styles.skipBtn}>
-                    Skip ID Capture
-                  </button>
-                </div>
-              ) : (
-                <div className={styles.previewContainer}>
-                  <div className={styles.previewCard}>
-                    <div className={styles.imageFrame}>
-                      <img src={idPhotoUrl} alt="Captured ID Document" className={styles.capturedImage} />
-                    </div>
-                    <div className={styles.previewForm}>
-                      <button onClick={handleRetake} className={styles.outlineBtn}>
-                        <RotateCcw size={16} /> Retake ID Photo
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* STEP 3: CAPTURE VISITOR PHOTO */}
-          {step === 3 && (
-            <div className={styles.stepContent}>
-              <div className={styles.sectionHeader}>
-                <h3>Capture Visitor Photo</h3>
-                <p>Ask the visitor to look directly at the webcam.</p>
-              </div>
-
-              {visitorPhotoUrl === null ? (
-                <div className={styles.cameraContainer}>
-                  <div className={styles.webcamWrapper}>
-                    <Webcam
-                      audio={false}
-                      ref={webcamRef}
-                      screenshotFormat="image/jpeg"
-                      className={styles.webcamVideo}
-                      videoConstraints={{ facingMode: "user" }}
-                    />
-                    <div className={styles.overlayFace}>
-                      <div className={styles.faceOval} />
-                      <span className={styles.frameInstruction}>ALIGN VISITOR FACE HERE</span>
-                    </div>
-                  </div>
-                  <button onClick={handleCapture} className={styles.actionBtn}>
-                    <Camera size={18} /> Capture Visitor Photo
-                  </button>
-                  <button onClick={() => setStep(4)} className={styles.skipBtn}>
-                    Skip Photo Capture
-                  </button>
-                </div>
-              ) : (
-                <div className={styles.previewContainer}>
-                  <div className={styles.previewCard}>
-                    <div className={styles.imageFrameFace}>
-                      <img src={visitorPhotoUrl} alt="Captured Visitor Face" className={styles.capturedImageFace} />
-                    </div>
-                    <div className={styles.previewFormFace}>
-                      <p className={styles.previewConfirmText}>Visitor photo captured successfully.</p>
-                      <button onClick={handleRetake} className={styles.outlineBtn}>
-                        <RotateCcw size={16} /> Retake Photo
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* STEP 4: ASSIGN RFID CARD */}
-          {step === 4 && (
             <form onSubmit={handleConfirm} className={styles.stepContent}>
               <div className={styles.sectionHeader}>
                 <h3>Assign RFID Card</h3>
@@ -456,8 +313,8 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
             </form>
           )}
 
-          {/* STEP 5: SUCCESS SCREEN */}
-          {step === 5 && (
+          {/* STEP 3: SUCCESS SCREEN */}
+          {step === 3 && (
             <div className={styles.successWrapper}>
               <div className={styles.successBanner}>
                 <div className={styles.successRing}>
@@ -497,7 +354,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
         </div>
 
         {/* Modal Footer */}
-        {step < 5 && (
+        {step < 3 && (
           <div className={styles.modalFooter}>
             {step > 1 ? (
               <button onClick={() => setStep(step - 1)} className={styles.backBtn}>
@@ -510,16 +367,6 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
             <div className={styles.footerActions}>
               {step === 1 && (
                 <button onClick={() => setStep(2)} className={styles.nextBtn}>
-                  Next: Government ID →
-                </button>
-              )}
-              {step === 2 && idPhotoUrl !== null && (
-                <button onClick={() => setStep(3)} className={styles.nextBtn}>
-                  Next: Visitor Photo →
-                </button>
-              )}
-              {step === 3 && visitorPhotoUrl !== null && (
-                <button onClick={() => setStep(4)} className={styles.nextBtn}>
                   Next: Assign Card →
                 </button>
               )}

@@ -801,9 +801,9 @@
 }
 
 .backBtn:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+  background: #f8fafc;
   color: #1e293b;
+  border-color: #94a3b8;
 }
 
 .footerActions {
@@ -812,9 +812,6 @@
 }
 
 .nextBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
   background: #2563eb;
   color: white;
   border: none;
@@ -824,12 +821,17 @@
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 2px 4px -1px rgba(37, 99, 235, 0.2);
 }
 
 .nextBtn:hover {
   background: #1d4ed8;
-  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.25);
+}
+
+.nextBtn:active {
+  transform: translateY(0);
 }
 
 .confirmBtn {
@@ -863,4 +865,52 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Kiosk Photos Display */
+.kioskPhotosSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.kioskPhotosSection h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.kioskPhotosGrid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.photoBox {
+  flex: 1;
+  min-width: 200px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.photoImg {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.photoLabel {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }

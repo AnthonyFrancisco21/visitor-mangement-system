@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import Webcam from "react-webcam";
 import {
   CheckCircle2,
   ChevronRight,
@@ -12,6 +13,8 @@ import {
   MapPin,
   Clock,
   CreditCard,
+  Camera,
+  RotateCcw
 } from "lucide-react";
 import styles from "./kiosk.module.css";
 
@@ -25,14 +28,16 @@ type Destination = {
 
 type FormData = {
   fullName: string;
-  birthDate: string;
+  idPhotoUrl: string;
+  visitorPhotoUrl: string;
   destinationIds: string[];
   reason: string;
 };
 
 const initialFormData: FormData = {
   fullName: "",
-  birthDate: "",
+  idPhotoUrl: "",
+  visitorPhotoUrl: "",
   destinationIds: [],
   reason: "",
 };
@@ -44,21 +49,6 @@ const VISITOR_REASONS = [
   "Maintenance",
   "Personal",
   "Other",
-];
-
-const MONTHS = [
-  { value: "01", label: "January" },
-  { value: "02", label: "February" },
-  { value: "03", label: "March" },
-  { value: "04", label: "April" },
-  { value: "05", label: "May" },
-  { value: "06", label: "June" },
-  { value: "07", label: "July" },
-  { value: "08", label: "August" },
-  { value: "09", label: "September" },
-  { value: "10", label: "October" },
-  { value: "11", label: "November" },
-  { value: "12", label: "December" },
 ];
 
 export default function KioskRegistrationPage() {
@@ -73,98 +63,8 @@ export default function KioskRegistrationPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [timer, setTimer] = useState(10);
 
-  const [dobYear, setDobYear] = useState("");
-  const [dobMonth, setDobMonth] = useState("");
-  const [dobDay, setDobDay] = useState("");
-
-  const YEARS = useMemo(() => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let y = currentYear; y >= currentYear - 100; y--) {
-      years.push(String(y));
-    }
-    return years;
-  }, []);
-
-  const daysInMonth = useMemo(() => {
-    if (!dobMonth) return 31;
-    const year = dobYear ? parseInt(dobYear) : 2020; // Default to leap year
-    const month = parseInt(dobMonth);
-    return new Date(year, month, 0).getDate();
-  }, [dobMonth, dobYear]);
-
-  const DAYS = useMemo(() => {
-    const list = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      list.push(String(d).padStart(2, "0"));
-    }
-    return list;
-  }, [daysInMonth]);
-
-  // Sync local select states if birthDate is cleared (e.g. on reset)
-  useEffect(() => {
-    if (!formData.birthDate) {
-      setDobYear("");
-      setDobMonth("");
-      setDobDay("");
-    } else {
-      const parts = formData.birthDate.split("-");
-      if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-        setDobYear(parts[0]);
-        setDobMonth(parts[1]);
-        setDobDay(parts[2]);
-      }
-    }
-  }, [formData.birthDate]);
-
-  const handleDateChange = (type: "year" | "month" | "day", value: string) => {
-    let newYear = dobYear;
-    let newMonth = dobMonth;
-    let newDay = dobDay;
-
-    if (type === "year") {
-      newYear = value;
-      setDobYear(value);
-    } else if (type === "month") {
-      newMonth = value;
-      setDobMonth(value);
-    } else if (type === "day") {
-      newDay = value;
-      setDobDay(value);
-    }
-
-    if (newYear && newMonth && newDay) {
-      const maxDays = new Date(parseInt(newYear), parseInt(newMonth), 0).getDate();
-      let finalDay = parseInt(newDay);
-      if (finalDay > maxDays) {
-        finalDay = maxDays;
-        newDay = String(finalDay).padStart(2, "0");
-        setDobDay(newDay);
-      }
-      setFormData((prev) => ({
-        ...prev,
-        birthDate: `${newYear}-${newMonth}-${newDay}`,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        birthDate: "",
-      }));
-    }
-  };
-
+  const webcamRef = useRef<Webcam>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const calculatedAge = useMemo(() => {
-    if (!formData.birthDate) return null;
-    const dob = new Date(formData.birthDate);
-    if (isNaN(dob.getTime())) return null;
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-    return age;
-  }, [formData.birthDate]);
 
   useEffect(() => {
     setMounted(true);
@@ -229,7 +129,7 @@ export default function KioskRegistrationPage() {
 
   useEffect(() => {
     let countdown: NodeJS.Timeout;
-    if (step === 4) {
+    if (step === 6) {
       countdown = setInterval(() => {
         setTimer((prev) => {
           if (prev <= 1) {
@@ -260,6 +160,26 @@ export default function KioskRegistrationPage() {
     }));
   };
 
+  const handleCaptureId = () => {
+    if (!webcamRef.current) return;
+    const imageSrc = webcamRef.current.getScreenshot();
+    if (imageSrc) setFormData(prev => ({ ...prev, idPhotoUrl: imageSrc }));
+  };
+
+  const handleRetakeId = () => {
+    setFormData(prev => ({ ...prev, idPhotoUrl: "" }));
+  };
+
+  const handleCaptureFace = () => {
+    if (!webcamRef.current) return;
+    const imageSrc = webcamRef.current.getScreenshot();
+    if (imageSrc) setFormData(prev => ({ ...prev, visitorPhotoUrl: imageSrc }));
+  };
+
+  const handleRetakeFace = () => {
+    setFormData(prev => ({ ...prev, visitorPhotoUrl: "" }));
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
@@ -272,7 +192,7 @@ export default function KioskRegistrationPage() {
       // fall through
     } finally {
       setIsSubmitting(false);
-      setStep(4);
+      setStep(6);
     }
   };
 
@@ -285,10 +205,11 @@ export default function KioskRegistrationPage() {
   };
 
   const STEPS = [
-    { num: 1, label: "Visitor" },
-    { num: 2, label: "Destination" },
-    { num: 3, label: "Purpose" },
-    { num: 4, label: "Notice" },
+    { num: 1, label: "Scan ID" },
+    { num: 2, label: "Visitor" },
+    { num: 3, label: "Photo" },
+    { num: 4, label: "Destination" },
+    { num: 5, label: "Purpose" },
   ];
 
   // Prevent hydration mismatch by returning a skeleton on initial render
@@ -365,7 +286,7 @@ export default function KioskRegistrationPage() {
   }
 
   // ── NOTICE / COMPLETION SCREEN ──────────────────────────────
-  if (step === 4) {
+  if (step === 6) {
     return (
       <div className={styles.page}>
         <div className={styles.noticePage}>
@@ -390,8 +311,7 @@ export default function KioskRegistrationPage() {
 
             {/* Description */}
             <p className={styles.noticeDesc}>
-              Please proceed to the reception desk with your{" "}
-              <strong>government-issued ID.</strong> The receptionist
+              Please proceed to the reception desk. The receptionist
               will complete the final steps on your behalf.
             </p>
 
@@ -402,18 +322,8 @@ export default function KioskRegistrationPage() {
                   <MapPin size={18} strokeWidth={1.5} />
                 </div>
                 <div className={styles.noticeStepBody}>
-                  <p className={styles.noticeStepLabel}>01 &mdash; ID Document Scan</p>
-                  <p className={styles.noticeStepDesc}>Present your government-issued ID at reception</p>
-                </div>
-              </div>
-
-              <div className={styles.noticeStep}>
-                <div className={styles.noticeStepIcon}>
-                  <Clock size={18} strokeWidth={1.5} />
-                </div>
-                <div className={styles.noticeStepBody}>
-                  <p className={styles.noticeStepLabel}>02 &mdash; Photo Capture</p>
-                  <p className={styles.noticeStepDesc}>A photo will be taken for your visitor record</p>
+                  <p className={styles.noticeStepLabel}>01 &mdash; Verify Information</p>
+                  <p className={styles.noticeStepDesc}>Receptionist will verify your details</p>
                 </div>
               </div>
 
@@ -422,7 +332,7 @@ export default function KioskRegistrationPage() {
                   <CreditCard size={18} strokeWidth={1.5} />
                 </div>
                 <div className={styles.noticeStepBody}>
-                  <p className={styles.noticeStepLabel}>03 &mdash; RFID Card Issuance</p>
+                  <p className={styles.noticeStepLabel}>02 &mdash; RFID Card Issuance</p>
                   <p className={styles.noticeStepDesc}>Receive your access card for the building</p>
                 </div>
               </div>
@@ -433,7 +343,7 @@ export default function KioskRegistrationPage() {
 
             {/* Auto time-in note */}
             <p className={styles.noticeTimeNote}>
-              ✦ Your time-in has been automatically recorded.
+              ✦ Your time-in will be automatically recorded upon card issuance.
             </p>
 
             {/* Countdown */}
@@ -487,10 +397,61 @@ export default function KioskRegistrationPage() {
       <main className={styles.main} ref={scrollRef}>
         <div className={styles.formInner}>
 
-          {/* ── STEP 1: Visitor Info ── */}
+          {/* ── STEP 1: SCAN ID ── */}
           {step === 1 && (
             <div className={styles.fadeIn}>
-              {/* Section label */}
+              <div className={styles.sectionLabel}>
+                <span className={styles.sectionRule} />
+                <span className={styles.sectionLabelText}>Government ID</span>
+                <span className={styles.sectionRule} />
+              </div>
+
+              <h2 className={styles.stepTitle}>
+                Scan your<br />ID Document.
+              </h2>
+              
+              {!formData.idPhotoUrl ? (
+                <div className={styles.cameraContainer}>
+                  <div className={styles.webcamWrapper}>
+                    <Webcam
+                      audio={false}
+                      ref={webcamRef}
+                      screenshotFormat="image/jpeg"
+                      className={styles.webcamVideo}
+                      videoConstraints={{ facingMode: "user" }}
+                    />
+                    <div className={styles.overlayFrame}>
+                      <div className={styles.cornerTL} />
+                      <div className={styles.cornerTR} />
+                      <div className={styles.cornerBL} />
+                      <div className={styles.cornerBR} />
+                      <span className={styles.frameInstruction}>PLACE ID IN FRAME</span>
+                    </div>
+                  </div>
+                  <button onClick={handleCaptureId} className={styles.actionBtn}>
+                    <Camera size={18} /> Capture ID Photo
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.previewContainer}>
+                  <div className={styles.previewCard}>
+                    <div className={styles.imageFrame}>
+                      <img src={formData.idPhotoUrl} alt="Captured ID Document" className={styles.capturedImage} />
+                    </div>
+                    <div className={styles.previewForm}>
+                      <button onClick={handleRetakeId} className={styles.outlineBtn}>
+                        <RotateCcw size={16} /> Retake ID Photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── STEP 2: Visitor Info ── */}
+          {step === 2 && (
+            <div className={styles.fadeIn}>
               <div className={styles.sectionLabel}>
                 <span className={styles.sectionRule} />
                 <span className={styles.sectionLabelText}>Visitor Information</span>
@@ -498,7 +459,7 @@ export default function KioskRegistrationPage() {
               </div>
 
               <h2 className={styles.stepTitle}>
-                Your<br />Details.
+                Verify your<br />Name.
               </h2>
 
               <div className={styles.fieldGroup}>
@@ -517,77 +478,61 @@ export default function KioskRegistrationPage() {
                     autoComplete="off"
                   />
                 </div>
-
-                <div className={styles.fieldRow}>
-                  <div className={styles.field}>
-                    <label className={styles.fieldLabel}>
-                      Date of Birth
-                    </label>
-                    <div className={styles.dateSelectGroup}>
-                      <select
-                        value={dobMonth}
-                        onChange={(e) => handleDateChange("month", e.target.value)}
-                        className={styles.dateSelect}
-                        aria-label="Month"
-                      >
-                        <option value="" disabled className={styles.dateSelectPlaceholder}>MM</option>
-                        {MONTHS.map((m) => (
-                          <option key={m.value} value={m.value}>
-                            {m.label}
-                          </option>
-                        ))}
-                      </select>
-
-                      <select
-                        value={dobDay}
-                        onChange={(e) => handleDateChange("day", e.target.value)}
-                        className={styles.dateSelect}
-                        aria-label="Day"
-                      >
-                        <option value="" disabled className={styles.dateSelectPlaceholder}>DD</option>
-                        {DAYS.map((d) => (
-                          <option key={d} value={d}>
-                            {d}
-                          </option>
-                        ))}
-                      </select>
-
-                      <select
-                        value={dobYear}
-                        onChange={(e) => handleDateChange("year", e.target.value)}
-                        className={styles.dateSelect}
-                        aria-label="Year"
-                      >
-                        <option value="" disabled className={styles.dateSelectPlaceholder}>YYYY</option>
-                        {YEARS.map((y) => (
-                          <option key={y} value={y}>
-                            {y}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className={styles.field}>
-                    <label className={styles.fieldLabel}>Calculated Age</label>
-                    <div className={styles.ageDisplay}>
-                      {calculatedAge !== null ? (
-                        <>
-                          <span className={styles.ageNum}>{calculatedAge}</span>
-                          <span className={styles.ageUnit}>years old</span>
-                        </>
-                      ) : (
-                        <span className={styles.agePlaceholder}>—</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           )}
 
-          {/* ── STEP 2: Destination ── */}
-          {step === 2 && (
+          {/* ── STEP 3: CAPTURE FACE ── */}
+          {step === 3 && (
+            <div className={styles.fadeIn}>
+              <div className={styles.sectionLabel}>
+                <span className={styles.sectionRule} />
+                <span className={styles.sectionLabelText}>Visitor Photo</span>
+                <span className={styles.sectionRule} />
+              </div>
+
+              <h2 className={styles.stepTitle}>
+                Take a<br />Selfie.
+              </h2>
+              
+              {!formData.visitorPhotoUrl ? (
+                <div className={styles.cameraContainer}>
+                  <div className={styles.webcamWrapper}>
+                    <Webcam
+                      audio={false}
+                      ref={webcamRef}
+                      screenshotFormat="image/jpeg"
+                      className={styles.webcamVideo}
+                      videoConstraints={{ facingMode: "user" }}
+                    />
+                    <div className={styles.overlayFace}>
+                      <div className={styles.faceOval} />
+                      <span className={styles.frameInstruction}>ALIGN FACE HERE</span>
+                    </div>
+                  </div>
+                  <button onClick={handleCaptureFace} className={styles.actionBtn}>
+                    <Camera size={18} /> Capture Photo
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.previewContainer}>
+                  <div className={styles.previewCard}>
+                    <div className={styles.imageFrame}>
+                      <img src={formData.visitorPhotoUrl} alt="Captured Visitor Face" className={styles.capturedImage} />
+                    </div>
+                    <div className={styles.previewForm}>
+                      <button onClick={handleRetakeFace} className={styles.outlineBtn}>
+                        <RotateCcw size={16} /> Retake Photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── STEP 4: Destination ── */}
+          {step === 4 && (
             <div className={styles.fadeIn}>
               <div className={styles.sectionLabel}>
                 <span className={styles.sectionRule} />
@@ -700,8 +645,8 @@ export default function KioskRegistrationPage() {
             </div>
           )}
 
-          {/* ── STEP 3: Purpose ── */}
-          {step === 3 && (
+          {/* ── STEP 5: Purpose ── */}
+          {step === 5 && (
             <div className={styles.fadeIn}>
               <div className={styles.sectionLabel}>
                 <span className={styles.sectionRule} />
@@ -745,12 +690,14 @@ export default function KioskRegistrationPage() {
           <div />
         )}
 
-        {step < 3 ? (
+        {step < 5 ? (
           <button
             onClick={() => setStep(step + 1)}
             disabled={
-              (step === 1 && (!formData.fullName.trim() || !formData.birthDate)) ||
-              (step === 2 && formData.destinationIds.length === 0)
+              (step === 1 && !formData.idPhotoUrl) ||
+              (step === 2 && !formData.fullName.trim()) ||
+              (step === 3 && !formData.visitorPhotoUrl) ||
+              (step === 4 && formData.destinationIds.length === 0)
             }
             className={styles.btnNext}
           >

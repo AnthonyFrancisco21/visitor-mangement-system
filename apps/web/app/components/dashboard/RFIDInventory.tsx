@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import styles from './RFIDInventory.module.css';
 
 type RfidCard = {
@@ -21,6 +22,10 @@ export default function RFIDInventory() {
   const [cardLabel, setCardLabel] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Delete State
+  const [cardToDelete, setCardToDelete] = useState<RfidCard | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchCards = async () => {
     try {
@@ -102,6 +107,30 @@ export default function RFIDInventory() {
     }
   };
 
+  const handleDeleteCard = async () => {
+    if (!cardToDelete) return;
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch(`/api/rfid/${cardToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setCardToDelete(null);
+        fetchCards();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete card');
+      }
+    } catch (error) {
+      console.error('Error deleting card:', error);
+      alert('An error occurred while deleting card');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'AVAILABLE': return styles.statusAvailable;
@@ -158,20 +187,36 @@ export default function RFIDInventory() {
 
               <div className={styles.cardActions}>
                 {card.status === 'AVAILABLE' && (
-                  <button 
-                    className={styles.lostBtn}
-                    onClick={() => handleStatusUpdate(card.id, 'LOST')}
-                  >
-                    Mark as Lost
-                  </button>
+                  <>
+                    <button 
+                      className={styles.lostBtn}
+                      onClick={() => handleStatusUpdate(card.id, 'LOST')}
+                    >
+                      Mark as Lost
+                    </button>
+                    <button 
+                      className={styles.deleteBtn}
+                      onClick={() => setCardToDelete(card)}
+                    >
+                      Delete
+                    </button>
+                  </>
                 )}
                 {card.status === 'LOST' && (
-                  <button 
-                    className={styles.availableBtn}
-                    onClick={() => handleStatusUpdate(card.id, 'AVAILABLE')}
-                  >
-                    Found / Set Available
-                  </button>
+                  <>
+                    <button 
+                      className={styles.availableBtn}
+                      onClick={() => handleStatusUpdate(card.id, 'AVAILABLE')}
+                    >
+                      Found / Set Available
+                    </button>
+                    <button 
+                      className={styles.deleteBtn}
+                      onClick={() => setCardToDelete(card)}
+                    >
+                      Delete
+                    </button>
+                  </>
                 )}
                 {card.status === 'IN_USE' && (
                   <span className={styles.actionNote}>Card currently with visitor</span>
@@ -254,6 +299,24 @@ export default function RFIDInventory() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        isOpen={!!cardToDelete}
+        title="Delete RFID Card"
+        message={
+          <>
+            Are you sure you want to delete the card{" "}
+            <strong>{cardToDelete?.label || cardToDelete?.uid}</strong>? This action cannot be undone.
+          </>
+        }
+        confirmLabel="Delete Card"
+        cancelLabel="Cancel"
+        type="danger"
+        isLoading={isDeleting}
+        onConfirm={handleDeleteCard}
+        onCancel={() => setCardToDelete(null)}
+      />
     </div>
   );
 }
