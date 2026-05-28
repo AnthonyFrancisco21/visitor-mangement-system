@@ -10,7 +10,9 @@ interface PendingRegistrationsProps {
   roleBadge: string;
 }
 
-export default function PendingRegistrations({ roleBadge }: PendingRegistrationsProps) {
+export default function PendingRegistrations({
+  roleBadge,
+}: PendingRegistrationsProps) {
   const [visits, setVisits] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedVisit, setSelectedVisit] = useState<any | null>(null);
@@ -83,7 +85,11 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
             Review and confirm visitor registrations submitted via the kiosk.
           </p>
         </div>
-        <button onClick={fetchVisits} className={styles.refreshBtn} disabled={isLoading}>
+        <button
+          onClick={fetchVisits}
+          className={styles.refreshBtn}
+          disabled={isLoading}
+        >
           <RefreshCw size={18} className={isLoading ? styles.spin : ""} />
           Refresh
         </button>
@@ -116,14 +122,21 @@ export default function PendingRegistrations({ roleBadge }: PendingRegistrations
               {visits.map((visit) => (
                 <tr key={visit.id} className={styles.tableRow}>
                   <td>
-                    <strong className={styles.visitorName}>{visit.visitor.fullName}</strong>
+                    <strong className={styles.visitorName}>
+                      {visit.visitor.fullName}
+                    </strong>
                   </td>
                   <td>
-                    {visit.destinations.map((d: any) => d.destination.name).join(", ")}
+                    {visit.destinations
+                      .map((d: any) => d.destination.name)
+                      .join(", ")}
                   </td>
                   <td>{visit.reason || "—"}</td>
                   <td>
-                    {new Date(visit.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(visit.createdAt).toLocaleTimeString(undefined, {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </td>
                   <td>
                     <div className={styles.actionsContainer}>

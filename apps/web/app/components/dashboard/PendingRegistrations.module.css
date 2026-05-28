@@ -68,7 +68,9 @@
 .tableContainer {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
   overflow: hidden;
   border: 1px solid #e2e8f0;
 }
@@ -155,7 +157,8 @@
   box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
 }
 
-.loadingState, .emptyState {
+.loadingState,
+.emptyState {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -169,7 +172,8 @@
   color: #10b981;
 }
 
-.loadingState p, .emptyState p {
+.loadingState p,
+.emptyState p {
   margin-top: 1rem;
   font-size: 0.95rem;
 }
@@ -186,6 +190,10 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
