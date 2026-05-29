@@ -18,11 +18,11 @@ export default function RegistrationDashboard({
   const [activeTab, setActiveTab] = useState<"pending" | "manual">("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Manual entry is now self-contained (creates ACTIVE visit directly).
+  // No need to switch to pending tab or refresh it after manual success.
   const handleManualSuccess = () => {
-    // Trigger refresh of pending registrations
-    setRefreshTrigger((prev) => prev + 1);
-    // Return to pending tab to show updated list
-    setActiveTab("pending");
+    // Stay on manual tab — visitor is already checked in.
+    // The entry wizard resets itself automatically.
   };
 
   return (

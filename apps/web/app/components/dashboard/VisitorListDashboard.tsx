@@ -25,10 +25,6 @@ interface VisitorListDashboardProps {
 type VisitorRecord = {
   id: string;
   visitorName: string;
-  birthDate: string;
-  contactNumber: string;
-  idType: string;
-  idNumber: string;
   rfidCard: string;
   destinations: string;
   timeIn: string;
@@ -37,7 +33,6 @@ type VisitorRecord = {
   reason: string;
   revokeReason: string | null;
   revokeNote: string | null;
-  address: string;
   visitorPhotoUrl: string | null;
   idPhotoUrl: string | null;
   rfidCardUid: string;
@@ -136,14 +131,10 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
     if (!query) return true;
     return (
       rec.visitorName.toLowerCase().includes(query) ||
-      rec.contactNumber.toLowerCase().includes(query) ||
-      rec.idType.toLowerCase().includes(query) ||
-      rec.idNumber.toLowerCase().includes(query) ||
       rec.destinations.toLowerCase().includes(query) ||
       rec.rfidCard.toLowerCase().includes(query) ||
       rec.rfidCardUid.toLowerCase().includes(query) ||
-      rec.reason.toLowerCase().includes(query) ||
-      rec.address.toLowerCase().includes(query)
+      rec.reason.toLowerCase().includes(query)
     );
   });
 
@@ -279,8 +270,7 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Visitor</th>
-                <th>Government ID</th>
+                <th>Visitor Name</th>
                 <th>Destination</th>
                 <th>RFID Card</th>
                 <th>Time In</th>
@@ -299,11 +289,6 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                 >
                   <td>
                     <strong className={styles.visitorName}>{rec.visitorName}</strong>
-                    <span className={styles.subText}>{rec.contactNumber}</span>
-                  </td>
-                  <td>
-                    <span className={styles.subText} style={{ fontWeight: 600 }}>{rec.idType}</span>
-                    <span className={styles.subText}>{rec.idNumber}</span>
                   </td>
                   <td>
                     <strong style={{ color: "#334155", fontSize: "0.88rem" }}>{rec.destinations}</strong>
@@ -372,36 +357,6 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Full Name</span>
                       <strong className={styles.detailValue}>{selectedRecord.visitorName}</strong>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Contact Number</span>
-                      <span className={styles.detailValue}>{selectedRecord.contactNumber}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Birthdate</span>
-                      <span className={styles.detailValue}>{selectedRecord.birthDate || "—"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Home Address</span>
-                      <span className={styles.detailValue}>{selectedRecord.address || "—"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section: Identity Credentials */}
-                <div className={styles.infoSection}>
-                  <div className={styles.sectionTitle}>
-                    <FileText size={18} className={styles.sectionIcon} />
-                    <h3>Identity Document</h3>
-                  </div>
-                  <div className={styles.detailsGrid}>
-                    <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>ID Document Type</span>
-                      <span className={styles.detailValue}>{selectedRecord.idType || "—"}</span>
-                    </div>
-                    <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>ID Document Number</span>
-                      <span className={styles.detailValue}>{selectedRecord.idNumber || "—"}</span>
                     </div>
                   </div>
                 </div>

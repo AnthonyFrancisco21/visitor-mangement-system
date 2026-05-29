@@ -11,6 +11,12 @@ import {
   ChevronRight,
   ChevronLeft,
   ScanText,
+  User,
+  MapPin,
+  FileText,
+  CreditCard,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
 import Webcam from "react-webcam";
 import Tesseract from "tesseract.js";
@@ -46,11 +52,12 @@ interface ManualVisitorEntryProps {
   onClose?: () => void;
 }
 
+const TOTAL_STEPS = 7; // 1-ID, 2-Name, 3-Face, 4-Dest, 5-Reason, 6-Summary, 7-RFID
+
 export default function ManualVisitorEntry({
   onSuccess,
   onClose,
 }: ManualVisitorEntryProps) {
-  // Step Wizard: 1: ID Capture -> 2: Review ID & Name -> 3: Face -> 4: Dest -> 5: Reason -> 6: Success
   const [step, setStep] = useState<number>(1);
 
   const [formData, setFormData] = useState<ManualFormData>({
@@ -64,13 +71,18 @@ export default function ManualVisitorEntry({
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // RFID state
+  const [rfidUid, setRfidUid] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [rfidError, setRfidError] = useState("");
+  const [rfidAssignedTo, setRfidAssignedTo] = useState<string | null>(null);
 
   // OCR State
   const [isExtractingText, setIsExtractingText] = useState(false);
 
   const webcamRef = useRef<Webcam>(null);
+  const rfidInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch destinations
   useEffect(() => {
@@ -81,27 +93,9 @@ export default function ManualVisitorEntry({
           setDestinations(await res.json());
         } else {
           setDestinations([
-            {
-              id: "1",
-              name: "Engineering Dept",
-              floor: "2",
-              headName: "John Doe",
-              description: "",
-            },
-            {
-              id: "2",
-              name: "HR Office",
-              floor: "2",
-              headName: "Jane Smith",
-              description: "",
-            },
-            {
-              id: "3",
-              name: "Executive Suite",
-              floor: "5",
-              headName: "CEO",
-              description: "",
-            },
+            { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
+            { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
+            { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
           ]);
         }
       } catch (error) {
@@ -111,9 +105,36 @@ export default function ManualVisitorEntry({
     fetchDestinations();
   }, []);
 
+  // Auto-focus RFID input on Step 7
+  useEffect(() => {
+    if (step === 7) {
+      const t = setTimeout(() => rfidInputRef.current?.focus(), 100);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  // Keep RFID input focused while on Step 7
+  useEffect(() => {
+    if (step !== 7) return;
+
+    const handleFocusBack = () => rfidInputRef.current?.focus();
+    const handleDocumentClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "BUTTON" || target.tagName === "A" || target.closest("button") || target.closest("a")) return;
+      rfidInputRef.current?.focus();
+    };
+
+    window.addEventListener("focus", handleFocusBack);
+    document.addEventListener("click", handleDocumentClick);
+    return () => {
+      window.removeEventListener("focus", handleFocusBack);
+      document.removeEventListener("click", handleDocumentClick);
+    };
+  }, [step]);
+
   const floors = useMemo(() => {
     const unique = Array.from(new Set(destinations.map((d) => d.floor))).sort(
-      (a, b) => parseInt(a) - parseInt(b),
+      (a, b) => parseInt(a) - parseInt(b)
     );
     return unique.length > 0 ? unique : ["1", "2", "3", "4", "5"];
   }, [destinations]);
@@ -125,12 +146,17 @@ export default function ManualVisitorEntry({
         (d) =>
           d.name.toLowerCase().includes(q) ||
           d.headName.toLowerCase().includes(q) ||
-          d.floor.includes(q),
+          d.floor.includes(q)
       );
     }
     if (!selectedFloor) return [];
     return destinations.filter((d) => d.floor === selectedFloor);
   }, [destinations, selectedFloor, searchQuery]);
+
+  const selectedDestinations = useMemo(
+    () => destinations.filter((d) => formData.destinationIds.includes(d.id)),
+    [destinations, formData.destinationIds]
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -146,15 +172,11 @@ export default function ManualVisitorEntry({
     }));
   };
 
-  // Extract Text from ID using Tesseract
   const extractTextFromId = async (imageSrc: string) => {
     setIsExtractingText(true);
     try {
       const result = await Tesseract.recognize(imageSrc, "eng");
-      // Add optional chaining (?.) to safely read the text
       const text = result?.data?.text || "";
-
-      // Basic heuristic to find a name: Look for lines with 2-3 words, capitalized.
       const lines = text
         .split("\n")
         .map((l) => l.trim())
@@ -162,14 +184,12 @@ export default function ManualVisitorEntry({
           (l) =>
             l.length > 4 &&
             !l.toLowerCase().includes("republic") &&
-            !l.toLowerCase().includes("id"),
+            !l.toLowerCase().includes("id")
         );
-
-      // Add a strict check for lines[0] to satisfy TypeScript
       if (lines.length > 0 && lines[0]) {
         setFormData((prev) => ({
           ...prev,
-          fullName: lines[0].replace(/[^a-zA-Z\s]/g, ""),
+          fullName: lines[0]!.replace(/[^a-zA-Z\s]/g, ""),
         }));
       }
     } catch (error) {
@@ -184,8 +204,8 @@ export default function ManualVisitorEntry({
     const imageSrc = webcamRef.current.getScreenshot();
     if (imageSrc) {
       setFormData((prev) => ({ ...prev, idPhotoUrl: imageSrc }));
-      setStep(2); // Move to review step
-      extractTextFromId(imageSrc); // Start background OCR
+      setStep(2);
+      extractTextFromId(imageSrc);
     }
   };
 
@@ -194,51 +214,67 @@ export default function ManualVisitorEntry({
     const imageSrc = webcamRef.current.getScreenshot();
     if (imageSrc) {
       setFormData((prev) => ({ ...prev, visitorPhotoUrl: imageSrc }));
-      setStep(4); // Move to destination
+      setStep(4);
     }
   };
 
-  const handleSubmit = async () => {
-    setErrorMessage("");
+  /** Called when RFID input detects a card tap (Enter key or hardware submit) */
+  const handleRfidSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isSubmitting) return;
+
+    const cleanRfid = rfidUid.trim();
+    if (!cleanRfid) {
+      setRfidError("Please scan an RFID card first.");
+      return;
+    }
+
     setIsSubmitting(true);
+    setRfidError("");
+    setRfidAssignedTo(null);
 
     try {
-      const res = await fetch("/api/kiosk/register", {
+      const res = await fetch("/api/receptionist/visits/manual-checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, isManualEntry: true }),
+        body: JSON.stringify({ ...formData, rfidUid: cleanRfid }),
       });
 
-      if (res.ok) {
-        setStep(6);
-        setTimeout(() => {
-          onSuccess?.();
-          setStep(1);
-          setFormData({
-            fullName: "",
-            idPhotoUrl: "",
-            visitorPhotoUrl: "",
-            destinationIds: [],
-            reason: "",
-          });
-          setSelectedFloor(null);
-          setSearchQuery("");
-        }, 2500);
-      } else {
-        const data = await res.json();
-        setErrorMessage(data.error || "Failed to register visitor");
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.isAlreadyInUse) {
+          setRfidAssignedTo(data.assignedTo ?? "another visitor");
+        }
+        throw new Error(data.error || "Failed to check in visitor.");
       }
-    } catch (error) {
-      setErrorMessage("An error occurred. Please try again.");
+
+      // Success — move to final step
+      setStep(8);
+      setTimeout(() => {
+        onSuccess?.();
+        // Reset wizard
+        setStep(1);
+        setFormData({ fullName: "", idPhotoUrl: "", visitorPhotoUrl: "", destinationIds: [], reason: "" });
+        setSelectedFloor(null);
+        setSearchQuery("");
+        setRfidUid("");
+        setRfidError("");
+        setRfidAssignedTo(null);
+      }, 2500);
+    } catch (err: any) {
+      setRfidError(err.message);
+      setRfidUid("");
+      setTimeout(() => rfidInputRef.current?.focus(), 50);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Helper to render wizard progress
+  // Progress dots for steps 1-7
   const renderProgress = () => (
     <div className={styles.progressContainer}>
-      {[1, 2, 3, 4, 5].map((s) => (
+      {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
         <div
           key={s}
           className={`${styles.progressDot} ${step >= s ? styles.activeDot : ""}`}
@@ -249,14 +285,14 @@ export default function ManualVisitorEntry({
 
   return (
     <div className={styles.container}>
-      {step < 6 && (
+      {step < 8 && (
         <div className={styles.header}>
           <div className={styles.headerTop}>
             <div>
               <h2 className={styles.title}>Visitor Intake</h2>
-              <p className={styles.subtitle}>Step {step} of 5</p>
+              <p className={styles.subtitle}>Step {step} of {TOTAL_STEPS}</p>
             </div>
-            {onClose && (
+            {onClose && step < 7 && (
               <button className={styles.closeBtn} onClick={onClose}>
                 <X size={20} />
               </button>
@@ -267,14 +303,11 @@ export default function ManualVisitorEntry({
       )}
 
       <div className={styles.formContent}>
-        {/* STEP 1: CAPTURE ID */}
+        {/* ── STEP 1: CAPTURE ID ── */}
         {step === 1 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Scan Government ID</h3>
-            <p className={styles.stepDesc}>
-              Place the ID clearly in the frame.
-            </p>
-
+            <p className={styles.stepDesc}>Place the ID clearly in the frame.</p>
             <div className={styles.cameraBox}>
               <Webcam
                 audio={false}
@@ -291,26 +324,20 @@ export default function ManualVisitorEntry({
           </div>
         )}
 
-        {/* STEP 2: REVIEW ID & NAME (OCR) */}
+        {/* ── STEP 2: REVIEW ID & NAME (OCR) ── */}
         {step === 2 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Verify Details</h3>
             <p className={styles.stepDesc}>
               Review the scanned ID and edit the extracted name if necessary.
             </p>
-
             <div className={styles.reviewLayout}>
               <div className={styles.previewBox}>
-                <img
-                  src={formData.idPhotoUrl}
-                  alt="ID"
-                  className={styles.capturedImg}
-                />
+                <img src={formData.idPhotoUrl} alt="ID" className={styles.capturedImg} />
                 <button onClick={() => setStep(1)} className={styles.retakeBtn}>
                   <RotateCcw size={14} /> Retake ID
                 </button>
               </div>
-
               <div className={styles.dataBox}>
                 <label className={styles.label}>
                   Extracted Name <span className={styles.required}>*</span>
@@ -339,11 +366,8 @@ export default function ManualVisitorEntry({
                 </div>
               </div>
             </div>
-
             <div className={styles.actions}>
-              <button onClick={() => setStep(1)} className={styles.backBtn}>
-                Back
-              </button>
+              <button onClick={() => setStep(1)} className={styles.backBtn}>Back</button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!formData.fullName.trim()}
@@ -355,14 +379,11 @@ export default function ManualVisitorEntry({
           </div>
         )}
 
-        {/* STEP 3: CAPTURE FACE */}
+        {/* ── STEP 3: CAPTURE FACE ── */}
         {step === 3 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Capture Visitor Photo</h3>
-            <p className={styles.stepDesc}>
-              Ask the visitor to look at the camera.
-            </p>
-
+            <p className={styles.stepDesc}>Ask the visitor to look at the camera.</p>
             {!formData.visitorPhotoUrl ? (
               <>
                 <div className={styles.cameraBox}>
@@ -376,13 +397,8 @@ export default function ManualVisitorEntry({
                   <div className={styles.faceOverlayGuide} />
                 </div>
                 <div className={styles.actions}>
-                  <button onClick={() => setStep(2)} className={styles.backBtn}>
-                    Back
-                  </button>
-                  <button
-                    onClick={handleCaptureFace}
-                    className={styles.primaryBtn}
-                  >
+                  <button onClick={() => setStep(2)} className={styles.backBtn}>Back</button>
+                  <button onClick={handleCaptureFace} className={styles.primaryBtn}>
                     <Camera size={18} /> Capture Photo
                   </button>
                 </div>
@@ -390,28 +406,17 @@ export default function ManualVisitorEntry({
             ) : (
               <>
                 <div className={styles.previewBox}>
-                  <img
-                    src={formData.visitorPhotoUrl}
-                    alt="Face"
-                    className={styles.capturedImg}
-                  />
+                  <img src={formData.visitorPhotoUrl} alt="Face" className={styles.capturedImg} />
                   <button
-                    onClick={() =>
-                      setFormData((p) => ({ ...p, visitorPhotoUrl: "" }))
-                    }
+                    onClick={() => setFormData((p) => ({ ...p, visitorPhotoUrl: "" }))}
                     className={styles.retakeBtn}
                   >
                     <RotateCcw size={14} /> Retake Photo
                   </button>
                 </div>
                 <div className={styles.actions}>
-                  <button onClick={() => setStep(2)} className={styles.backBtn}>
-                    Back
-                  </button>
-                  <button
-                    onClick={() => setStep(4)}
-                    className={styles.primaryBtn}
-                  >
+                  <button onClick={() => setStep(2)} className={styles.backBtn}>Back</button>
+                  <button onClick={() => setStep(4)} className={styles.primaryBtn}>
                     Next <ChevronRight size={18} />
                   </button>
                 </div>
@@ -420,11 +425,10 @@ export default function ManualVisitorEntry({
           </div>
         )}
 
-        {/* STEP 4: DESTINATION */}
+        {/* ── STEP 4: DESTINATION ── */}
         {step === 4 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Select Destination</h3>
-
             <input
               type="text"
               placeholder="Search department, head name, or floor..."
@@ -433,7 +437,6 @@ export default function ManualVisitorEntry({
               className={styles.searchInput}
               autoComplete="off"
             />
-
             <div className={styles.scrollArea}>
               {!selectedFloor && !searchQuery.trim() ? (
                 <div className={styles.floorGrid}>
@@ -451,10 +454,7 @@ export default function ManualVisitorEntry({
               ) : (
                 <div className={styles.destSection}>
                   {!searchQuery.trim() && (
-                    <button
-                      className={styles.backLink}
-                      onClick={() => setSelectedFloor(null)}
-                    >
+                    <button className={styles.backLink} onClick={() => setSelectedFloor(null)}>
                       <ChevronLeft size={16} /> Back to Floors
                     </button>
                   )}
@@ -477,23 +477,15 @@ export default function ManualVisitorEntry({
                             {dest.headName} (Floor {dest.floor})
                           </span>
                         </div>
-                        {selected && (
-                          <CheckCircle2
-                            size={20}
-                            className={styles.checkIcon}
-                          />
-                        )}
+                        {selected && <CheckCircle2 size={20} className={styles.checkIcon} />}
                       </label>
                     );
                   })}
                 </div>
               )}
             </div>
-
             <div className={styles.actions}>
-              <button onClick={() => setStep(3)} className={styles.backBtn}>
-                Back
-              </button>
+              <button onClick={() => setStep(3)} className={styles.backBtn}>Back</button>
               <button
                 onClick={() => setStep(5)}
                 disabled={formData.destinationIds.length === 0}
@@ -505,11 +497,10 @@ export default function ManualVisitorEntry({
           </div>
         )}
 
-        {/* STEP 5: REASON */}
+        {/* ── STEP 5: REASON ── */}
         {step === 5 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Purpose of Visit</h3>
-
             <div className={styles.reasonGrid}>
               {VISITOR_REASONS.map((reason) => (
                 <label
@@ -521,52 +512,178 @@ export default function ManualVisitorEntry({
                     name="reason"
                     value={reason}
                     checked={formData.reason === reason}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, reason: e.target.value }))
-                    }
+                    onChange={(e) => setFormData((p) => ({ ...p, reason: e.target.value }))}
                     hidden
                   />
                   <span>{reason}</span>
                 </label>
               ))}
             </div>
-
-            {errorMessage && (
-              <div className={styles.errorBox}>
-                <AlertCircle size={16} /> <span>{errorMessage}</span>
-              </div>
-            )}
-
             <div className={styles.actions}>
-              <button onClick={() => setStep(4)} className={styles.backBtn}>
-                Back
-              </button>
+              <button onClick={() => setStep(4)} className={styles.backBtn}>Back</button>
               <button
-                onClick={handleSubmit}
-                disabled={!formData.reason || isSubmitting}
-                className={styles.submitBtn}
+                onClick={() => setStep(6)}
+                disabled={!formData.reason}
+                className={styles.primaryBtn}
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={18} className={styles.spin} /> Processing...
-                  </>
-                ) : (
-                  "Submit Registration"
-                )}
+                Review Summary <ChevronRight size={18} />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 6: SUCCESS */}
+        {/* ── STEP 6: REVIEW SUMMARY ── */}
         {step === 6 && (
+          <div className={styles.stepBlock}>
+            <h3 className={styles.stepTitle}>Review & Confirm</h3>
+            <p className={styles.stepDesc}>
+              Verify all information before assigning an RFID card.
+            </p>
+
+            <div className={styles.summaryCard}>
+              {/* Name */}
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryIcon}><User size={16} /></span>
+                <div className={styles.summaryDetail}>
+                  <span className={styles.summaryLabel}>Full Name</span>
+                  <strong className={styles.summaryValue}>{formData.fullName}</strong>
+                </div>
+              </div>
+
+              {/* Destination */}
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryIcon}><MapPin size={16} /></span>
+                <div className={styles.summaryDetail}>
+                  <span className={styles.summaryLabel}>Destination(s)</span>
+                  <strong className={styles.summaryValue}>
+                    {selectedDestinations.map((d) => d.name).join(", ")}
+                  </strong>
+                  <span className={styles.summaryMeta}>
+                    {selectedDestinations.map((d) => `${d.headName} · Floor ${d.floor}`).join(" | ")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Reason */}
+              <div className={styles.summaryRow}>
+                <span className={styles.summaryIcon}><FileText size={16} /></span>
+                <div className={styles.summaryDetail}>
+                  <span className={styles.summaryLabel}>Reason for Visit</span>
+                  <strong className={styles.summaryValue}>{formData.reason}</strong>
+                </div>
+              </div>
+
+              {/* Photos */}
+              {(formData.idPhotoUrl || formData.visitorPhotoUrl) && (
+                <div className={styles.summaryPhotos}>
+                  {formData.idPhotoUrl && (
+                    <div className={styles.summaryPhotoBox}>
+                      <img src={formData.idPhotoUrl} alt="ID" className={styles.summaryPhoto} />
+                      <span className={styles.summaryPhotoLabel}>ID Document</span>
+                    </div>
+                  )}
+                  {formData.visitorPhotoUrl && (
+                    <div className={styles.summaryPhotoBox}>
+                      <img src={formData.visitorPhotoUrl} alt="Face" className={styles.summaryPhoto} />
+                      <span className={styles.summaryPhotoLabel}>Visitor Photo</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.actions}>
+              <button onClick={() => setStep(5)} className={styles.backBtn}>Back</button>
+              <button onClick={() => setStep(7)} className={styles.primaryBtn}>
+                Assign RFID Card <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 7: RFID LISTENING ── */}
+        {step === 7 && (
+          <form onSubmit={handleRfidSubmit} className={styles.stepBlock}>
+            <h3 className={styles.stepTitle}>Assign RFID Card</h3>
+            <p className={styles.stepDesc}>
+              Tap a physical RFID card on the reader to complete registration.
+            </p>
+
+            {rfidError && (
+              <div className={styles.rfidErrorAlert}>
+                <AlertTriangle size={18} className={styles.rfidErrorIcon} />
+                <div className={styles.rfidErrorMessage}>
+                  <strong>Scan Error</strong>
+                  <p>{rfidError}</p>
+                  {rfidAssignedTo && (
+                    <span className={styles.rfidErrorHint}>
+                      Please retrieve this card or scan a different available RFID card.
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div
+              className={styles.rfidListeningArea}
+              onClick={() => rfidInputRef.current?.focus()}
+            >
+              <div className={styles.rfidScannerGraphic}>
+                <div className={`${styles.radarPulse} ${styles.pulse1}`} />
+                <div className={`${styles.radarPulse} ${styles.pulse2}`} />
+                <div className={styles.scannerIconWrapper}>
+                  <CreditCard size={48} className={styles.scannerCardIcon} />
+                </div>
+              </div>
+              <span className={styles.listeningStatus}>
+                {isSubmitting ? "Registering visit..." : "System Listening for Card Tap..."}
+              </span>
+              <p className={styles.listeningSub}>
+                Place the card flat against the desktop RFID reader
+              </p>
+              <input
+                ref={rfidInputRef}
+                type="text"
+                value={rfidUid}
+                onChange={(e) => {
+                  setRfidUid(e.target.value);
+                  if (rfidError) {
+                    setRfidError("");
+                    setRfidAssignedTo(null);
+                  }
+                }}
+                placeholder="Scan output goes here..."
+                className={styles.hiddenRfidInput}
+                autoComplete="off"
+              />
+            </div>
+
+            {rfidUid && !isSubmitting && (
+              <div className={styles.manualConfirmRow}>
+                <button type="submit" className={styles.submitBtn}>
+                  Confirm Card (ID: {rfidUid})
+                </button>
+              </div>
+            )}
+
+            {isSubmitting && (
+              <div className={styles.actions}>
+                <Loader2 size={20} className={styles.spin} />
+                <span>Processing...</span>
+              </div>
+            )}
+          </form>
+        )}
+
+        {/* ── STEP 8: SUCCESS ── */}
+        {step === 8 && (
           <div className={styles.successContainer}>
             <div className={styles.successIcon}>
-              <CheckCircle2 size={48} />
+              <Check size={48} />
             </div>
-            <h3 className={styles.successTitle}>Registration Complete</h3>
+            <h3 className={styles.successTitle}>Check-In Successful!</h3>
             <p className={styles.successMessage}>
-              {formData.fullName} has been successfully checked in.
+              {formData.fullName} has been checked in. Hand over the RFID card to the visitor.
             </p>
           </div>
         )}
