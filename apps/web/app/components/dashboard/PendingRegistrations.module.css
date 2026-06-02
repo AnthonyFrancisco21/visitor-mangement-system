@@ -1,3 +1,5 @@
+/* PendingRegistrations.module.css - Updated */
+
 .container {
   padding: 1.5rem;
   max-width: 1200px;
@@ -107,6 +109,18 @@
 
 .visitorName {
   color: #1e293b;
+  font-weight: 600;
+}
+
+/* ── NEW: Styling for visitor name not registered yet ── */
+.visitorNamePending {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: 400;
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: #f1f5f9;
+  border-radius: 4px;
 }
 
 .actionsContainer {
@@ -195,5 +209,40 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 1rem;
+  }
+
+  .actionsContainer {
+    flex-direction: column;
+  }
+
+  .confirmBtn,
+  .deleteBtn {
+    width: 100%;
+    justify-content: center;
   }
 }

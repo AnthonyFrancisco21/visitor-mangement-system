@@ -12,80 +12,22 @@ export async function POST(req: NextRequest) {
     const parsedData = registerVisitorSchema.parse(body);
     const {
       fullName,
-      birthDate,
-      contactNumber,
-      idType,
-      idNumber,
       idPhotoUrl,
       visitorPhotoUrl,
       destinationIds,
       reason,
     } = parsedData;
 
-    // 2. Check for active or pending visits if idNumber is provided
-    if (idNumber) {
-      const activeOrPendingVisit = await prisma.visit.findFirst({
-        where: {
-          visitor: {
-            idNumber: idNumber,
-          },
-          status: {
-            in: ["PENDING", "ACTIVE"],
-          },
-        },
-      });
-
-      if (activeOrPendingVisit) {
-        return NextResponse.json(
-          {
-            error:
-              "Visitor is already registered and currently active or pending.",
-            visitId: activeOrPendingVisit.id,
-          },
-          { status: 409 }, // Conflict
-        );
-      }
-    }
-
-    // 3. Create or update visitor and create visit in a transaction
+    // 2. Create visitor and create visit in a transaction
     const result = await prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
-        // Upsert visitor if idNumber is provided, otherwise just create
-        let visitor;
-
-        if (idNumber) {
-          visitor = await tx.visitor.upsert({
-            where: { idNumber },
-            update: {
-              fullName,
-              birthDate,
-              contactNumber,
-              idType,
-              idPhotoUrl,
-              visitorPhotoUrl,
-            },
-            create: {
-              fullName,
-              birthDate,
-              contactNumber,
-              idType,
-              idNumber,
-              idPhotoUrl,
-              visitorPhotoUrl,
-            },
-          });
-        } else {
-          visitor = await tx.visitor.create({
-            data: {
-              fullName,
-              birthDate,
-              contactNumber,
-              idType,
-              idPhotoUrl,
-              visitorPhotoUrl,
-            },
-          });
-        }
+        const visitor = await tx.visitor.create({
+          data: {
+            fullName,
+            idPhotoUrl,
+            visitorPhotoUrl,
+          },
+        });
 
         // Create the visit with PENDING status
         const visit = await tx.visit.create({

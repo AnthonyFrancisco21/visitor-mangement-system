@@ -14,7 +14,7 @@ import {
   Clock,
   CreditCard,
   Camera,
-  RotateCcw
+  RotateCcw,
 } from "lucide-react";
 import styles from "./kiosk.module.css";
 
@@ -80,18 +80,66 @@ export default function KioskRegistrationPage() {
           setDestinations(await res.json());
         } else {
           setDestinations([
-            { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
-            { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
-            { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
-            { id: "4", name: "Finance Office", floor: "3", headName: "Maria Santos", description: "" },
-            { id: "5", name: "IT Department", floor: "4", headName: "Alex Chen", description: "" },
+            {
+              id: "1",
+              name: "Engineering Dept",
+              floor: "2",
+              headName: "John Doe",
+              description: "",
+            },
+            {
+              id: "2",
+              name: "HR Office",
+              floor: "2",
+              headName: "Jane Smith",
+              description: "",
+            },
+            {
+              id: "3",
+              name: "Executive Suite",
+              floor: "5",
+              headName: "CEO",
+              description: "",
+            },
+            {
+              id: "4",
+              name: "Finance Office",
+              floor: "3",
+              headName: "Maria Santos",
+              description: "",
+            },
+            {
+              id: "5",
+              name: "IT Department",
+              floor: "4",
+              headName: "Alex Chen",
+              description: "",
+            },
           ]);
         }
       } catch {
         setDestinations([
-          { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
-          { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
-          { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
+          {
+            id: "1",
+            name: "Engineering Dept",
+            floor: "2",
+            headName: "John Doe",
+            description: "",
+          },
+          {
+            id: "2",
+            name: "HR Office",
+            floor: "2",
+            headName: "Jane Smith",
+            description: "",
+          },
+          {
+            id: "3",
+            name: "Executive Suite",
+            floor: "5",
+            headName: "CEO",
+            description: "",
+          },
         ]);
       } finally {
         setIsLoadingDestinations(false);
@@ -102,7 +150,7 @@ export default function KioskRegistrationPage() {
 
   const floors = useMemo(() => {
     const unique = Array.from(new Set(destinations.map((d) => d.floor))).sort(
-      (a, b) => parseInt(a) - parseInt(b)
+      (a, b) => parseInt(a) - parseInt(b),
     );
     return unique.length > 0 ? unique : ["1", "2", "3", "4", "5"];
   }, [destinations]);
@@ -114,7 +162,7 @@ export default function KioskRegistrationPage() {
         (d) =>
           d.name.toLowerCase().includes(q) ||
           d.headName.toLowerCase().includes(q) ||
-          d.floor.includes(q)
+          d.floor.includes(q),
       );
     }
     if (!selectedFloor) return [];
@@ -145,7 +193,9 @@ export default function KioskRegistrationPage() {
   }, [step]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -163,21 +213,22 @@ export default function KioskRegistrationPage() {
   const handleCaptureId = () => {
     if (!webcamRef.current) return;
     const imageSrc = webcamRef.current.getScreenshot();
-    if (imageSrc) setFormData(prev => ({ ...prev, idPhotoUrl: imageSrc }));
+    if (imageSrc) setFormData((prev) => ({ ...prev, idPhotoUrl: imageSrc }));
   };
 
   const handleRetakeId = () => {
-    setFormData(prev => ({ ...prev, idPhotoUrl: "" }));
+    setFormData((prev) => ({ ...prev, idPhotoUrl: "" }));
   };
 
   const handleCaptureFace = () => {
     if (!webcamRef.current) return;
     const imageSrc = webcamRef.current.getScreenshot();
-    if (imageSrc) setFormData(prev => ({ ...prev, visitorPhotoUrl: imageSrc }));
+    if (imageSrc)
+      setFormData((prev) => ({ ...prev, visitorPhotoUrl: imageSrc }));
   };
 
   const handleRetakeFace = () => {
-    setFormData(prev => ({ ...prev, visitorPhotoUrl: "" }));
+    setFormData((prev) => ({ ...prev, visitorPhotoUrl: "" }));
   };
 
   const handleSubmit = async () => {
@@ -206,10 +257,9 @@ export default function KioskRegistrationPage() {
 
   const STEPS = [
     { num: 1, label: "Scan ID" },
-    { num: 2, label: "Visitor" },
-    { num: 3, label: "Photo" },
-    { num: 4, label: "Destination" },
-    { num: 5, label: "Purpose" },
+    { num: 2, label: "Photo" },
+    { num: 3, label: "Destination" },
+    { num: 4, label: "Purpose" },
   ];
 
   // Prevent hydration mismatch by returning a skeleton on initial render
@@ -226,13 +276,22 @@ export default function KioskRegistrationPage() {
   // ── STANDBY SCREEN ──────────────────────────────────────────
   if (step === 0) {
     const rawTime = mounted
-      ? currentTime.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: true })
+      ? currentTime.toLocaleTimeString(undefined, {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
       : "12:00 AM";
     const parts = rawTime.split(" ");
     const timeDisplay = parts[0];
     const meridiem = parts[1] ?? "";
     const dateStr = mounted
-      ? currentTime.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+      ? currentTime.toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })
       : "";
 
     return (
@@ -246,7 +305,9 @@ export default function KioskRegistrationPage() {
             <div className={styles.standbyBrandBlock}>
               <span className={styles.standbyBrandMark}>VMS</span>
               <span className={styles.standbyBrandSep} />
-              <span className={styles.standbyBrandName}>SGW Visitor Management</span>
+              <span className={styles.standbyBrandName}>
+                SGW Visitor Management
+              </span>
             </div>
           </div>
 
@@ -302,7 +363,8 @@ export default function KioskRegistrationPage() {
 
             {/* Headline */}
             <h1 className={styles.noticeTitle}>
-              Almost<br />
+              Almost
+              <br />
               <em>done.</em>
             </h1>
 
@@ -311,8 +373,8 @@ export default function KioskRegistrationPage() {
 
             {/* Description */}
             <p className={styles.noticeDesc}>
-              Please proceed to the reception desk. The receptionist
-              will complete the final steps on your behalf.
+              Please proceed to the reception desk. The receptionist will
+              complete the final steps on your behalf.
             </p>
 
             {/* Numbered reception steps */}
@@ -322,8 +384,12 @@ export default function KioskRegistrationPage() {
                   <MapPin size={18} strokeWidth={1.5} />
                 </div>
                 <div className={styles.noticeStepBody}>
-                  <p className={styles.noticeStepLabel}>01 &mdash; Verify Information</p>
-                  <p className={styles.noticeStepDesc}>Receptionist will verify your details</p>
+                  <p className={styles.noticeStepLabel}>
+                    01 &mdash; Verify Information
+                  </p>
+                  <p className={styles.noticeStepDesc}>
+                    Receptionist will verify your details
+                  </p>
                 </div>
               </div>
 
@@ -332,8 +398,12 @@ export default function KioskRegistrationPage() {
                   <CreditCard size={18} strokeWidth={1.5} />
                 </div>
                 <div className={styles.noticeStepBody}>
-                  <p className={styles.noticeStepLabel}>02 &mdash; RFID Card Issuance</p>
-                  <p className={styles.noticeStepDesc}>Receive your access card for the building</p>
+                  <p className={styles.noticeStepLabel}>
+                    02 &mdash; RFID Card Issuance
+                  </p>
+                  <p className={styles.noticeStepDesc}>
+                    Receive your access card for the building
+                  </p>
                 </div>
               </div>
             </div>
@@ -379,12 +449,16 @@ export default function KioskRegistrationPage() {
                   styles.stepItem,
                   step === s.num ? styles.stepActive : "",
                   step > s.num ? styles.stepDone : "",
-                ].filter(Boolean).join(" ")}
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 <span className={styles.stepDot}>
-                  {step > s.num
-                    ? <CheckCircle2 size={13} strokeWidth={2.5} />
-                    : s.num}
+                  {step > s.num ? (
+                    <CheckCircle2 size={13} strokeWidth={2.5} />
+                  ) : (
+                    s.num
+                  )}
                 </span>
                 <span className={styles.stepLabel}>{s.label}</span>
               </div>
@@ -396,7 +470,6 @@ export default function KioskRegistrationPage() {
       {/* Scrollable form area */}
       <main className={styles.main} ref={scrollRef}>
         <div className={styles.formInner}>
-
           {/* ── STEP 1: SCAN ID ── */}
           {step === 1 && (
             <div className={styles.fadeIn}>
@@ -407,9 +480,11 @@ export default function KioskRegistrationPage() {
               </div>
 
               <h2 className={styles.stepTitle}>
-                Scan your<br />ID Document.
+                Scan your
+                <br />
+                ID Document.
               </h2>
-              
+
               {!formData.idPhotoUrl ? (
                 <div className={styles.cameraContainer}>
                   <div className={styles.webcamWrapper}>
@@ -425,10 +500,15 @@ export default function KioskRegistrationPage() {
                       <div className={styles.cornerTR} />
                       <div className={styles.cornerBL} />
                       <div className={styles.cornerBR} />
-                      <span className={styles.frameInstruction}>PLACE ID IN FRAME</span>
+                      <span className={styles.frameInstruction}>
+                        PLACE ID IN FRAME
+                      </span>
                     </div>
                   </div>
-                  <button onClick={handleCaptureId} className={styles.actionBtn}>
+                  <button
+                    onClick={handleCaptureId}
+                    className={styles.actionBtn}
+                  >
                     <Camera size={18} /> Capture ID Photo
                   </button>
                 </div>
@@ -436,10 +516,17 @@ export default function KioskRegistrationPage() {
                 <div className={styles.previewContainer}>
                   <div className={styles.previewCard}>
                     <div className={styles.imageFrame}>
-                      <img src={formData.idPhotoUrl} alt="Captured ID Document" className={styles.capturedImage} />
+                      <img
+                        src={formData.idPhotoUrl}
+                        alt="Captured ID Document"
+                        className={styles.capturedImage}
+                      />
                     </div>
                     <div className={styles.previewForm}>
-                      <button onClick={handleRetakeId} className={styles.outlineBtn}>
+                      <button
+                        onClick={handleRetakeId}
+                        className={styles.outlineBtn}
+                      >
                         <RotateCcw size={16} /> Retake ID Photo
                       </button>
                     </div>
@@ -449,41 +536,8 @@ export default function KioskRegistrationPage() {
             </div>
           )}
 
-          {/* ── STEP 2: Visitor Info ── */}
+          {/* ── STEP 2: CAPTURE FACE ── */}
           {step === 2 && (
-            <div className={styles.fadeIn}>
-              <div className={styles.sectionLabel}>
-                <span className={styles.sectionRule} />
-                <span className={styles.sectionLabelText}>Visitor Information</span>
-                <span className={styles.sectionRule} />
-              </div>
-
-              <h2 className={styles.stepTitle}>
-                Verify your<br />Name.
-              </h2>
-
-              <div className={styles.fieldGroup}>
-                <div className={styles.field}>
-                  <label className={styles.fieldLabel} htmlFor="fullName">
-                    Full Name
-                  </label>
-                  <input
-                    id="fullName"
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className={styles.fieldInput}
-                    placeholder="e.g. Juan dela Cruz"
-                    autoComplete="off"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── STEP 3: CAPTURE FACE ── */}
-          {step === 3 && (
             <div className={styles.fadeIn}>
               <div className={styles.sectionLabel}>
                 <span className={styles.sectionRule} />
@@ -492,9 +546,10 @@ export default function KioskRegistrationPage() {
               </div>
 
               <h2 className={styles.stepTitle}>
-                Take a<br />Selfie.
+                Take a<br />
+                Selfie.
               </h2>
-              
+
               {!formData.visitorPhotoUrl ? (
                 <div className={styles.cameraContainer}>
                   <div className={styles.webcamWrapper}>
@@ -507,10 +562,15 @@ export default function KioskRegistrationPage() {
                     />
                     <div className={styles.overlayFace}>
                       <div className={styles.faceOval} />
-                      <span className={styles.frameInstruction}>ALIGN FACE HERE</span>
+                      <span className={styles.frameInstruction}>
+                        ALIGN FACE HERE
+                      </span>
                     </div>
                   </div>
-                  <button onClick={handleCaptureFace} className={styles.actionBtn}>
+                  <button
+                    onClick={handleCaptureFace}
+                    className={styles.actionBtn}
+                  >
                     <Camera size={18} /> Capture Photo
                   </button>
                 </div>
@@ -518,10 +578,17 @@ export default function KioskRegistrationPage() {
                 <div className={styles.previewContainer}>
                   <div className={styles.previewCard}>
                     <div className={styles.imageFrame}>
-                      <img src={formData.visitorPhotoUrl} alt="Captured Visitor Face" className={styles.capturedImage} />
+                      <img
+                        src={formData.visitorPhotoUrl}
+                        alt="Captured Visitor Face"
+                        className={styles.capturedImage}
+                      />
                     </div>
                     <div className={styles.previewForm}>
-                      <button onClick={handleRetakeFace} className={styles.outlineBtn}>
+                      <button
+                        onClick={handleRetakeFace}
+                        className={styles.outlineBtn}
+                      >
                         <RotateCcw size={16} /> Retake Photo
                       </button>
                     </div>
@@ -531,8 +598,8 @@ export default function KioskRegistrationPage() {
             </div>
           )}
 
-          {/* ── STEP 4: Destination ── */}
-          {step === 4 && (
+          {/* ── STEP 3: Destination ── */}
+          {step === 3 && (
             <div className={styles.fadeIn}>
               <div className={styles.sectionLabel}>
                 <span className={styles.sectionRule} />
@@ -548,7 +615,11 @@ export default function KioskRegistrationPage() {
 
               {/* Search */}
               <div className={styles.searchBar}>
-                <Search size={20} strokeWidth={1.5} className={styles.searchIco} />
+                <Search
+                  size={20}
+                  strokeWidth={1.5}
+                  className={styles.searchIco}
+                />
                 <input
                   type="text"
                   placeholder="Search by department or contact name..."
@@ -605,10 +676,14 @@ export default function KioskRegistrationPage() {
                             className={[
                               styles.destCard,
                               sel ? styles.destSelected : "",
-                            ].filter(Boolean).join(" ")}
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
                           >
                             <div className={styles.destBody}>
-                              <span className={styles.destName}>{dest.name}</span>
+                              <span className={styles.destName}>
+                                {dest.name}
+                              </span>
                               <div className={styles.destMeta}>
                                 <span>{dest.headName}</span>
                                 {(searchQuery.trim() || !selectedFloor) && (
@@ -645,17 +720,21 @@ export default function KioskRegistrationPage() {
             </div>
           )}
 
-          {/* ── STEP 5: Purpose ── */}
-          {step === 5 && (
+          {/* ── STEP 4: Purpose ── */}
+          {step === 4 && (
             <div className={styles.fadeIn}>
               <div className={styles.sectionLabel}>
                 <span className={styles.sectionRule} />
-                <span className={styles.sectionLabelText}>Purpose of Visit</span>
+                <span className={styles.sectionLabelText}>
+                  Purpose of Visit
+                </span>
                 <span className={styles.sectionRule} />
               </div>
 
               <h2 className={styles.stepTitle}>
-                Why are<br />you here?
+                Why are
+                <br />
+                you here?
               </h2>
 
               <div className={styles.reasonGrid}>
@@ -668,7 +747,9 @@ export default function KioskRegistrationPage() {
                     className={[
                       styles.reasonCard,
                       formData.reason === r ? styles.reasonSelected : "",
-                    ].filter(Boolean).join(" ")}
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
                   >
                     <span className={styles.reasonText}>{r}</span>
                   </button>
@@ -690,14 +771,13 @@ export default function KioskRegistrationPage() {
           <div />
         )}
 
-        {step < 5 ? (
+        {step < 4 ? (
           <button
             onClick={() => setStep(step + 1)}
             disabled={
               (step === 1 && !formData.idPhotoUrl) ||
-              (step === 2 && !formData.fullName.trim()) ||
-              (step === 3 && !formData.visitorPhotoUrl) ||
-              (step === 4 && formData.destinationIds.length === 0)
+              (step === 2 && !formData.visitorPhotoUrl) ||
+              (step === 3 && formData.destinationIds.length === 0)
             }
             className={styles.btnNext}
           >

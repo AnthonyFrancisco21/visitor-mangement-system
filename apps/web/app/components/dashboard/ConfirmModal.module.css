@@ -1,3 +1,5 @@
+/* ConfirmModal.module.css - Updated with better name input styling */
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -15,9 +17,9 @@
   border-radius: 16px;
   width: 100%;
   max-width: 620px;
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
-    0 20px 25px -5px rgba(15, 23, 42, 0.15), 
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(15, 23, 42, 0.15),
     0 10px 10px -5px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
@@ -174,8 +176,14 @@
 }
 
 @keyframes fadeInStep {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .sectionHeader {
@@ -200,8 +208,84 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
+/* ── IMPROVED: Name Card with Photo ── */
+.nameCardWithPhoto {
+  grid-column: 1 / -1 !important;
+  display: grid !important;
+  grid-template-columns: 120px 1fr !important;
+  gap: 1.25rem !important;
+  align-items: flex-start !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%) !important;
+  border: 2px solid #bfdbfe !important;
+  padding: 1.25rem !important;
+}
+
+.photoRefSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.idPhotoRef {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.nameInputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inputLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.nameInput {
+  padding: 0.875rem 1rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  background: white;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #f0f9ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.nameInput::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.nameHint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Standard Info Card */
 .infoCard {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -320,7 +404,10 @@
   top: 15%;
 }
 
-.cornerTL, .cornerTR, .cornerBL, .cornerBR {
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
   position: absolute;
   width: 20px;
   height: 20px;
@@ -328,10 +415,30 @@
   border-style: solid;
 }
 
-.cornerTL { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 4px; }
-.cornerTR { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 4px; }
-.cornerBL { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 4px; }
-.cornerBR { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 4px; }
+.cornerTL {
+  top: -2px;
+  left: -2px;
+  border-width: 3px 0 0 3px;
+  border-top-left-radius: 4px;
+}
+.cornerTR {
+  top: -2px;
+  right: -2px;
+  border-width: 3px 3px 0 0;
+  border-top-right-radius: 4px;
+}
+.cornerBL {
+  bottom: -2px;
+  left: -2px;
+  border-width: 0 0 3px 3px;
+  border-bottom-left-radius: 4px;
+}
+.cornerBR {
+  bottom: -2px;
+  right: -2px;
+  border-width: 0 3px 3px 0;
+  border-bottom-right-radius: 4px;
+}
 
 .frameInstruction {
   color: white;
@@ -426,13 +533,15 @@
   justify-content: center;
 }
 
-.capturedImage, .capturedImageFace {
+.capturedImage,
+.capturedImageFace {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.previewForm, .previewFormFace {
+.previewForm,
+.previewFormFace {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -454,11 +563,10 @@
 }
 
 .textInput {
-  width: 100%;
-  padding: 0.65rem 0.85rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #1e293b;
   font-family: monospace;
 }
@@ -546,8 +654,13 @@
 }
 
 @keyframes pulseCard {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
 }
 
 .radarPulse {
@@ -618,14 +731,27 @@
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
-  animation: shakeAlert 0.3s cubic-bezier(.36,.07,.19,.97) both;
+  animation: shakeAlert 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @keyframes shakeAlert {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }
 
 .errorIcon {
@@ -672,8 +798,14 @@
 }
 
 @keyframes successFadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .successBanner {
@@ -699,8 +831,14 @@
 }
 
 @keyframes successScale {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  100% { transform: scale(1.45); opacity: 0; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
 }
 
 .successCheckmark {
@@ -717,8 +855,14 @@
 }
 
 @keyframes checkmarkPop {
-  0% { transform: scale(0.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .successBanner h3 {
@@ -863,8 +1007,12 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Kiosk Photos Display */
@@ -913,4 +1061,28 @@
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .modalContainer {
+    max-width: 95%;
+    max-height: 95vh;
+  }
+
+  .overviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nameCardWithPhoto {
+    grid-template-columns: 100px 1fr !important;
+  }
+
+  .idPhotoRef {
+    aspect-ratio: 2/3;
+  }
+
+  .kioskPhotosGrid {
+    flex-direction: column;
+  }
 }

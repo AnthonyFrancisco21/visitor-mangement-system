@@ -93,9 +93,27 @@ export default function ManualVisitorEntry({
           setDestinations(await res.json());
         } else {
           setDestinations([
-            { id: "1", name: "Engineering Dept", floor: "2", headName: "John Doe", description: "" },
-            { id: "2", name: "HR Office", floor: "2", headName: "Jane Smith", description: "" },
-            { id: "3", name: "Executive Suite", floor: "5", headName: "CEO", description: "" },
+            {
+              id: "1",
+              name: "Engineering Dept",
+              floor: "2",
+              headName: "John Doe",
+              description: "",
+            },
+            {
+              id: "2",
+              name: "HR Office",
+              floor: "2",
+              headName: "Jane Smith",
+              description: "",
+            },
+            {
+              id: "3",
+              name: "Executive Suite",
+              floor: "5",
+              headName: "CEO",
+              description: "",
+            },
           ]);
         }
       } catch (error) {
@@ -120,7 +138,13 @@ export default function ManualVisitorEntry({
     const handleFocusBack = () => rfidInputRef.current?.focus();
     const handleDocumentClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === "BUTTON" || target.tagName === "A" || target.closest("button") || target.closest("a")) return;
+      if (
+        target.tagName === "BUTTON" ||
+        target.tagName === "A" ||
+        target.closest("button") ||
+        target.closest("a")
+      )
+        return;
       rfidInputRef.current?.focus();
     };
 
@@ -134,7 +158,7 @@ export default function ManualVisitorEntry({
 
   const floors = useMemo(() => {
     const unique = Array.from(new Set(destinations.map((d) => d.floor))).sort(
-      (a, b) => parseInt(a) - parseInt(b)
+      (a, b) => parseInt(a) - parseInt(b),
     );
     return unique.length > 0 ? unique : ["1", "2", "3", "4", "5"];
   }, [destinations]);
@@ -146,7 +170,7 @@ export default function ManualVisitorEntry({
         (d) =>
           d.name.toLowerCase().includes(q) ||
           d.headName.toLowerCase().includes(q) ||
-          d.floor.includes(q)
+          d.floor.includes(q),
       );
     }
     if (!selectedFloor) return [];
@@ -155,7 +179,7 @@ export default function ManualVisitorEntry({
 
   const selectedDestinations = useMemo(
     () => destinations.filter((d) => formData.destinationIds.includes(d.id)),
-    [destinations, formData.destinationIds]
+    [destinations, formData.destinationIds],
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +208,7 @@ export default function ManualVisitorEntry({
           (l) =>
             l.length > 4 &&
             !l.toLowerCase().includes("republic") &&
-            !l.toLowerCase().includes("id")
+            !l.toLowerCase().includes("id"),
         );
       if (lines.length > 0 && lines[0]) {
         setFormData((prev) => ({
@@ -255,7 +279,13 @@ export default function ManualVisitorEntry({
         onSuccess?.();
         // Reset wizard
         setStep(1);
-        setFormData({ fullName: "", idPhotoUrl: "", visitorPhotoUrl: "", destinationIds: [], reason: "" });
+        setFormData({
+          fullName: "",
+          idPhotoUrl: "",
+          visitorPhotoUrl: "",
+          destinationIds: [],
+          reason: "",
+        });
         setSelectedFloor(null);
         setSearchQuery("");
         setRfidUid("");
@@ -290,7 +320,9 @@ export default function ManualVisitorEntry({
           <div className={styles.headerTop}>
             <div>
               <h2 className={styles.title}>Visitor Intake</h2>
-              <p className={styles.subtitle}>Step {step} of {TOTAL_STEPS}</p>
+              <p className={styles.subtitle}>
+                Step {step} of {TOTAL_STEPS}
+              </p>
             </div>
             {onClose && step < 7 && (
               <button className={styles.closeBtn} onClick={onClose}>
@@ -307,7 +339,9 @@ export default function ManualVisitorEntry({
         {step === 1 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Scan Government ID</h3>
-            <p className={styles.stepDesc}>Place the ID clearly in the frame.</p>
+            <p className={styles.stepDesc}>
+              Place the ID clearly in the frame.
+            </p>
             <div className={styles.cameraBox}>
               <Webcam
                 audio={false}
@@ -333,14 +367,19 @@ export default function ManualVisitorEntry({
             </p>
             <div className={styles.reviewLayout}>
               <div className={styles.previewBox}>
-                <img src={formData.idPhotoUrl} alt="ID" className={styles.capturedImg} />
+                <img
+                  src={formData.idPhotoUrl}
+                  alt="ID"
+                  className={styles.capturedImg}
+                />
                 <button onClick={() => setStep(1)} className={styles.retakeBtn}>
                   <RotateCcw size={14} /> Retake ID
                 </button>
               </div>
               <div className={styles.dataBox}>
                 <label className={styles.label}>
-                  Extracted Name <span className={styles.required}>*</span>
+                  Extracted Name{" "}
+                  <span className={styles.optional}>(Optional)</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <input
@@ -367,12 +406,10 @@ export default function ManualVisitorEntry({
               </div>
             </div>
             <div className={styles.actions}>
-              <button onClick={() => setStep(1)} className={styles.backBtn}>Back</button>
-              <button
-                onClick={() => setStep(3)}
-                disabled={!formData.fullName.trim()}
-                className={styles.primaryBtn}
-              >
+              <button onClick={() => setStep(1)} className={styles.backBtn}>
+                Back
+              </button>
+              <button onClick={() => setStep(3)} className={styles.primaryBtn}>
                 Next <ChevronRight size={18} />
               </button>
             </div>
@@ -383,7 +420,9 @@ export default function ManualVisitorEntry({
         {step === 3 && (
           <div className={styles.stepBlock}>
             <h3 className={styles.stepTitle}>Capture Visitor Photo</h3>
-            <p className={styles.stepDesc}>Ask the visitor to look at the camera.</p>
+            <p className={styles.stepDesc}>
+              Ask the visitor to look at the camera.
+            </p>
             {!formData.visitorPhotoUrl ? (
               <>
                 <div className={styles.cameraBox}>
@@ -397,8 +436,13 @@ export default function ManualVisitorEntry({
                   <div className={styles.faceOverlayGuide} />
                 </div>
                 <div className={styles.actions}>
-                  <button onClick={() => setStep(2)} className={styles.backBtn}>Back</button>
-                  <button onClick={handleCaptureFace} className={styles.primaryBtn}>
+                  <button onClick={() => setStep(2)} className={styles.backBtn}>
+                    Back
+                  </button>
+                  <button
+                    onClick={handleCaptureFace}
+                    className={styles.primaryBtn}
+                  >
                     <Camera size={18} /> Capture Photo
                   </button>
                 </div>
@@ -406,17 +450,28 @@ export default function ManualVisitorEntry({
             ) : (
               <>
                 <div className={styles.previewBox}>
-                  <img src={formData.visitorPhotoUrl} alt="Face" className={styles.capturedImg} />
+                  <img
+                    src={formData.visitorPhotoUrl}
+                    alt="Face"
+                    className={styles.capturedImg}
+                  />
                   <button
-                    onClick={() => setFormData((p) => ({ ...p, visitorPhotoUrl: "" }))}
+                    onClick={() =>
+                      setFormData((p) => ({ ...p, visitorPhotoUrl: "" }))
+                    }
                     className={styles.retakeBtn}
                   >
                     <RotateCcw size={14} /> Retake Photo
                   </button>
                 </div>
                 <div className={styles.actions}>
-                  <button onClick={() => setStep(2)} className={styles.backBtn}>Back</button>
-                  <button onClick={() => setStep(4)} className={styles.primaryBtn}>
+                  <button onClick={() => setStep(2)} className={styles.backBtn}>
+                    Back
+                  </button>
+                  <button
+                    onClick={() => setStep(4)}
+                    className={styles.primaryBtn}
+                  >
                     Next <ChevronRight size={18} />
                   </button>
                 </div>
@@ -454,7 +509,10 @@ export default function ManualVisitorEntry({
               ) : (
                 <div className={styles.destSection}>
                   {!searchQuery.trim() && (
-                    <button className={styles.backLink} onClick={() => setSelectedFloor(null)}>
+                    <button
+                      className={styles.backLink}
+                      onClick={() => setSelectedFloor(null)}
+                    >
                       <ChevronLeft size={16} /> Back to Floors
                     </button>
                   )}
@@ -477,7 +535,12 @@ export default function ManualVisitorEntry({
                             {dest.headName} (Floor {dest.floor})
                           </span>
                         </div>
-                        {selected && <CheckCircle2 size={20} className={styles.checkIcon} />}
+                        {selected && (
+                          <CheckCircle2
+                            size={20}
+                            className={styles.checkIcon}
+                          />
+                        )}
                       </label>
                     );
                   })}
@@ -485,7 +548,9 @@ export default function ManualVisitorEntry({
               )}
             </div>
             <div className={styles.actions}>
-              <button onClick={() => setStep(3)} className={styles.backBtn}>Back</button>
+              <button onClick={() => setStep(3)} className={styles.backBtn}>
+                Back
+              </button>
               <button
                 onClick={() => setStep(5)}
                 disabled={formData.destinationIds.length === 0}
@@ -512,7 +577,9 @@ export default function ManualVisitorEntry({
                     name="reason"
                     value={reason}
                     checked={formData.reason === reason}
-                    onChange={(e) => setFormData((p) => ({ ...p, reason: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((p) => ({ ...p, reason: e.target.value }))
+                    }
                     hidden
                   />
                   <span>{reason}</span>
@@ -520,7 +587,9 @@ export default function ManualVisitorEntry({
               ))}
             </div>
             <div className={styles.actions}>
-              <button onClick={() => setStep(4)} className={styles.backBtn}>Back</button>
+              <button onClick={() => setStep(4)} className={styles.backBtn}>
+                Back
+              </button>
               <button
                 onClick={() => setStep(6)}
                 disabled={!formData.reason}
@@ -543,33 +612,45 @@ export default function ManualVisitorEntry({
             <div className={styles.summaryCard}>
               {/* Name */}
               <div className={styles.summaryRow}>
-                <span className={styles.summaryIcon}><User size={16} /></span>
+                <span className={styles.summaryIcon}>
+                  <User size={16} />
+                </span>
                 <div className={styles.summaryDetail}>
                   <span className={styles.summaryLabel}>Full Name</span>
-                  <strong className={styles.summaryValue}>{formData.fullName}</strong>
+                  <strong className={styles.summaryValue}>
+                    {formData.fullName}
+                  </strong>
                 </div>
               </div>
 
               {/* Destination */}
               <div className={styles.summaryRow}>
-                <span className={styles.summaryIcon}><MapPin size={16} /></span>
+                <span className={styles.summaryIcon}>
+                  <MapPin size={16} />
+                </span>
                 <div className={styles.summaryDetail}>
                   <span className={styles.summaryLabel}>Destination(s)</span>
                   <strong className={styles.summaryValue}>
                     {selectedDestinations.map((d) => d.name).join(", ")}
                   </strong>
                   <span className={styles.summaryMeta}>
-                    {selectedDestinations.map((d) => `${d.headName} · Floor ${d.floor}`).join(" | ")}
+                    {selectedDestinations
+                      .map((d) => `${d.headName} · Floor ${d.floor}`)
+                      .join(" | ")}
                   </span>
                 </div>
               </div>
 
               {/* Reason */}
               <div className={styles.summaryRow}>
-                <span className={styles.summaryIcon}><FileText size={16} /></span>
+                <span className={styles.summaryIcon}>
+                  <FileText size={16} />
+                </span>
                 <div className={styles.summaryDetail}>
                   <span className={styles.summaryLabel}>Reason for Visit</span>
-                  <strong className={styles.summaryValue}>{formData.reason}</strong>
+                  <strong className={styles.summaryValue}>
+                    {formData.reason}
+                  </strong>
                 </div>
               </div>
 
@@ -578,14 +659,26 @@ export default function ManualVisitorEntry({
                 <div className={styles.summaryPhotos}>
                   {formData.idPhotoUrl && (
                     <div className={styles.summaryPhotoBox}>
-                      <img src={formData.idPhotoUrl} alt="ID" className={styles.summaryPhoto} />
-                      <span className={styles.summaryPhotoLabel}>ID Document</span>
+                      <img
+                        src={formData.idPhotoUrl}
+                        alt="ID"
+                        className={styles.summaryPhoto}
+                      />
+                      <span className={styles.summaryPhotoLabel}>
+                        ID Document
+                      </span>
                     </div>
                   )}
                   {formData.visitorPhotoUrl && (
                     <div className={styles.summaryPhotoBox}>
-                      <img src={formData.visitorPhotoUrl} alt="Face" className={styles.summaryPhoto} />
-                      <span className={styles.summaryPhotoLabel}>Visitor Photo</span>
+                      <img
+                        src={formData.visitorPhotoUrl}
+                        alt="Face"
+                        className={styles.summaryPhoto}
+                      />
+                      <span className={styles.summaryPhotoLabel}>
+                        Visitor Photo
+                      </span>
                     </div>
                   )}
                 </div>
@@ -593,7 +686,9 @@ export default function ManualVisitorEntry({
             </div>
 
             <div className={styles.actions}>
-              <button onClick={() => setStep(5)} className={styles.backBtn}>Back</button>
+              <button onClick={() => setStep(5)} className={styles.backBtn}>
+                Back
+              </button>
               <button onClick={() => setStep(7)} className={styles.primaryBtn}>
                 Assign RFID Card <ChevronRight size={18} />
               </button>
@@ -617,7 +712,8 @@ export default function ManualVisitorEntry({
                   <p>{rfidError}</p>
                   {rfidAssignedTo && (
                     <span className={styles.rfidErrorHint}>
-                      Please retrieve this card or scan a different available RFID card.
+                      Please retrieve this card or scan a different available
+                      RFID card.
                     </span>
                   )}
                 </div>
@@ -636,7 +732,9 @@ export default function ManualVisitorEntry({
                 </div>
               </div>
               <span className={styles.listeningStatus}>
-                {isSubmitting ? "Registering visit..." : "System Listening for Card Tap..."}
+                {isSubmitting
+                  ? "Registering visit..."
+                  : "System Listening for Card Tap..."}
               </span>
               <p className={styles.listeningSub}>
                 Place the card flat against the desktop RFID reader
@@ -683,7 +781,10 @@ export default function ManualVisitorEntry({
             </div>
             <h3 className={styles.successTitle}>Check-In Successful!</h3>
             <p className={styles.successMessage}>
-              {formData.fullName} has been checked in. Hand over the RFID card to the visitor.
+              {formData.fullName
+                ? `${formData.fullName} has been`
+                : "Visitor has been"}{" "}
+              checked in. Hand over the RFID card to the visitor.
             </p>
           </div>
         )}

@@ -83,7 +83,8 @@ model Visitor {
   id String @id @default(cuid())
 
   // ── Extracted from ID OCR / manual entry ──
-  fullName      String
+  /// Visitor name — optional, receptionist can fill this in later from ID photo
+  fullName      String?
   /// Age is computed from birthDate; store raw date from ID
   birthDate     String?
   /// Full address extracted from ID

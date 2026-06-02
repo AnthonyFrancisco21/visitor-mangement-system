@@ -3,7 +3,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { visitId, rfidUid, idPhotoUrl, visitorPhotoUrl, idNumber } = await req.json();
+    const {
+      visitId,
+      rfidUid,
+      idPhotoUrl,
+      visitorPhotoUrl,
+      idNumber,
+      visitorName,
+    } = await req.json();
 
     // Find the RFID Card
     const rfidCard = await prisma.rfidCard.findUnique({
@@ -11,7 +18,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!rfidCard) {
-      return NextResponse.json({ error: "RFID card not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "RFID card not found" },
+        { status: 404 },
+      );
     }
 
     if (rfidCard.status !== "AVAILABLE") {
@@ -24,12 +34,16 @@ export async function POST(req: NextRequest) {
           visitor: true,
         },
       });
-      const activeVisitorName = activeVisit?.visitor?.fullName || "another visitor";
-      return NextResponse.json({ 
-        error: `RFID card is already in use by ${activeVisitorName}`,
-        isAlreadyInUse: true,
-        assignedTo: activeVisitorName
-      }, { status: 400 });
+      const activeVisitorName =
+        activeVisit?.visitor?.fullName || "another visitor";
+      return NextResponse.json(
+        {
+          error: `RFID card is already in use by ${activeVisitorName}`,
+          isAlreadyInUse: true,
+          assignedTo: activeVisitorName,
+        },
+        { status: 400 },
+      );
     }
 
     // Update the Visit and Visitor
@@ -50,6 +64,7 @@ export async function POST(req: NextRequest) {
           idPhotoUrl,
           visitorPhotoUrl,
           ...(idNumber ? { idNumber } : {}),
+          ...(visitorName ? { fullName: visitorName } : {}),
         },
       });
 
@@ -65,9 +80,15 @@ export async function POST(req: NextRequest) {
       return { visit: updatedVisit, visitor: updatedVisitor };
     });
 
-    return NextResponse.json({ message: "Visit confirmed successfully", result });
+    return NextResponse.json({
+      message: "Visit confirmed successfully",
+      result,
+    });
   } catch (error: any) {
     console.error("Error confirming visit:", error);
-    return NextResponse.json({ error: error.message || "Failed to confirm visit" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to confirm visit" },
+      { status: 500 },
+    );
   }
 }

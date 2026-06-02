@@ -1,3 +1,5 @@
+// apps/web/components/dashboard/PendingRegistrations.tsx
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -75,6 +77,23 @@ export default function PendingRegistrations({
     }
   };
 
+  // Helper function to get display name
+  const getVisitorDisplayName = (visit: any) => {
+    const fullName = visit.visitor.fullName;
+
+    // If fullName exists and is not empty, show it
+    if (fullName && fullName.trim()) {
+      return fullName;
+    }
+
+    // Otherwise show placeholder with light styling
+    return (
+      <span className={styles.visitorNamePending}>
+        Visitor name not registered yet
+      </span>
+    );
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
@@ -121,11 +140,7 @@ export default function PendingRegistrations({
             <tbody>
               {visits.map((visit) => (
                 <tr key={visit.id} className={styles.tableRow}>
-                  <td>
-                    <strong className={styles.visitorName}>
-                      {visit.visitor.fullName}
-                    </strong>
-                  </td>
+                  <td>{getVisitorDisplayName(visit)}</td>
                   <td>
                     {visit.destinations
                       .map((d: any) => d.destination.name)

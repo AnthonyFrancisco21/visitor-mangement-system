@@ -1,9 +1,9 @@
-import PendingRegistrations from "@/app/components/dashboard/PendingRegistrations";
+import RegistrationDashboard from "@/app/components/dashboard/RegistrationDashboard";
 
 export const metadata = {
-  title: "Pending Registrations — VisitorPass",
+  title: "Visitor Registration — VisitorPass",
 };
 
 export default function AdminRegistrationPage() {
-  return <PendingRegistrations roleBadge="Admin" />;
+  return <RegistrationDashboard roleBadge="Admin" />;
 }

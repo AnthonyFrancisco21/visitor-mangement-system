@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  X, 
-  User, 
-  MapPin, 
-  Clock, 
-  Check, 
+import {
+  X,
+  User,
+  MapPin,
+  Clock,
+  Check,
   AlertTriangle,
-  CreditCard
+  CreditCard,
 } from "lucide-react";
 import styles from "./ConfirmModal.module.css";
 
@@ -18,12 +18,17 @@ type ConfirmModalProps = {
   onSuccess: () => void;
 };
 
-export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModalProps) {
+export default function ConfirmModal({
+  visit,
+  onClose,
+  onSuccess,
+}: ConfirmModalProps) {
   const [step, setStep] = useState(1);
   const [rfidUid, setRfidUid] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [rfidAssignedTo, setRfidAssignedTo] = useState<string | null>(null);
+  const [visitorName, setVisitorName] = useState(visit.visitor.fullName || "");
 
   const rfidInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,9 +54,9 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
       const target = e.target as HTMLElement;
       // Don't intercept clicks on buttons or links
       if (
-        target.tagName === "BUTTON" || 
-        target.tagName === "A" || 
-        target.closest("button") || 
+        target.tagName === "BUTTON" ||
+        target.tagName === "A" ||
+        target.closest("button") ||
         target.closest("a")
       ) {
         return;
@@ -61,14 +66,12 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
 
     window.addEventListener("focus", handleFocusBack);
     document.addEventListener("click", handleDocumentClick);
-    
+
     return () => {
       window.removeEventListener("focus", handleFocusBack);
       document.removeEventListener("click", handleDocumentClick);
     };
   }, [step]);
-
-
 
   const handleConfirm = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -91,6 +94,7 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
         body: JSON.stringify({
           visitId: visit.id,
           rfidUid: cleanRfid,
+          visitorName: visitorName.trim() || null,
         }),
       });
 
@@ -99,14 +103,16 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
       if (!res.ok) {
         if (data.isAlreadyInUse) {
           setRfidAssignedTo(data.assignedTo || "another visitor");
-          throw new Error(`RFID card is already in use by ${data.assignedTo || "another visitor"}`);
+          throw new Error(
+            `RFID card is already in use by ${data.assignedTo || "another visitor"}`,
+          );
         }
         throw new Error(data.error || "Failed to confirm visit");
       }
 
       // Transition to Success Step
       setStep(3);
-      
+
       // Auto-trigger onSuccess callback after a delay for visual confirmation
       setTimeout(() => {
         onSuccess();
@@ -127,7 +133,11 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+      return d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
     } catch {
       return dateStr;
     }
@@ -147,7 +157,11 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
             <p className={styles.subtitle}>{visit.visitor.fullName}</p>
           </div>
           {step < 3 && (
-            <button onClick={onClose} className={styles.closeBtn} aria-label="Close modal">
+            <button
+              onClick={onClose}
+              className={styles.closeBtn}
+              aria-label="Close modal"
+            >
               <X size={20} />
             </button>
           )}
@@ -157,17 +171,21 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
         {step < 3 && (
           <div className={styles.stepTracker}>
             <div className={styles.progressContainer}>
-              <div 
-                className={styles.progressBar} 
-                style={{ width: `${currentStepPercentage()}%` }} 
+              <div
+                className={styles.progressBar}
+                style={{ width: `${currentStepPercentage()}%` }}
               />
             </div>
             <div className={styles.stepDots}>
-              <div className={`${styles.stepDot} ${step >= 1 ? styles.activeDot : ""} ${step > 1 ? styles.completedDot : ""}`}>
+              <div
+                className={`${styles.stepDot} ${step >= 1 ? styles.activeDot : ""} ${step > 1 ? styles.completedDot : ""}`}
+              >
                 <span className={styles.dotNumber}>{step > 1 ? "✓" : "1"}</span>
                 <span className={styles.dotLabel}>Overview</span>
               </div>
-              <div className={`${styles.stepDot} ${step >= 2 ? styles.activeDot : ""} ${step > 2 ? styles.completedDot : ""}`}>
+              <div
+                className={`${styles.stepDot} ${step >= 2 ? styles.activeDot : ""} ${step > 2 ? styles.completedDot : ""}`}
+              >
                 <span className={styles.dotNumber}>2</span>
                 <span className={styles.dotLabel}>RFID Card</span>
               </div>
@@ -185,7 +203,8 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                 <p>{error}</p>
                 {rfidAssignedTo && (
                   <span className={styles.errorHint}>
-                    Please retrieve this card or scan a different available RFID card.
+                    Please retrieve this card or scan a different available RFID
+                    card.
                   </span>
                 )}
               </div>
@@ -197,17 +216,43 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
             <div className={styles.stepContent}>
               <div className={styles.sectionHeader}>
                 <h3>Verify Visitor Details</h3>
-                <p>Ensure the visitor information matches their physical presence.</p>
+                <p>
+                  Ensure the visitor information matches their physical
+                  presence.
+                </p>
               </div>
 
               <div className={styles.overviewGrid}>
-                <div className={styles.infoCard}>
-                  <div className={styles.infoIconWrapper}>
-                    <User size={18} />
+                <div
+                  className={`${styles.infoCard} ${styles.nameCardWithPhoto}`}
+                >
+                  <div className={styles.photoRefSection}>
+                    {visit.visitor.idPhotoUrl && (
+                      <img
+                        src={visit.visitor.idPhotoUrl}
+                        alt="ID Reference"
+                        className={styles.idPhotoRef}
+                      />
+                    )}
                   </div>
-                  <div className={styles.infoDetails}>
-                    <span className={styles.label}>Full Name</span>
-                    <span className={styles.value}>{visit.visitor.fullName}</span>
+                  <div className={styles.nameInputSection}>
+                    <label className={styles.inputLabel}>
+                      Visitor Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={visitorName}
+                      onChange={(e) => setVisitorName(e.target.value)}
+                      className={styles.nameInput}
+                      placeholder="Enter visitor's name from ID"
+                      autoComplete="off"
+                    />
+                    {!visitorName && (
+                      <p className={styles.nameHint}>
+                        Tip: Check the ID photo to the left for the visitor's
+                        name
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -218,10 +263,15 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                   <div className={styles.infoDetails}>
                     <span className={styles.label}>Destination & Contact</span>
                     <span className={styles.value}>
-                      {visit.destinations.map((d: any) => d.destination.name).join(", ")}
+                      {visit.destinations
+                        .map((d: any) => d.destination.name)
+                        .join(", ")}
                       {visit.destinations[0]?.destination?.headName && (
                         <span className={styles.subValue}>
-                          Host: {visit.destinations.map((d: any) => d.destination.headName).join(", ")}
+                          Host:{" "}
+                          {visit.destinations
+                            .map((d: any) => d.destination.headName)
+                            .join(", ")}
                         </span>
                       )}
                     </span>
@@ -234,7 +284,9 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                   </div>
                   <div className={styles.infoDetails}>
                     <span className={styles.label}>Reason for Visit</span>
-                    <span className={styles.value}>{visit.reason || "General Visit"}</span>
+                    <span className={styles.value}>
+                      {visit.reason || "General Visit"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -246,13 +298,21 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                   <div className={styles.kioskPhotosGrid}>
                     {visit.visitor.idPhotoUrl && (
                       <div className={styles.photoBox}>
-                        <img src={visit.visitor.idPhotoUrl} alt="ID Document" className={styles.photoImg} />
+                        <img
+                          src={visit.visitor.idPhotoUrl}
+                          alt="ID Document"
+                          className={styles.photoImg}
+                        />
                         <span className={styles.photoLabel}>Government ID</span>
                       </div>
                     )}
                     {visit.visitor.visitorPhotoUrl && (
                       <div className={styles.photoBox}>
-                        <img src={visit.visitor.visitorPhotoUrl} alt="Visitor Face" className={styles.photoImg} />
+                        <img
+                          src={visit.visitor.visitorPhotoUrl}
+                          alt="Visitor Face"
+                          className={styles.photoImg}
+                        />
                         <span className={styles.photoLabel}>Visitor Face</span>
                       </div>
                     )}
@@ -267,10 +327,16 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
             <form onSubmit={handleConfirm} className={styles.stepContent}>
               <div className={styles.sectionHeader}>
                 <h3>Assign RFID Card</h3>
-                <p>Tap a physical RFID card on the reader to complete registration.</p>
+                <p>
+                  Tap a physical RFID card on the reader to complete
+                  registration.
+                </p>
               </div>
 
-              <div className={styles.rfidListeningArea} onClick={() => rfidInputRef.current?.focus()}>
+              <div
+                className={styles.rfidListeningArea}
+                onClick={() => rfidInputRef.current?.focus()}
+              >
                 <div className={styles.rfidScannerGraphic}>
                   <div className={`${styles.radarPulse} ${styles.pulse1}`} />
                   <div className={`${styles.radarPulse} ${styles.pulse2}`} />
@@ -278,9 +344,11 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                     <CreditCard size={48} className={styles.scannerCardIcon} />
                   </div>
                 </div>
-                
+
                 <span className={styles.listeningStatus}>
-                  {isSubmitting ? "Registering visit details..." : "System Listening for Card Tap..."}
+                  {isSubmitting
+                    ? "Registering visit details..."
+                    : "System Listening for Card Tap..."}
                 </span>
                 <p className={styles.listeningSub}>
                   Place the card flat against the desktop RFID reader
@@ -324,18 +392,25 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                   </div>
                 </div>
                 <h3>Check-In Successful!</h3>
-                <p>The visitor's registration is complete. Hand over their RFID card.</p>
+                <p>
+                  The visitor's registration is complete. Hand over their RFID
+                  card.
+                </p>
               </div>
 
               <div className={styles.successInfoSummary}>
                 <div className={styles.summaryRow}>
                   <span className={styles.sumLabel}>Visitor</span>
-                  <span className={styles.sumVal}>{visit.visitor.fullName}</span>
+                  <span className={styles.sumVal}>
+                    {visitorName || visit.visitor.fullName || "Visitor"}
+                  </span>
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.sumLabel}>Destination</span>
                   <span className={styles.sumVal}>
-                    {visit.destinations.map((d: any) => d.destination.name).join(", ")}
+                    {visit.destinations
+                      .map((d: any) => d.destination.name)
+                      .join(", ")}
                   </span>
                 </div>
                 <div className={styles.summaryRow}>
@@ -344,11 +419,18 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
                 </div>
                 <div className={styles.summaryRow}>
                   <span className={styles.sumLabel}>Time In</span>
-                  <span className={styles.sumVal}>{new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className={styles.sumVal}>
+                    {new Date().toLocaleTimeString(undefined, {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </div>
               </div>
 
-              <p className={styles.autoCloseNotice}>Closing and returning to receptionist dashboard...</p>
+              <p className={styles.autoCloseNotice}>
+                Closing and returning to receptionist dashboard...
+              </p>
             </div>
           )}
         </div>
@@ -357,7 +439,10 @@ export default function ConfirmModal({ visit, onClose, onSuccess }: ConfirmModal
         {step < 3 && (
           <div className={styles.modalFooter}>
             {step > 1 ? (
-              <button onClick={() => setStep(step - 1)} className={styles.backBtn}>
+              <button
+                onClick={() => setStep(step - 1)}
+                className={styles.backBtn}
+              >
                 Back
               </button>
             ) : (
