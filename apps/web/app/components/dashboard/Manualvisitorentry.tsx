@@ -10,7 +10,6 @@ import {
   RotateCcw,
   ChevronRight,
   ChevronLeft,
-  ScanText,
   User,
   MapPin,
   FileText,
@@ -19,7 +18,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import Webcam from "react-webcam";
-import Tesseract from "tesseract.js";
 import styles from "./Manualvisitorentry.module.css";
 
 interface Destination {
@@ -78,8 +76,7 @@ export default function ManualVisitorEntry({
   const [rfidError, setRfidError] = useState("");
   const [rfidAssignedTo, setRfidAssignedTo] = useState<string | null>(null);
 
-  // OCR State
-  const [isExtractingText, setIsExtractingText] = useState(false);
+
 
   const webcamRef = useRef<Webcam>(null);
   const rfidInputRef = useRef<HTMLInputElement>(null);
@@ -196,40 +193,12 @@ export default function ManualVisitorEntry({
     }));
   };
 
-  const extractTextFromId = async (imageSrc: string) => {
-    setIsExtractingText(true);
-    try {
-      const result = await Tesseract.recognize(imageSrc, "eng");
-      const text = result?.data?.text || "";
-      const lines = text
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(
-          (l) =>
-            l.length > 4 &&
-            !l.toLowerCase().includes("republic") &&
-            !l.toLowerCase().includes("id"),
-        );
-      if (lines.length > 0 && lines[0]) {
-        setFormData((prev) => ({
-          ...prev,
-          fullName: lines[0]!.replace(/[^a-zA-Z\s]/g, ""),
-        }));
-      }
-    } catch (error) {
-      console.error("OCR Extraction failed:", error);
-    } finally {
-      setIsExtractingText(false);
-    }
-  };
-
   const handleCaptureId = () => {
     if (!webcamRef.current) return;
     const imageSrc = webcamRef.current.getScreenshot();
     if (imageSrc) {
       setFormData((prev) => ({ ...prev, idPhotoUrl: imageSrc }));
       setStep(2);
-      extractTextFromId(imageSrc);
     }
   };
 
@@ -378,8 +347,8 @@ export default function ManualVisitorEntry({
               </div>
               <div className={styles.dataBox}>
                 <label className={styles.label}>
-                  Extracted Name{" "}
-                  <span className={styles.optional}>(Optional)</span>
+                  Visitor Name{" "}
+                  <span className={styles.optional}>(Can be filled up later)</span>
                 </label>
                 <div className={styles.inputWrapper}>
                   <input
@@ -391,17 +360,6 @@ export default function ManualVisitorEntry({
                     placeholder="Enter visitor's full name"
                     autoComplete="off"
                   />
-                  {isExtractingText && (
-                    <div className={styles.extractingBadge}>
-                      <Loader2 size={14} className={styles.spin} />
-                      <span>Scanning text...</span>
-                    </div>
-                  )}
-                  {!isExtractingText && formData.fullName && (
-                    <div className={styles.successBadge}>
-                      <ScanText size={14} /> Text Extracted
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -618,7 +576,7 @@ export default function ManualVisitorEntry({
                 <div className={styles.summaryDetail}>
                   <span className={styles.summaryLabel}>Full Name</span>
                   <strong className={styles.summaryValue}>
-                    {formData.fullName}
+                    {formData.fullName || "Not provided"}
                   </strong>
                 </div>
               </div>

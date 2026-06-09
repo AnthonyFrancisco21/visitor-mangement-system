@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Users, 
-  Loader2, 
-  RefreshCw, 
+import {
+  Users,
+  Loader2,
+  RefreshCw,
   AlertCircle,
   Calendar,
   Download,
@@ -14,7 +14,7 @@ import {
   MapPin,
   Clock,
   User,
-  FileText
+  FileText,
 } from "lucide-react";
 import styles from "./VisitorListDashboard.module.css";
 
@@ -39,7 +39,9 @@ type VisitorRecord = {
   rfidCardLabel: string;
 };
 
-export default function VisitorListDashboard({ roleBadge }: VisitorListDashboardProps) {
+export default function VisitorListDashboard({
+  roleBadge,
+}: VisitorListDashboardProps) {
   const getTodayString = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -52,7 +54,11 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
   const [endDate, setEndDate] = useState(getTodayString());
   const [records, setRecords] = useState<VisitorRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRecord, setSelectedRecord] = useState<VisitorRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<VisitorRecord | null>(
+    null,
+  );
+  const [editRecord, setEditRecord] = useState<VisitorRecord | null>(null);
+  const [newName, setNewName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchRecords = async () => {
@@ -79,19 +85,27 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case "ACTIVE": return styles.statusActive;
-      case "COMPLETED": return styles.statusCompleted;
-      case "REVOKED": return styles.statusRevoked;
-      default: return "";
+      case "ACTIVE":
+        return styles.statusActive;
+      case "COMPLETED":
+        return styles.statusCompleted;
+      case "REVOKED":
+        return styles.statusRevoked;
+      default:
+        return "";
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "ACTIVE": return "Active In Building";
-      case "COMPLETED": return "Checked Out";
-      case "REVOKED": return "Revoked Checkout";
-      default: return status;
+      case "ACTIVE":
+        return "Active In Building";
+      case "COMPLETED":
+        return "Checked Out";
+      case "REVOKED":
+        return "Revoked Checkout";
+      default:
+        return status;
     }
   };
 
@@ -100,7 +114,10 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
     try {
       const d = new Date(timeStr);
       if (isNaN(d.getTime())) return timeStr;
-      return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+      return d.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch {
       return "—";
     }
@@ -157,12 +174,39 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
     const url = `/api/visitor?startDate=${startDate}&endDate=${endDate}&format=csv`;
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `Visitor_Report_${startDate}_to_${endDate}.csv`);
+    link.setAttribute(
+      "download",
+      `Visitor_Report_${startDate}_to_${endDate}.csv`,
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-
+  // Save updated visitor name
+  const saveName = async () => {
+    if (!editRecord) return;
+    const trimmed = newName.trim();
+    if (!trimmed) {
+      console.error("Name cannot be empty");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/visitors/${editRecord.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed }),
+      });
+      if (res.ok) {
+        await fetchRecords();
+        setEditRecord(null);
+        setNewName("");
+      } else {
+        console.error("Failed to update name");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
@@ -170,7 +214,8 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
           <div className={styles.badge}>{roleBadge}</div>
           <h1 className={styles.title}>Visitor List</h1>
           <p className={styles.desc}>
-            View and search all registered visitors checked in or out of the building.
+            View and search all registered visitors checked in or out of the
+            building.
           </p>
         </div>
       </div>
@@ -212,8 +257,8 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
               className={styles.searchInput}
             />
             {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery("")} 
+              <button
+                onClick={() => setSearchQuery("")}
                 className={styles.clearSearchBtn}
                 aria-label="Clear search"
               >
@@ -223,8 +268,8 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
           </div>
         </div>
 
-        <button 
-          onClick={fetchRecords} 
+        <button
+          onClick={fetchRecords}
           className={styles.refreshBtn}
           disabled={isLoading}
           aria-label="Refresh visitor list"
@@ -233,8 +278,8 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
           Refresh
         </button>
 
-        <button 
-          onClick={downloadCSV} 
+        <button
+          onClick={downloadCSV}
           className={styles.downloadBtn}
           disabled={isLoading || records.length === 0}
           aria-label="Download CSV report"
@@ -260,10 +305,9 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
             <Users size={48} className={styles.emptyIcon} />
             <h3>No Records Found</h3>
             <p>
-              {searchQuery 
-                ? "No visitor sessions match your search query." 
-                : "There are no recorded visitor check-ins for the selected date range."
-              }
+              {searchQuery
+                ? "No visitor sessions match your search query."
+                : "There are no recorded visitor check-ins for the selected date range."}
             </p>
           </div>
         ) : (
@@ -281,17 +325,38 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
             </thead>
             <tbody>
               {filteredRecords.map((rec) => (
-                <tr 
-                  key={rec.id} 
+                <tr
+                  key={rec.id}
                   className={styles.tableRow}
                   onClick={() => setSelectedRecord(rec)}
                   title="Click to view visitor details"
                 >
                   <td>
-                    <strong className={styles.visitorName}>{rec.visitorName}</strong>
+                    {rec.visitorName ? (
+                      <strong className={styles.visitorName}>
+                        {rec.visitorName}
+                      </strong>
+                    ) : (
+                      <span className={styles.visitorName}>No Name</span>
+                    )}
+                    {!rec.visitorName && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditRecord(rec);
+                          setNewName("");
+                        }}
+                        className={styles.actionBtn}
+                        style={{ marginLeft: "0.5rem" }}
+                      >
+                        Add Name
+                      </button>
+                    )}
                   </td>
                   <td>
-                    <strong style={{ color: "#334155", fontSize: "0.88rem" }}>{rec.destinations}</strong>
+                    <strong style={{ color: "#334155", fontSize: "0.88rem" }}>
+                      {rec.destinations}
+                    </strong>
                     <span className={styles.subText}>Reason: {rec.reason}</span>
                   </td>
                   <td>
@@ -302,15 +367,22 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                     {rec.timeOut ? (
                       formatTime(rec.timeOut)
                     ) : (
-                      <span style={{ color: "#2563eb", fontWeight: 600 }}>Inside</span>
+                      <span style={{ color: "#2563eb", fontWeight: 600 }}>
+                        Inside
+                      </span>
                     )}
                   </td>
                   <td>
-                    <span className={`${styles.statusBadge} ${getStatusBadgeClass(rec.status)}`}>
+                    <span
+                      className={`${styles.statusBadge} ${getStatusBadgeClass(rec.status)}`}
+                    >
                       {getStatusLabel(rec.status)}
                     </span>
                     {rec.status === "REVOKED" && rec.revokeReason && (
-                      <span className={styles.subText} style={{ color: "#b91c1c", fontStyle: "italic" }}>
+                      <span
+                        className={styles.subText}
+                        style={{ color: "#b91c1c", fontStyle: "italic" }}
+                      >
                         Reason: {rec.revokeReason}
                       </span>
                     )}
@@ -323,19 +395,25 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
         )}
       </div>
 
-      {/* Visitor Details Modal */}
       {selectedRecord && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedRecord(null)}>
-          <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
-            
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setSelectedRecord(null)}
+        >
+          <div
+            className={styles.modalContainer}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className={styles.modalHeader}>
               <div>
                 <h2>Visitor Profile Detail</h2>
-                <p className={styles.modalSubtitle}>Session ID: {selectedRecord.id}</p>
+                <p className={styles.modalSubtitle}>
+                  Session ID: {selectedRecord.id}
+                </p>
               </div>
-              <button 
-                className={styles.closeBtn} 
+              <button
+                className={styles.closeBtn}
                 onClick={() => setSelectedRecord(null)}
                 aria-label="Close modal"
               >
@@ -346,7 +424,6 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
             {/* Modal Body */}
             <div className={styles.modalBody}>
               <div className={styles.modalGrid}>
-                
                 {/* Section: Personal Info */}
                 <div className={styles.infoSection}>
                   <div className={styles.sectionTitle}>
@@ -356,7 +433,9 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Full Name</span>
-                      <strong className={styles.detailValue}>{selectedRecord.visitorName}</strong>
+                      <strong className={styles.detailValue}>
+                        {selectedRecord.visitorName}
+                      </strong>
                     </div>
                   </div>
                 </div>
@@ -370,13 +449,22 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Card Label</span>
-                      <span className={`${styles.detailValue} ${styles.rfidCardValue}`}>
-                        {selectedRecord.rfidCardLabel || selectedRecord.rfidCard || "—"}
+                      <span
+                        className={`${styles.detailValue} ${styles.rfidCardValue}`}
+                      >
+                        {selectedRecord.rfidCardLabel ||
+                          selectedRecord.rfidCard ||
+                          "—"}
                       </span>
                     </div>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Card Hardware UID</span>
-                      <span className={styles.detailValue} style={{ fontFamily: "monospace" }}>
+                      <span className={styles.detailLabel}>
+                        Card Hardware UID
+                      </span>
+                      <span
+                        className={styles.detailValue}
+                        style={{ fontFamily: "monospace" }}
+                      >
                         {selectedRecord.rfidCardUid || "—"}
                       </span>
                     </div>
@@ -392,18 +480,26 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                   <div className={styles.detailsGrid}>
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Destination</span>
-                      <strong className={styles.detailValue} style={{ color: "#2563eb" }}>
+                      <strong
+                        className={styles.detailValue}
+                        style={{ color: "#2563eb" }}
+                      >
                         {selectedRecord.destinations}
                       </strong>
                     </div>
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Reason for Visit</span>
-                      <span className={styles.detailValue}>{selectedRecord.reason}</span>
+                      <span className={styles.detailLabel}>
+                        Reason for Visit
+                      </span>
+                      <span className={styles.detailValue}>
+                        {selectedRecord.reason}
+                      </span>
                     </div>
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Time In</span>
                       <span className={styles.detailValue}>
-                        {formatTime(selectedRecord.timeIn)} ({new Date(selectedRecord.timeIn).toLocaleDateString()})
+                        {formatTime(selectedRecord.timeIn)} (
+                        {new Date(selectedRecord.timeIn).toLocaleDateString()})
                       </span>
                     </div>
                     <div className={styles.detailItem}>
@@ -412,88 +508,154 @@ export default function VisitorListDashboard({ roleBadge }: VisitorListDashboard
                         {selectedRecord.timeOut ? (
                           `${formatTime(selectedRecord.timeOut)} (${new Date(selectedRecord.timeOut).toLocaleDateString()})`
                         ) : (
-                          <span style={{ color: "#2563eb", fontWeight: 700 }}>Still Checked In</span>
+                          <span style={{ color: "#2563eb", fontWeight: 700 }}>
+                            Still Checked In
+                          </span>
                         )}
                       </span>
                     </div>
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Visit Duration</span>
-                      <span className={styles.detailValue}>{getDuration(selectedRecord.timeIn, selectedRecord.timeOut)}</span>
+                      <span className={styles.detailValue}>
+                        {getDuration(
+                          selectedRecord.timeIn,
+                          selectedRecord.timeOut,
+                        )}
+                      </span>
                     </div>
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Current Status</span>
-                      <span className={`${styles.statusBadge} ${getStatusBadgeClass(selectedRecord.status)}`}>
+                      <span
+                        className={`${styles.statusBadge} ${getStatusBadgeClass(selectedRecord.status)}`}
+                      >
                         {getStatusLabel(selectedRecord.status)}
                       </span>
                     </div>
                   </div>
-
-                  {selectedRecord.status === "REVOKED" && (
-                    <div className={styles.revokeInfoCard}>
-                      <strong>Revocation Details:</strong>
-                      <p>Reason: {selectedRecord.revokeReason || "—"}</p>
-                      {selectedRecord.revokeNote && <p>Notes: {selectedRecord.revokeNote}</p>}
-                    </div>
-                  )}
+                  {selectedRecord.status === "REVOKED" &&
+                    selectedRecord.revokeReason && (
+                      <div className={styles.revokeInfoCard}>
+                        <strong>Revocation Details:</strong>
+                        <p>Reason: {selectedRecord.revokeReason || "—"}</p>
+                        {selectedRecord.revokeNote && (
+                          <p>Notes: {selectedRecord.revokeNote}</p>
+                        )}
+                      </div>
+                    )}
                 </div>
 
-              </div>
+                {/* Section: Media Attachments */}
+                <div className={styles.mediaSection}>
+                  <h3>Captured Media Records</h3>
+                  <div className={styles.mediaGrid}>
+                    {/* Visitor Live Face Photo */}
+                    <div className={styles.mediaCard}>
+                      <span className={styles.mediaCardTitle}>
+                        Live Visitor Image
+                      </span>
+                      <div className={styles.mediaFrame}>
+                        {selectedRecord.visitorPhotoUrl ? (
+                          <img
+                            src={selectedRecord.visitorPhotoUrl}
+                            alt={`Live face capture of ${selectedRecord.visitorName}`}
+                            className={styles.mediaImage}
+                          />
+                        ) : (
+                          <div className={styles.mediaPlaceholder}>
+                            <User size={40} />
+                            <span>No live photo captured</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-              {/* Section: Media Attachments */}
-              <div className={styles.mediaSection}>
-                <h3>Captured Media Records</h3>
-                <div className={styles.mediaGrid}>
-                  
-                  {/* Visitor Live Face Photo */}
-                  <div className={styles.mediaCard}>
-                    <span className={styles.mediaCardTitle}>Live Visitor Image</span>
-                    <div className={styles.mediaFrame}>
-                      {selectedRecord.visitorPhotoUrl ? (
-                        <img 
-                          src={selectedRecord.visitorPhotoUrl} 
-                          alt={`Live face capture of ${selectedRecord.visitorName}`} 
-                          className={styles.mediaImage}
-                        />
-                      ) : (
-                        <div className={styles.mediaPlaceholder}>
-                          <User size={40} />
-                          <span>No live photo captured</span>
-                        </div>
-                      )}
+                    {/* ID Document Photo */}
+                    <div className={styles.mediaCard}>
+                      <span className={styles.mediaCardTitle}>
+                        Captured ID Document
+                      </span>
+                      <div className={styles.mediaFrame}>
+                        {selectedRecord.idPhotoUrl ? (
+                          <img
+                            src={selectedRecord.idPhotoUrl}
+                            alt="Government-issued ID scanned record"
+                            className={styles.mediaImage}
+                          />
+                        ) : (
+                          <div className={styles.mediaPlaceholder}>
+                            <FileText size={40} />
+                            <span>No ID document photo captured</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-
-                  {/* ID Document Photo */}
-                  <div className={styles.mediaCard}>
-                    <span className={styles.mediaCardTitle}>Captured ID Document</span>
-                    <div className={styles.mediaFrame}>
-                      {selectedRecord.idPhotoUrl ? (
-                        <img 
-                          src={selectedRecord.idPhotoUrl} 
-                          alt="Government-issued ID scanned record" 
-                          className={styles.mediaImage}
-                        />
-                      ) : (
-                        <div className={styles.mediaPlaceholder}>
-                          <FileText size={40} />
-                          <span>No ID document photo captured</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
                 </div>
               </div>
-
             </div>
 
             {/* Modal Footer */}
             <div className={styles.modalFooter}>
-              <button className={styles.actionBtn} onClick={() => setSelectedRecord(null)}>
+              <button
+                className={styles.actionBtn}
+                onClick={() => setSelectedRecord(null)}
+              >
                 Close Profile
               </button>
             </div>
+          </div>
+        </div>
+      )}
 
+      {/* Edit Name Modal */}
+      {editRecord && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setEditRecord(null)}
+        >
+          <div
+            className={styles.modalContainer}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <div>
+                <h2>Edit Visitor Name</h2>
+                <p className={styles.modalSubtitle}>
+                  Visitor ID: {editRecord.id}
+                </p>
+              </div>
+              <button
+                className={styles.closeBtn}
+                onClick={() => setEditRecord(null)}
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div>
+                <label className={styles.detailLabel}>New Name</label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Enter visitor name"
+                  className={styles.dateInput}
+                />
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.actionBtn} onClick={saveName}>
+                Save
+              </button>
+              <button
+                className={styles.actionBtn}
+                onClick={() => setEditRecord(null)}
+                style={{ marginLeft: "0.5rem" }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

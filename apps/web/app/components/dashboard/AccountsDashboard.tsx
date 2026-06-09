@@ -20,7 +20,7 @@ type UserAccount = {
   email: string;
   role: "ADMIN" | "RECEPTIONIST";
   isActive: boolean;
-  createdAt: string;
+  createdAt: string | Date;
 };
 
 interface AccountsDashboardProps {

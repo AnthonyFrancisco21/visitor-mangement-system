@@ -1,9 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
+export async function GET(req: NextRequest) {
+  const rfidUid = req.nextUrl.searchParams.get("rfidUid");
+  if (!rfidUid) {
+    return NextResponse.json({ error: "rfidUid query parameter required" }, { status: 400 });
+  }
+
+  const rfidCard = await prisma.rfidCard.findUnique({
+    where: { uid: rfidUid },
+  });
+
+  if (!rfidCard) {
+    return NextResponse.json({ error: "RFID card not found in the system." }, { status: 404 });
+  }
+
+  if (rfidCard.status !== "AVAILABLE") {
+    const activeVisit = await prisma.visit.findFirst({
+      where: { rfidCardId: rfidCard.id, status: "ACTIVE" },
+      include: { visitor: true },
+    });
+    const assignedTo = activeVisit?.visitor?.fullName ?? "another visitor";
+    return NextResponse.json(
+      {
+        error: `RFID card is already in use by ${assignedTo}.`,
+        isAlreadyInUse: true,
+        assignedTo,
+      },
+      { status: 400 }
+    );
+  }
+
+  return NextResponse.json({ message: "RFID card is available", rfidCardId: rfidCard.id }, { status: 200 });
+}
+
+import { z } from "zod";
+
+
 const manualCheckinSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
+  fullName: z.string().optional().or(z.literal("")),
   idPhotoUrl: z.string().optional().or(z.literal("")),
   visitorPhotoUrl: z.string().optional().or(z.literal("")),
   destinationIds: z.array(z.string()).min(1, "At least one destination is required"),
@@ -53,7 +88,7 @@ export async function POST(req: NextRequest) {
     const result = await prisma.$transaction(async (tx) => {
       const visitor = await tx.visitor.create({
         data: {
-          fullName,
+          fullName: fullName || null,
           idPhotoUrl: idPhotoUrl || null,
           visitorPhotoUrl: visitorPhotoUrl || null,
         },

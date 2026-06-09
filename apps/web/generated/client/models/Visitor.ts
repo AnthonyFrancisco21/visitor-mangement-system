@@ -185,7 +185,7 @@ export type VisitorGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type VisitorGroupByOutputType = {
   id: string
-  fullName: string
+  fullName: string | null
   birthDate: string | null
   address: string | null
   contactNumber: string | null
@@ -220,7 +220,7 @@ export type VisitorWhereInput = {
   OR?: Prisma.VisitorWhereInput[]
   NOT?: Prisma.VisitorWhereInput | Prisma.VisitorWhereInput[]
   id?: Prisma.StringFilter<"Visitor"> | string
-  fullName?: Prisma.StringFilter<"Visitor"> | string
+  fullName?: Prisma.StringNullableFilter<"Visitor"> | string | null
   birthDate?: Prisma.StringNullableFilter<"Visitor"> | string | null
   address?: Prisma.StringNullableFilter<"Visitor"> | string | null
   contactNumber?: Prisma.StringNullableFilter<"Visitor"> | string | null
@@ -235,7 +235,7 @@ export type VisitorWhereInput = {
 
 export type VisitorOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  fullName?: Prisma.SortOrder
+  fullName?: Prisma.SortOrderInput | Prisma.SortOrder
   birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -254,7 +254,7 @@ export type VisitorWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.VisitorWhereInput | Prisma.VisitorWhereInput[]
   OR?: Prisma.VisitorWhereInput[]
   NOT?: Prisma.VisitorWhereInput | Prisma.VisitorWhereInput[]
-  fullName?: Prisma.StringFilter<"Visitor"> | string
+  fullName?: Prisma.StringNullableFilter<"Visitor"> | string | null
   birthDate?: Prisma.StringNullableFilter<"Visitor"> | string | null
   address?: Prisma.StringNullableFilter<"Visitor"> | string | null
   contactNumber?: Prisma.StringNullableFilter<"Visitor"> | string | null
@@ -268,7 +268,7 @@ export type VisitorWhereUniqueInput = Prisma.AtLeast<{
 
 export type VisitorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  fullName?: Prisma.SortOrder
+  fullName?: Prisma.SortOrderInput | Prisma.SortOrder
   birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -288,7 +288,7 @@ export type VisitorScalarWhereWithAggregatesInput = {
   OR?: Prisma.VisitorScalarWhereWithAggregatesInput[]
   NOT?: Prisma.VisitorScalarWhereWithAggregatesInput | Prisma.VisitorScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Visitor"> | string
-  fullName?: Prisma.StringWithAggregatesFilter<"Visitor"> | string
+  fullName?: Prisma.StringNullableWithAggregatesFilter<"Visitor"> | string | null
   birthDate?: Prisma.StringNullableWithAggregatesFilter<"Visitor"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Visitor"> | string | null
   contactNumber?: Prisma.StringNullableWithAggregatesFilter<"Visitor"> | string | null
@@ -302,7 +302,7 @@ export type VisitorScalarWhereWithAggregatesInput = {
 
 export type VisitorCreateInput = {
   id?: string
-  fullName: string
+  fullName?: string | null
   birthDate?: string | null
   address?: string | null
   contactNumber?: string | null
@@ -317,7 +317,7 @@ export type VisitorCreateInput = {
 
 export type VisitorUncheckedCreateInput = {
   id?: string
-  fullName: string
+  fullName?: string | null
   birthDate?: string | null
   address?: string | null
   contactNumber?: string | null
@@ -332,7 +332,7 @@ export type VisitorUncheckedCreateInput = {
 
 export type VisitorUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -347,7 +347,7 @@ export type VisitorUpdateInput = {
 
 export type VisitorUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -362,7 +362,7 @@ export type VisitorUncheckedUpdateInput = {
 
 export type VisitorCreateManyInput = {
   id?: string
-  fullName: string
+  fullName?: string | null
   birthDate?: string | null
   address?: string | null
   contactNumber?: string | null
@@ -376,7 +376,7 @@ export type VisitorCreateManyInput = {
 
 export type VisitorUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -390,7 +390,7 @@ export type VisitorUpdateManyMutationInput = {
 
 export type VisitorUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -469,7 +469,7 @@ export type VisitorUpdateOneRequiredWithoutVisitsNestedInput = {
 
 export type VisitorCreateWithoutVisitsInput = {
   id?: string
-  fullName: string
+  fullName?: string | null
   birthDate?: string | null
   address?: string | null
   contactNumber?: string | null
@@ -483,7 +483,7 @@ export type VisitorCreateWithoutVisitsInput = {
 
 export type VisitorUncheckedCreateWithoutVisitsInput = {
   id?: string
-  fullName: string
+  fullName?: string | null
   birthDate?: string | null
   address?: string | null
   contactNumber?: string | null
@@ -513,7 +513,7 @@ export type VisitorUpdateToOneWithWhereWithoutVisitsInput = {
 
 export type VisitorUpdateWithoutVisitsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -527,7 +527,7 @@ export type VisitorUpdateWithoutVisitsInput = {
 
 export type VisitorUncheckedUpdateWithoutVisitsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -646,7 +646,10 @@ export type $VisitorPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    fullName: string
+    /**
+     * Visitor name — optional, receptionist can fill this in later from ID photo
+     */
+    fullName: string | null
     /**
      * Age is computed from birthDate; store raw date from ID
      */
