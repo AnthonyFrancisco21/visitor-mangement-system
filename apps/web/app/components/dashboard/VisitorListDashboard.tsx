@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Users,
   Loader2,
@@ -15,6 +15,11 @@ import {
   Clock,
   User,
   FileText,
+  Pencil,
+  Check,
+  Phone,
+  IdCard,
+  MapPinned,
 } from "lucide-react";
 import styles from "./VisitorListDashboard.module.css";
 
@@ -24,7 +29,13 @@ interface VisitorListDashboardProps {
 
 type VisitorRecord = {
   id: string;
+  visitorId: string;
   visitorName: string;
+  birthDate: string | null;
+  contactNumber: string;
+  address: string;
+  idType: string;
+  idNumber: string;
   rfidCard: string;
   destinations: string;
   timeIn: string;
@@ -57,9 +68,14 @@ export default function VisitorListDashboard({
   const [selectedRecord, setSelectedRecord] = useState<VisitorRecord | null>(
     null,
   );
-  const [editRecord, setEditRecord] = useState<VisitorRecord | null>(null);
-  const [newName, setNewName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
+  // Inline name editing state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState("");
+  const [isSavingName, setIsSavingName] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const fetchRecords = async () => {
     setIsLoading(true);
@@ -143,11 +159,28 @@ export default function VisitorListDashboard({
     }
   };
 
+  const computeAge = (birthDateStr: string | null) => {
+    if (!birthDateStr) return null;
+    try {
+      const birth = new Date(birthDateStr);
+      if (isNaN(birth.getTime())) return null;
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age;
+    } catch {
+      return null;
+    }
+  };
+
   const filteredRecords = records.filter((rec) => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
     return (
-      rec.visitorName.toLowerCase().includes(query) ||
+      (rec.visitorName || "").toLowerCase().includes(query) ||
       rec.destinations.toLowerCase().includes(query) ||
       rec.rfidCard.toLowerCase().includes(query) ||
       rec.rfidCardUid.toLowerCase().includes(query) ||
@@ -155,10 +188,15 @@ export default function VisitorListDashboard({
     );
   });
 
+  // Close modal on Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setSelectedRecord(null);
+        if (isEditingName) {
+          cancelEditName();
+        } else {
+          closeModal();
+        }
       }
     };
     if (selectedRecord) {
@@ -167,7 +205,15 @@ export default function VisitorListDashboard({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedRecord]);
+  }, [selectedRecord, isEditingName]);
+
+  // Focus name input when editing starts
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+      nameInputRef.current.select();
+    }
+  }, [isEditingName]);
 
   const downloadCSV = () => {
     if (records.length === 0) return;
@@ -182,31 +228,74 @@ export default function VisitorListDashboard({
     link.click();
     document.body.removeChild(link);
   };
-  // Save updated visitor name
+
+  const closeModal = () => {
+    setSelectedRecord(null);
+    setIsEditingName(false);
+    setEditingName("");
+    setSaveError(null);
+  };
+
+  const startEditName = () => {
+    if (!selectedRecord) return;
+    setEditingName(selectedRecord.visitorName || "");
+    setIsEditingName(true);
+    setSaveError(null);
+  };
+
+  const cancelEditName = () => {
+    setIsEditingName(false);
+    setEditingName("");
+    setSaveError(null);
+  };
+
+  /** Save updated visitor name via PATCH using visitorId */
   const saveName = async () => {
-    if (!editRecord) return;
-    const trimmed = newName.trim();
+    if (!selectedRecord) return;
+    const trimmed = editingName.trim();
     if (!trimmed) {
-      console.error("Name cannot be empty");
+      setSaveError("Name cannot be empty");
       return;
     }
+    setIsSavingName(true);
+    setSaveError(null);
     try {
-      const res = await fetch(`/api/visitors/${editRecord.id}`, {
+      const res = await fetch(`/api/visitors/${selectedRecord.visitorId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: trimmed }),
       });
       if (res.ok) {
-        await fetchRecords();
-        setEditRecord(null);
-        setNewName("");
+        // Update local state immediately
+        const updatedRecord = { ...selectedRecord, visitorName: trimmed };
+        setSelectedRecord(updatedRecord);
+        setRecords((prev) =>
+          prev.map((r) => (r.id === selectedRecord.id ? updatedRecord : r)),
+        );
+        setIsEditingName(false);
+        setEditingName("");
       } else {
-        console.error("Failed to update name");
+        const errData = await res.json().catch(() => null);
+        setSaveError(errData?.error || "Failed to update name");
       }
     } catch (e) {
       console.error(e);
+      setSaveError("Network error. Please try again.");
+    } finally {
+      setIsSavingName(false);
     }
   };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveName();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      cancelEditName();
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
@@ -328,7 +417,12 @@ export default function VisitorListDashboard({
                 <tr
                   key={rec.id}
                   className={styles.tableRow}
-                  onClick={() => setSelectedRecord(rec)}
+                  onClick={() => {
+                    setSelectedRecord(rec);
+                    setIsEditingName(false);
+                    setEditingName("");
+                    setSaveError(null);
+                  }}
                   title="Click to view visitor details"
                 >
                   <td>
@@ -337,20 +431,10 @@ export default function VisitorListDashboard({
                         {rec.visitorName}
                       </strong>
                     ) : (
-                      <span className={styles.visitorName}>No Name</span>
-                    )}
-                    {!rec.visitorName && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditRecord(rec);
-                          setNewName("");
-                        }}
-                        className={styles.actionBtn}
-                        style={{ marginLeft: "0.5rem" }}
-                      >
-                        Add Name
-                      </button>
+                      <span className={styles.noNameTag}>
+                        <User size={12} />
+                        No Name Yet
+                      </span>
                     )}
                   </td>
                   <td>
@@ -395,10 +479,11 @@ export default function VisitorListDashboard({
         )}
       </div>
 
+      {/* Visitor Detail Modal */}
       {selectedRecord && (
         <div
           className={styles.modalOverlay}
-          onClick={() => setSelectedRecord(null)}
+          onClick={closeModal}
         >
           <div
             className={styles.modalContainer}
@@ -414,7 +499,7 @@ export default function VisitorListDashboard({
               </div>
               <button
                 className={styles.closeBtn}
-                onClick={() => setSelectedRecord(null)}
+                onClick={closeModal}
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -431,12 +516,123 @@ export default function VisitorListDashboard({
                     <h3>Personal Information</h3>
                   </div>
                   <div className={styles.detailsGrid}>
+                    {/* Editable Name Field */}
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Full Name</span>
-                      <strong className={styles.detailValue}>
-                        {selectedRecord.visitorName}
-                      </strong>
+                      {isEditingName ? (
+                        <div className={styles.nameEditRow}>
+                          <input
+                            ref={nameInputRef}
+                            type="text"
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onKeyDown={handleNameKeyDown}
+                            className={styles.nameEditInput}
+                            placeholder="Enter visitor name..."
+                            disabled={isSavingName}
+                          />
+                          <button
+                            className={styles.nameEditSaveBtn}
+                            onClick={saveName}
+                            disabled={isSavingName || !editingName.trim()}
+                            title="Save name"
+                          >
+                            {isSavingName ? (
+                              <Loader2 size={14} className={styles.spin} />
+                            ) : (
+                              <Check size={14} />
+                            )}
+                          </button>
+                          <button
+                            className={styles.nameEditCancelBtn}
+                            onClick={cancelEditName}
+                            disabled={isSavingName}
+                            title="Cancel"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className={styles.nameDisplayRow}>
+                          {selectedRecord.visitorName ? (
+                            <strong className={styles.detailValue}>
+                              {selectedRecord.visitorName}
+                            </strong>
+                          ) : (
+                            <span className={styles.noNameInline}>
+                              No name provided
+                            </span>
+                          )}
+                          <button
+                            className={styles.nameEditTrigger}
+                            onClick={startEditName}
+                            title={selectedRecord.visitorName ? "Edit name" : "Add name"}
+                          >
+                            <Pencil size={13} />
+                            <span>{selectedRecord.visitorName ? "Edit" : "Add Name"}</span>
+                          </button>
+                        </div>
+                      )}
+                      {saveError && (
+                        <span className={styles.nameEditError}>
+                          <AlertCircle size={12} />
+                          {saveError}
+                        </span>
+                      )}
                     </div>
+
+                    {/* Birth Date & Age */}
+                    {selectedRecord.birthDate && selectedRecord.birthDate !== "—" && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Birth Date</span>
+                        <span className={styles.detailValue}>
+                          {selectedRecord.birthDate}
+                          {computeAge(selectedRecord.birthDate) !== null && (
+                            <span className={styles.ageTag}>
+                              {computeAge(selectedRecord.birthDate)} yrs old
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Contact Number */}
+                    {selectedRecord.contactNumber && selectedRecord.contactNumber !== "—" && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Contact Number</span>
+                        <span className={styles.detailValue}>
+                          <Phone size={13} className={styles.inlineIcon} />
+                          {selectedRecord.contactNumber}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Address */}
+                    {selectedRecord.address && selectedRecord.address !== "—" && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Address</span>
+                        <span className={styles.detailValue}>
+                          <MapPinned size={13} className={styles.inlineIcon} />
+                          {selectedRecord.address}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* ID Type & Number */}
+                    {selectedRecord.idType && selectedRecord.idType !== "—" && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>ID Document</span>
+                        <span className={styles.detailValue}>
+                          <IdCard size={13} className={styles.inlineIcon} />
+                          {selectedRecord.idType}
+                          {selectedRecord.idNumber && selectedRecord.idNumber !== "—" && (
+                            <span className={styles.idNumberTag}>
+                              #{selectedRecord.idNumber}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -557,7 +753,7 @@ export default function VisitorListDashboard({
                         {selectedRecord.visitorPhotoUrl ? (
                           <img
                             src={selectedRecord.visitorPhotoUrl}
-                            alt={`Live face capture of ${selectedRecord.visitorName}`}
+                            alt={`Live face capture of ${selectedRecord.visitorName || "visitor"}`}
                             className={styles.mediaImage}
                           />
                         ) : (
@@ -598,62 +794,9 @@ export default function VisitorListDashboard({
             <div className={styles.modalFooter}>
               <button
                 className={styles.actionBtn}
-                onClick={() => setSelectedRecord(null)}
+                onClick={closeModal}
               >
                 Close Profile
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Name Modal */}
-      {editRecord && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setEditRecord(null)}
-        >
-          <div
-            className={styles.modalContainer}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.modalHeader}>
-              <div>
-                <h2>Edit Visitor Name</h2>
-                <p className={styles.modalSubtitle}>
-                  Visitor ID: {editRecord.id}
-                </p>
-              </div>
-              <button
-                className={styles.closeBtn}
-                onClick={() => setEditRecord(null)}
-                aria-label="Close modal"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <div>
-                <label className={styles.detailLabel}>New Name</label>
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Enter visitor name"
-                  className={styles.dateInput}
-                />
-              </div>
-            </div>
-            <div className={styles.modalFooter}>
-              <button className={styles.actionBtn} onClick={saveName}>
-                Save
-              </button>
-              <button
-                className={styles.actionBtn}
-                onClick={() => setEditRecord(null)}
-                style={{ marginLeft: "0.5rem" }}
-              >
-                Cancel
               </button>
             </div>
           </div>

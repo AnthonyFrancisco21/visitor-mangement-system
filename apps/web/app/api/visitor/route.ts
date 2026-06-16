@@ -161,6 +161,7 @@ export async function GET(req: NextRequest) {
     // Transform data to send formatted response
     const formatted = visits.map((v) => ({
       id: v.id,
+      visitorId: v.visitorId,
       visitorName: v.visitor.fullName,
       birthDate: v.visitor.birthDate,
       contactNumber: v.visitor.contactNumber || "—",

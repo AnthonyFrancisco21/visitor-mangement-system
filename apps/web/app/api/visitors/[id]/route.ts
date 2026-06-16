@@ -6,10 +6,10 @@ const updateNameSchema = z.object({
   name: z.string().min(1, "Name cannot be empty"),
 });
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id: visitorId } = await params;
     const { name } = updateNameSchema.parse(await req.json());
-    const visitorId = params.id;
     const updated = await prisma.visitor.update({
       where: { id: visitorId },
       data: { fullName: name },

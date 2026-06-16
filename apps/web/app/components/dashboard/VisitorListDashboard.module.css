@@ -204,6 +204,27 @@
   font-weight: 700;
 }
 
+/* "No Name Yet" tag shown in the table row */
+.noNameTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
 .subText {
   display: block;
   font-size: 0.76rem;
@@ -513,6 +534,10 @@
   font-weight: 600;
   color: #334155;
   word-break: break-word;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .rfidCardValue {
@@ -544,6 +569,198 @@
 .revokeInfoCard p {
   margin: 0.15rem 0 0 0;
   font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────
+   Inline Name Editing (inside modal)
+   ───────────────────────────────────────────── */
+
+/* Row that displays the current name + edit trigger */
+.nameDisplayRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 32px;
+}
+
+/* "No name provided" faded text */
+.noNameInline {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Pencil edit trigger button */
+.nameEditTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: 1px solid transparent;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nameEditTrigger:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Row shown when editing name: input + save + cancel */
+.nameEditRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  animation: fadeSlideIn 0.2s ease;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nameEditInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1.5px solid #2563eb;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  background: #f8fafc;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.nameEditInput:focus {
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.nameEditInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nameEditInput::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Save button (checkmark) */
+.nameEditSaveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: #059669;
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.nameEditSaveBtn:hover:not(:disabled) {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3);
+}
+
+.nameEditSaveBtn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Cancel button (X icon) */
+.nameEditCancelBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.nameEditCancelBtn:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.nameEditCancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error text below name input */
+.nameEditError {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────
+   Additional detail value helpers
+   ───────────────────────────────────────────── */
+
+/* Small inline icon next to detail text */
+.inlineIcon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* Age tag next to birthdate */
+.ageTag {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  margin-left: 0.35rem;
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1px solid rgba(22, 163, 74, 0.15);
+}
+
+/* ID number tag */
+.idNumberTag {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  margin-left: 0.25rem;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: monospace;
 }
 
 /* Media Section */
